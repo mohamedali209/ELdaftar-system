@@ -1,6 +1,6 @@
 # aldafttar
 
-ELdaftar ui jewelry shop system..
+ELdaftar desktop ui jewelry shop system..
 
 
 ![11](https://github.com/mohamedali209/ELdaftar-UI/assets/157232556/3bfec701-c2aa-46c8-917c-78474f021054)
