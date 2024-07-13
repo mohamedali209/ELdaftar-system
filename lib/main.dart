@@ -3,7 +3,9 @@ import 'package:aldafttar/utils/sizeconfig.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const Aldaftar());
+  runApp(
+    const Aldaftar(),
+  );
 }
 
 class Aldaftar extends StatelessWidget {
