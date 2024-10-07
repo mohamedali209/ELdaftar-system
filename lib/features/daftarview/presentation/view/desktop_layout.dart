@@ -1,33 +1,39 @@
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/adaptive_layout.dart';
+import 'package:aldafttar/features/daftarview/presentation/view/widgets/custom_drawer.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/desktop_body.dart';
+import 'package:aldafttar/features/daftarview/presentation/view/widgets/drawer_item_list.dart';
+import 'package:aldafttar/features/daftarview/presentation/view/widgets/mobile_layout.dart';
 import 'package:flutter/material.dart';
 
-class Desktoplayout extends StatelessWidget {
-  const Desktoplayout({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return AdaptiveLayout(
-      mobileLayout: (context) => const SizedBox(),
-      tabletLayout: (context) => const SizedBox(),
-      desktopLayout: (context) => const Daftarview(),
-    );
-  }
-}
+final GlobalKey<DraweritemlistState> drawerKey =
+    GlobalKey<DraweritemlistState>();
 
-class Daftarview extends StatelessWidget {
+class Daftarview extends StatefulWidget {
   const Daftarview({
     super.key,
   });
 
   @override
+  State<Daftarview> createState() => _DaftarviewState();
+}
+
+class _DaftarviewState extends State<Daftarview> {
+  final GlobalKey<ScaffoldState> key = GlobalKey();
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-          decoration: const BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage('assets/images/backkkk.png'),
-                  fit: BoxFit.cover)),
-          child: const Desktopbody()),
+      backgroundColor: Colors.black,
+      key: key,
+      drawer: MediaQuery.sizeOf(context).width < 600
+          ? Customdrawer(drawerKey: drawerKey)
+          : null,
+      body: AdaptiveLayout(
+        mobileLayout: (context) => const DaftarscreenMobile(),
+        tabletLayout: (context) => Desktopbody(),
+        desktopLayout: (context) => Desktopbody(),
+      ),
     );
   }
 }
+

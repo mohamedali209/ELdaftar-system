@@ -10,18 +10,29 @@ class DaftarelGard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const DaftarelgardHeader(),
-        const SizedBox(
-          height: 20,
+    return const CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: SizedBox(
+            height: 10,
+          ),
         ),
-        const Gardrowheader(),
-        const SizedBox(
-          height: 10,
+        SliverToBoxAdapter(child: DaftarelgardHeader()),
+        SliverToBoxAdapter(
+          child: SizedBox(
+            height: 10,
+          ),
         ),
-        Listgard(),
+        SliverToBoxAdapter(child: Gardrowheader()),
+        SliverToBoxAdapter(
+          child: Divider(color: Color.fromARGB(255, 114, 110, 110)),
+        ),
+        SliverToBoxAdapter(
+          child: SizedBox(
+            height: 10,
+          ),
+        ),
+        SliverToBoxAdapter(child: Listgard()),
       ],
     );
   }

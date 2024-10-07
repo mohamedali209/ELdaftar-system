@@ -9,24 +9,13 @@ class Gardrowheader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        DaftarcontainerItem(title: 'الصنف'),
-        SizedBox(
-          width: 30,
-        ),
-        DaftarcontainerItem(title: 'عدد 21'),
-        SizedBox(
-          width: 30,
-        ),
-        DaftarcontainerItem(title: 'عدد 18'),
-        SizedBox(
-          width: 30,
-        ),
-        DaftarcontainerItem(title: 'الوزن الاجمالي'),
-        SizedBox(
-          width: 30,
-        ),
+        DaftarcontainerItem(color: Colors.white, title: 'الصنف'),
+        DaftarcontainerItem(color: Colors.white, title: 'عدد 21'),
+        DaftarcontainerItem(color: Colors.white, title: 'عدد 18'),
+        DaftarcontainerItem(color: Colors.white, title: 'الوزن 18'),
+        DaftarcontainerItem(color: Colors.white, title: 'الوزن 21'),
       ],
     );
   }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1072160261169",
+    "project_id": "el-daftar-3ee0c",
+    "storage_bucket": "el-daftar-3ee0c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1072160261169:android:7e69c87a808fdfabfb8110",
+        "android_client_info": {
+          "package_name": "com.example.aldafttar"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBseBL6fk8Z2i7V-xuU4NNXnm_LvyIXBww"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

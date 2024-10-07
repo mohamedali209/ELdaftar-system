@@ -1,32 +1,41 @@
-
-import 'package:aldafttar/features/Gardview/presentation/model/row_gard_model.dart';
+import 'package:aldafttar/features/Gardview/presentation/manager/cubit/Listgard/cubit/listgard_cubit.dart';
+import 'package:aldafttar/features/Gardview/presentation/manager/cubit/Listgard/cubit/listgard_state.dart';
 import 'package:aldafttar/features/Gardview/presentation/view/widgets/rowof_gard.dart';
+import 'package:aldafttar/utils/custom_loading.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class Listgard extends StatelessWidget {
-   Listgard({super.key});
-final List<Gardmodel>items=[Gardmodel(no3: 'خواتم', num21: '69', num18: '122', wazn: '570'),
-Gardmodel(no3: 'دبل', num21: '21', num18: '88', wazn: '579'),
-Gardmodel(no3: 'سلاسل', num21: '69', num18: '122', wazn: '570'),
-Gardmodel(no3: 'حلقان', num21: '69', num18: '122', wazn: '570'),
-Gardmodel(no3: 'انسيالات', num21: '69', num18: '122', wazn: '570'),
-Gardmodel(no3: 'اساور', num21: '69', num18: '122', wazn: '570'),
-Gardmodel(no3: 'اساور بخواتم', num21: '69', num18: '122', wazn: '570'),
-Gardmodel(no3: 'تعاليق', num21: '69', num18: '122', wazn: '570'),
-Gardmodel(no3: 'كوليهات', num21: '69', num18: '122', wazn: '570'),
-Gardmodel(no3: 'غوايش', num21: '69', num18: '122', wazn: '570'),
-];
+  const Listgard({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 350,
-      child: ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (context, index) =>Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Rowofgard(gardmodel: items[index]),
-        ) ,),
+    return BlocProvider(
+      create: (context) => ListGardCubit()..fetchData(),
+      child: BlocBuilder<ListGardCubit, ListGardState>(
+        builder: (context, state) {
+          if (state is ListGardLoading) {
+            return const Center(child: CustomLoadingIndicator());
+          } else if (state is ListGardError) {
+            return Center(child: Text('Error: ${state.message}'));
+          } else if (state is ListGardLoaded) {
+            final items = state.items;
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: items.map((item) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Rowofgard(gardmodel: item),
+                  );
+                }).toList(),
+              ),
+            );
+          } else {
+            return const Center(child: Text('No data available'));
+          }
+        },
+      ),
     );
   }
 }

@@ -22,7 +22,7 @@ class DetailsDaftarcontainer extends StatelessWidget {
           color: Color(0xff161616),
           borderRadius: BorderRadius.all(Radius.circular(4))),
       height: 40,
-      width: MediaQuery.sizeOf(context).width * .33,
+      width: MediaQuery.sizeOf(context).width * .25,
       child: Row(
         children: [
           const SizedBox(

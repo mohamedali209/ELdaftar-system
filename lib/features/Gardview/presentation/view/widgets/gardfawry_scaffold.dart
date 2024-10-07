@@ -5,14 +5,9 @@ class Gardfawyscaffold extends StatelessWidget {
   const Gardfawyscaffold({super.key});
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage('assets/images/backkkk.png'),
-                fit: BoxFit.cover)),
-        child: const Gardfawrybody(),
-      ),
+    return const Scaffold(
+      backgroundColor: Colors.black,
+      body: Gardfawrybody(),
     );
   }
 }

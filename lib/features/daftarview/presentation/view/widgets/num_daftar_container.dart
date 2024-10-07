@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class Numdaftarcontainer extends StatelessWidget {
@@ -16,7 +15,10 @@ class Numdaftarcontainer extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(4))),
       height: 40,
       width: 40,
-      child: Text(title),
+      child: Text(
+        title,
+        style: const TextStyle(color: Colors.amber),
+      ),
     );
   }
 }

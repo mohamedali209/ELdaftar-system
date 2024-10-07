@@ -1,4 +1,3 @@
-
 import 'package:aldafttar/utils/styles.dart';
 import 'package:flutter/material.dart';
 
@@ -8,6 +7,7 @@ class DaftarcontainerItem extends StatelessWidget {
     required this.title,
     this.color,
   });
+
   final String title;
   final Color? color;
 
@@ -16,12 +16,18 @@ class DaftarcontainerItem extends StatelessWidget {
     return Container(
       alignment: Alignment.center,
       decoration: const BoxDecoration(
-          color: Color(0xff161616),
-          borderRadius: BorderRadius.all(Radius.circular(4))),
+        color: Colors.black,
+        borderRadius: BorderRadius.all(Radius.circular(4)),
+      ),
       height: 40,
       width: MediaQuery.sizeOf(context).width * .12,
-      child: Text(title,
-          style: Appstyles.daftartodayheader(context).copyWith(color: color)),
+      child: FittedBox(
+        fit: BoxFit.scaleDown, // Ensures the text scales down to fit
+        child: Text(
+          title,
+          style: Appstyles.daftartodayheader(context).copyWith(color: color),
+        ),
+      ),
     );
   }
 }

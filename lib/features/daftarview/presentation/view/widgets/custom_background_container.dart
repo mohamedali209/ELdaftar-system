@@ -7,8 +7,8 @@ class Custombackgroundcontainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          border: Border.all(color: const Color.fromARGB(255, 112, 111, 111)),
-          color: Colors.white.withOpacity(.05),
+          color: const Color.fromARGB(255, 31, 30, 30),
+          // Colors.white.withOpacity(.05),
           borderRadius: BorderRadius.circular(10)),
       child: child,
     );

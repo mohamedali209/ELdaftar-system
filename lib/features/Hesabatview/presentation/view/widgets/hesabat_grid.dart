@@ -2,39 +2,37 @@ import 'package:aldafttar/features/Hesabatview/presentation/view/models/hesab_it
 import 'package:aldafttar/features/Hesabatview/presentation/view/widgets/hesab_item.dart';
 import 'package:flutter/material.dart';
 
-class Hesabatgridview extends StatefulWidget {
-  const Hesabatgridview({super.key});
+class Hesabatgridview extends StatelessWidget {
+  const Hesabatgridview({super.key, required this.items});
 
-  @override
-  State<Hesabatgridview> createState() => _HesabatgridviewState();
-}
-
-class _HesabatgridviewState extends State<Hesabatgridview> {
-  final List<Hesabmodel> items = [
-    Hesabmodel(suppliername: 'حسين', wazna: '1250.99', nakdyia: '30000'),
-    Hesabmodel(suppliername: 'مايكل', wazna: '340.8', nakdyia: '5260'),
-    Hesabmodel(suppliername: 'وليد', wazna: '5556.99', nakdyia: '12560'),
-    Hesabmodel(suppliername: 'بطرس', wazna: '250.23', nakdyia: '3220'),
-    Hesabmodel(suppliername: 'حسين', wazna: '1250.99', nakdyia: '30000'),
-    Hesabmodel(suppliername: 'مايكل', wazna: '340.8', nakdyia: '5260'),
-    Hesabmodel(suppliername: 'وليد', wazna: '5556.99', nakdyia: '12560'),
-    Hesabmodel(suppliername: 'بطرس', wazna: '250.23', nakdyia: '3220'),
-    Hesabmodel(suppliername: 'حسين', wazna: '1250.99', nakdyia: '30000'),
-    Hesabmodel(suppliername: 'مايكل', wazna: '340.8', nakdyia: '5260'),
-    Hesabmodel(suppliername: 'وليد', wazna: '5556.99', nakdyia: '12560'),
-    Hesabmodel(suppliername: 'بطرس', wazna: '250.23', nakdyia: '3220'),
-  ];
+  final List<Hesabmodel> items;
 
   @override
   Widget build(BuildContext context) {
+    // Get screen width
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Determine crossAxisCount based on screen width (responsive layout)
+    int crossAxisCount;
+    if (screenWidth < 600) {
+      crossAxisCount = 1; // Mobile screen
+    } else if (screenWidth < 1300) {
+      crossAxisCount = 2; // Tablet screen
+    } else {
+      crossAxisCount = 4; // Large screen (desktop)
+    }
+
     return GridView.builder(
-      padding: const EdgeInsets.all(30),
+      scrollDirection: Axis.vertical,
+      padding: const EdgeInsets.all(20),
       itemCount: items.length,
-      gridDelegate:
-          const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
-      itemBuilder: (context, index) => Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Hesabitem(hesabmodel: items[index]),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount, // Responsive column count
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 20,
+      ),
+      itemBuilder: (context, index) => Hesabitem(
+        hesabmodel: items[index],
       ),
     );
   }
