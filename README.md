@@ -1,16 +1,15 @@
 # aldafttar
 
-A new Flutter project.
+ELdaftar desktop ui jewelry shop system..
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+![11](https://github.com/mohamedali209/ELdaftar-UI/assets/157232556/3bfec701-c2aa-46c8-917c-78474f021054)
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+![22](https://github.com/mohamedali209/ELdaftar-UI/assets/157232556/15705e8c-2d23-4bf7-b8c2-56c033134fb5)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+![33](https://github.com/mohamedali209/ELdaftar-UI/assets/157232556/7a0fa8c9-bda5-4b06-94f8-e05877d341d8)
+
+
+![44](https://github.com/mohamedali209/ELdaftar-UI/assets/157232556/978b6bd9-ba32-4b34-afbe-2652b5aaedc7)
