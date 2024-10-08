@@ -23,52 +23,60 @@ class Signinbody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(
-          'الدفتر',
-          style: Appstyles.bold50(context).copyWith(fontSize: 70),
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: MediaQuery.of(context).size.height, // Ensures the content takes up full height
         ),
-        const SizedBox(
-          height: 20,
-        ),
-        Text(
-          'تسجيل الدخول',
-          style: Appstyles.regular25(context).copyWith(color: Colors.amber),
-        ),
-        const SignTextfields(),
-        const Loginbutton(),
-        const SizedBox(
-          height: 20,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextButton(
-              onPressed: () {
-                AppRouter.router.push(AppRouter.ksignupview);
-              },
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero, // Removes the padding
+        child: IntrinsicHeight(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
+            crossAxisAlignment: CrossAxisAlignment.center, // Center content horizontally
+            children: [
+              Text(
+                'الدفتر',
+                style: Appstyles.bold50(context).copyWith(fontSize: 70),
               ),
-              child: Text(
-                'قم ب انشاء حساب',
-                style: Appstyles.regular12cairo(context)
-                    .copyWith(fontSize: 12, color: Colors.amber),
+              const SizedBox(
+                height: 20,
               ),
-            ),
-            const SizedBox(
-              width: 2,
-            ),
-            Text('ليس لديك حساب ؟',
-                style:
-                    Appstyles.regular12cairo(context).copyWith(fontSize: 12)),
-          ],
+              Text(
+                'تسجيل الدخول',
+                style: Appstyles.regular25(context).copyWith(color: Colors.amber),
+              ),
+              const SignTextfields(),
+              const Loginbutton(),
+              const SizedBox(
+                height: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      AppRouter.router.push(AppRouter.ksignupview);
+                    },
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero, // Removes the padding
+                    ),
+                    child: Text(
+                      'قم ب انشاء حساب',
+                      style: Appstyles.regular12cairo(context)
+                          .copyWith(fontSize: 12, color: Colors.amber),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 2,
+                  ),
+                  Text('ليس لديك حساب ؟',
+                      style: Appstyles.regular12cairo(context).copyWith(fontSize: 12)),
+                ],
+              ),
+            ],
+          ),
         ),
-      ],
+      ),
     );
   }
 }
-

@@ -10,27 +10,41 @@ class SignupScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            'الدفتر',
-            style: Appstyles.bold50(context).copyWith(fontSize: 70),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context)
+                .size
+                .height, // Ensures full screen height
           ),
-          const SizedBox(
-            height: 20,
+          child: IntrinsicHeight(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center, // Center vertically
+              crossAxisAlignment:
+                  CrossAxisAlignment.center, // Center horizontally
+              children: [
+                Text(
+                  'الدفتر',
+                  style: Appstyles.bold50(context).copyWith(fontSize: 70),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  'انشاء حساب',
+                  style: Appstyles.regular25(context)
+                      .copyWith(color: Colors.amber),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                const SignupTextfields(),
+                const Signupbutton(),
+              ],
+            ),
           ),
-          Text(
-            ' انشاء حساب',
-            style: Appstyles.regular25(context).copyWith(color: Colors.amber),
-          ),
-          const SizedBox(
-            height: 15,
-          ),
-          const SignupTextfields(),
-          const Signupbutton(),
-        ],
+        ),
       ),
     );
   }
