@@ -6,7 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class Summarydftarlist extends StatelessWidget {
-  const Summarydftarlist({super.key});
+  const Summarydftarlist({super.key, required this.onItemAdded});
+
+  // This callback will be triggered when an item is added
+  final VoidCallback onItemAdded;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +32,6 @@ class Summarydftarlist extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  // Main items (all except the last two)
                   Container(
                     decoration: BoxDecoration(
                       color: const Color(0xffCC9900), // Amber background color
@@ -49,13 +51,11 @@ class Summarydftarlist extends StatelessWidget {
                   ),
                   const SizedBox(width: 20.0), // Space between containers
 
-                  // Last two items with distinct style
                   if (items.length > 2)
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.black,
-                        border: Border.all(
-                            color: const Color(0xffCC9900), width: 2), // Amber border
+                        border: Border.all(color: const Color(0xffCC9900), width: 2), // Amber border
                         borderRadius: BorderRadius.circular(15),
                       ),
                       padding: const EdgeInsets.all(8.0),

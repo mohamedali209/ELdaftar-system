@@ -44,9 +44,17 @@ class DraweritemlistState extends State<Draweritemlist> {
         title: 'حسابات',
         image: 'assets/images/hesabat.svg',
       ),
-      DrawerItemModel(
+        DrawerItemModel(
         onTap: () {
           context.read<DrawerCubit>().updateIndex(3);
+          GoRouter.of(context).go(AppRouter.kmarmatview);
+        },
+        title: 'المرمات',
+        image: 'assets/images/marmat.svg',
+      ),
+      DrawerItemModel(
+        onTap: () {
+          context.read<DrawerCubit>().updateIndex(4);
           GoRouter.of(context).go(AppRouter.ktahlelView);
         },
         title: 'تحليلات',

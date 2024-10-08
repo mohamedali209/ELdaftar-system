@@ -1,6 +1,5 @@
 import 'package:aldafttar/features/Gardview/presentation/manager/cubit/updateinventory/cubit/updateinventory_cubit.dart';
 import 'package:aldafttar/features/Hesabatview/presentation/view/manager/cubit/supplier_cubit.dart';
-import 'package:aldafttar/features/daftarview/presentation/view/manager/cubit/items_cubit.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/manager/drawercubit/cubit/drawer_cubit.dart';
 import 'package:aldafttar/firebase_options.dart';
 import 'package:aldafttar/utils/app_router.dart';
@@ -32,9 +31,6 @@ class Aldaftar extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => ItemsCubit(),
-        ),
-        BlocProvider(
           create: (context) => DrawerCubit(),
         ),
         BlocProvider(
@@ -52,5 +48,3 @@ class Aldaftar extends StatelessWidget {
     );
   }
 }
-
-

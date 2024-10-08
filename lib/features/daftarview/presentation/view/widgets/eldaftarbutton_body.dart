@@ -14,10 +14,12 @@ class DaftarToday extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<ItemsCubit>(
-          create: (context) => ItemsCubit(),
+          BlocProvider<SummaryDftarCubit>(
+          create: (context) => SummaryDftarCubit()..fetchData(),
         ),
-  
+        BlocProvider<ItemsCubit>(
+          create: (context) => ItemsCubit(), // Pass SummaryDftarCubit
+        ),
       ],
       child: const DaftarTodayContent(),
     );
@@ -54,12 +56,18 @@ class DaftarTodayContent extends StatelessWidget {
               child: CustomScrollView(
                 slivers: [
                   // Sliver for summary list
-                  const SliverToBoxAdapter(
+                  SliverToBoxAdapter(
                     child: Column(
                       children: [
-                        SizedBox(height: 40), // Space for the background image
-                        Summarydftarlist(),
-                        SizedBox(height: 10), // Optionally add space below
+                        const SizedBox(
+                            height: 40), // Space for the background image
+                        Summarydftarlist(
+                          onItemAdded: () {
+                            context.read<SummaryDftarCubit>().fetchData();
+                          },
+                        ),
+                        const SizedBox(
+                            height: 10), // Optionally add space below
                       ],
                     ),
                   ),
@@ -96,7 +104,9 @@ class DaftarTodayContent extends StatelessWidget {
                   SliverToBoxAdapter(
                     child: SellingWidget(
                       onItemAdded: (newItem) {
-                        context.read<ItemsCubit>().addSellingItem(newItem);
+                        context.read<ItemsCubit>().addSellingItem(
+                              newItem,
+                            );
                       },
                       items: state.sellingItems,
                     ),
@@ -138,9 +148,6 @@ class DaftarTodayContent extends StatelessWidget {
                     child: BuyingWidget(
                       onItemAdded: (newItem) {
                         context.read<ItemsCubit>().addBuyingItem(newItem);
-
-                        // Reload the SummaryDftarCubit after adding the item
-                        context.read<SummaryDftarCubit>().fetchData();
                       },
                       items: state.buyingItems,
                     ),
