@@ -11,24 +11,28 @@ class Supplierwaznaornkdyia extends StatelessWidget {
   final String num;
   @override
   Widget build(BuildContext context) {
-    final formattedNum = double.tryParse(num)?.toStringAsFixed(2) ?? '0.00';
+    final formattedNum = double.tryParse(num)?.toStringAsFixed(2) ;
 
     return Column(
+      
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          textDirection: TextDirection.rtl,
-          children: [
-            Text(
-              ' : $waznaornakdyia ',
-              style: Appstyles.regular12cairo(context)
-                  .copyWith(fontSize: 10, color: Colors.amber),
-            ),
-            Text(
-              formattedNum,
-              style: const TextStyle(fontSize: 10),
-            ),
-          ],
+        Padding(
+          padding: const EdgeInsets.only(left: 5,right: 5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            textDirection: TextDirection.rtl,
+            children: [
+              Text(
+                ' : $waznaornakdyia ',
+                style: Appstyles.regular12cairo(context)
+                    .copyWith(fontSize: 10, color: Colors.amber),
+              ),
+              Text(
+                formattedNum??num,
+                style: const TextStyle(fontSize: 10),
+              ),
+            ],
+          ),
         ),
         const Divider()
       ],

@@ -12,17 +12,7 @@ class DaftarToday extends StatelessWidget {
   const DaftarToday({super.key});
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-          BlocProvider<SummaryDftarCubit>(
-          create: (context) => SummaryDftarCubit()..fetchData(),
-        ),
-        BlocProvider<ItemsCubit>(
-          create: (context) => ItemsCubit(), // Pass SummaryDftarCubit
-        ),
-      ],
-      child: const DaftarTodayContent(),
-    );
+    return const DaftarTodayContent();
   }
 }
 

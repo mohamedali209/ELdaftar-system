@@ -1,3 +1,4 @@
+import 'package:aldafttar/features/marmatview/view/widgets/marmat_expanded_container.dart';
 import 'package:flutter/material.dart';
 
 class MarmatmobileLayout extends StatelessWidget {
@@ -30,6 +31,9 @@ class MarmatmobileLayout extends StatelessWidget {
             },
           ),
         ),
+        const Expanded(
+          child: Marmatexpandedcontainer(),
+        )
       ],
     );
   }

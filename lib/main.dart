@@ -1,6 +1,7 @@
 import 'package:aldafttar/features/Gardview/presentation/manager/cubit/updateinventory/cubit/updateinventory_cubit.dart';
 import 'package:aldafttar/features/Hesabatview/presentation/view/manager/cubit/supplier_cubit.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/manager/drawercubit/cubit/drawer_cubit.dart';
+import 'package:aldafttar/features/marmatview/manager/cubit/marmat_cubit.dart';
 import 'package:aldafttar/firebase_options.dart';
 import 'package:aldafttar/utils/app_router.dart';
 import 'package:aldafttar/utils/sizeconfig.dart';
@@ -38,6 +39,9 @@ class Aldaftar extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => UpdateInventoryCubit(),
+        ),
+         BlocProvider(
+          create: (context) => MarmatCubit(firestore: FirebaseFirestore.instance),
         ),
       ],
       child: MaterialApp.router(

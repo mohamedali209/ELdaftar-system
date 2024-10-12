@@ -1,35 +1,69 @@
+import 'dart:async';
+
 import 'package:aldafttar/features/daftarview/presentation/view/manager/cubit/items_state.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/models/daftar_check_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ItemsCubit extends Cubit<ItemsState> {
+  StreamSubscription<DocumentSnapshot>? _subscription;
+
   ItemsCubit() : super(const ItemsState(sellingItems: [], buyingItems: [])) {
     fetchInitialData();
   }
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  void fetchInitialData() async {
+  void fetchInitialData() {
     try {
-      DocumentSnapshot snapshot =
-          await _firestore.collection('dailyTransactions').doc('today').get();
+      // Stream real-time updates for the 'dailyTransactions' document
+      _subscription = _firestore
+          .collection('dailyTransactions')
+          .doc('today')
+          .snapshots()
+          .listen((snapshot) {
+        // Check if the document exists
+        if (snapshot.exists) {
+          List<Daftarcheckmodel> sellingItems = [];
+          List<Daftarcheckmodel> buyingItems = [];
 
-      if (snapshot.exists) {
-        List<Daftarcheckmodel> sellingItems = (snapshot['sellingItems'] as List)
-            .map((item) => Daftarcheckmodel.fromFirestore(item))
-            .toList();
-        List<Daftarcheckmodel> buyingItems = (snapshot['buyingItems'] as List)
-            .map((item) => Daftarcheckmodel.fromFirestore(item))
-            .toList();
+          // Safely handle sellingItems and buyingItems fields
+          if (snapshot.data() != null) {
+            if (snapshot['sellingItems'] != null) {
+              sellingItems = (snapshot['sellingItems'] as List)
+                  .map((item) => Daftarcheckmodel.fromFirestore(item))
+                  .toList();
+            }
 
-        emit(ItemsState(sellingItems: sellingItems, buyingItems: buyingItems));
-      } else {
-        emit(const ItemsState(sellingItems: [], buyingItems: []));
-      }
+            if (snapshot['buyingItems'] != null) {
+              buyingItems = (snapshot['buyingItems'] as List)
+                  .map((item) => Daftarcheckmodel.fromFirestore(item))
+                  .toList();
+            }
+          }
+
+          // Emit the new state with updated selling and buying items
+          emit(
+              ItemsState(sellingItems: sellingItems, buyingItems: buyingItems));
+        } else {
+          // If the document doesn't exist, emit empty lists
+          emit(const ItemsState(sellingItems: [], buyingItems: []));
+        }
+      }, onError: (error) {
+        // Handle errors in the stream
+        print('Error fetching data: $error');
+      });
     } catch (e) {
-      print(e);
+      // Handle any exceptions that occur outside the stream
+      print('Error: $e');
     }
+  }
+
+  @override
+  Future<void> close() {
+    _subscription
+        ?.cancel(); // Cancel the stream subscription to prevent memory leaks
+    return super.close();
   }
 
   void addSellingItem(Daftarcheckmodel newItem) async {
@@ -41,28 +75,46 @@ class ItemsCubit extends Cubit<ItemsState> {
       buyingItems: state.buyingItems,
     ));
 
-    await _updateFirestore();
-    await _subtractFromInventory(newItemWithNum);
-    await _updateTotals();
-    await _updateTotalCash(double.tryParse(newItemWithNum.price) ?? 0,
-        add: true); // Update total_cash for selling
+    try {
+      await Future.wait([
+        _updateFirestore(),
+        _subtractFromInventory(newItemWithNum),
+        _updateTotals(),
+        _updateTotalCash(double.tryParse(newItemWithNum.price) ?? 0, add: true)
+      ]);
+    } catch (e) {
+      print('Error adding selling item: $e');
+    }
+//   if (!isClosed) {
+//   emit(ItemsState(
+//     sellingItems: List.from(state.sellingItems)..add(newItemWithNum),
+//     buyingItems: state.buyingItems,
+//   ));
+// }
   }
 
   void addBuyingItem(Daftarcheckmodel newItem) async {
     final nextNum = (state.buyingItems.length + 1).toString();
     final newItemWithNum = newItem.copyWith(num: nextNum);
 
-    emit(ItemsState(
-      sellingItems: state.sellingItems,
-      buyingItems: List.from(state.buyingItems)..add(newItemWithNum),
-    ));
+  
+      emit(ItemsState(
+        sellingItems: state.sellingItems,
+        buyingItems: List.from(state.buyingItems)..add(newItemWithNum),
+      ));
 
-    await _updateFirestore();
-    await _addItemGramsToWeight(
-        newItemWithNum); // Update weight collection with the new item's grams
-    await _updateTotals();
-    await _updateTotalCash(double.tryParse(newItemWithNum.price) ?? 0,
-        add: false); // Update total_cash for buying
+    try {
+      // Execute all async tasks concurrently for better performance
+      await Future.wait([
+        _updateFirestore(),
+        _addItemGramsToWeight(newItemWithNum), // Update weight collection
+        _updateTotals(),
+        _updateTotalCash(double.tryParse(newItemWithNum.price) ?? 0,
+            add: false), // Update total_cash for buying
+      ]);
+    } catch (e) {
+      print('Error adding buying item: $e');
+    }
   }
 
   Future<void> _addItemGramsToWeight(Daftarcheckmodel newItem) async {

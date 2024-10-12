@@ -48,118 +48,138 @@ class Hesabatcontainer extends StatelessWidget {
                 ),
               ],
             ),
-            content:Stack(
-            children: [
-              Container(
-                width: 350,
-                decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          gradient: const LinearGradient(
-            colors: [
-              Colors.black,
-              Color.fromARGB(255, 44, 33, 3),
-            ],
-            stops: [0.80, 1.0],
-            begin: Alignment.centerRight,
-            end: Alignment.centerLeft,
-          ),
-                ),
-                padding: const EdgeInsets.all(10.0),
-                child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildTextField('الاسم', (value) => supplierName = value, TextInputType.text),
-            const SizedBox(height: 10), // Space between fields
-            _buildTextField('وزنة 18', (value) => wazna18 = value, TextInputType.number),
-            const SizedBox(height: 10), // Space between fields
-            _buildTextField('وزنة 21', (value) => wazna21 = value, TextInputType.number),
-            const SizedBox(height: 10), // Space between fields
-            _buildTextField('وزنة 24', (value) => wazna24 = value, TextInputType.number),
-            const SizedBox(height: 10), // Space between fields
-            _buildTextField('نقدية', (value) => nakdyia = value, TextInputType.number),
-          ],
-                ),
-              ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Image.asset(
-          'assets/images/edafethesab.png', // Adjust the path if needed
-          width: 200, // Set desired width
-          height: 60, // Set desired height
-          fit: BoxFit.cover, // Adjust fit as needed
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            content: Stack(
               children: [
-                Expanded(
-          child: TextButton(
-            style: TextButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('إلغاء'),
-          ),
+                // Main container with padding to make space for the image at the bottom
+                Padding(
+                  padding: const EdgeInsets.only(
+                      bottom: 20.0), // Padding to leave space for the image
+                  child: Container(
+                    width: 350,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      gradient: const LinearGradient(
+                        colors: [
+                          Colors.black,
+                          Color.fromARGB(255, 44, 33, 3),
+                        ],
+                        stops: [0.80, 1.0],
+                        begin: Alignment.centerRight,
+                        end: Alignment.centerLeft,
+                      ),
+                    ),
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildTextField(
+                            'الاسم',
+                            (value) => supplierName = value,
+                            TextInputType.text),
+                        const SizedBox(height: 10),
+                        _buildTextField('وزنة 18', (value) => wazna18 = value,
+                            TextInputType.number),
+                        const SizedBox(height: 10),
+                        _buildTextField('وزنة 21', (value) => wazna21 = value,
+                            TextInputType.number),
+                        const SizedBox(height: 10),
+                        _buildTextField('وزنة 24', (value) => wazna24 = value,
+                            TextInputType.number),
+                        const SizedBox(height: 10),
+                        _buildTextField('نقدية', (value) => nakdyia = value,
+                            TextInputType.number),
+                      ],
+                    ),
+                  ),
                 ),
-                const SizedBox(width: 16), // Add space between buttons
-                Expanded(
-          child: TextButton(
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-            ),
-            onPressed: () {
-              if (supplierName.isNotEmpty &&
-                  wazna18.isNotEmpty &&
-                  wazna21.isNotEmpty &&
-                  nakdyia.isNotEmpty) {
-                final newSupplier = Hesabmodel(
-                  transactions: [],
-                  id: '', // Ensure this matches how you initialize the ID
-                  suppliername: supplierName,
-                  wazna18: wazna18,
-                  wazna21: wazna21,
-                  wazna24: wazna24,
-                  nakdyia: nakdyia,
-                );
-                context.read<SupplierCubit>().addSupplier(newSupplier);
-                Navigator.of(context).pop();
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please fill all fields')),
-                );
-              }
-            },
-            child: Container(
-              width: 130,
-              height: 30,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xff735600), Colors.amber],
-                  begin: Alignment.centerRight,
-                  end: Alignment.centerLeft,
-                ),
-                borderRadius: BorderRadius.circular(15), // Adjust as needed
-              ),
-              child: const Center(
-                child: Text(
-                  'إضافة',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ),
-          ),
+                // Positioned image at the bottom but behind the content
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  left: 0, // Make the image full width to look like a footer
+                  child: IgnorePointer(
+                    // This makes sure the image doesn't block taps
+                    child: Image.asset(
+                      'assets/images/edafethesab.png', // Adjust the path if needed
+                      width: 200, // Set desired width
+                      height: 60, // Set desired height
+                      fit: BoxFit.cover, // Adjust fit as needed
+                    ),
+                  ),
                 ),
               ],
             ),
-          ],
+            actions: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('إلغاء'),
+                    ),
+                  ),
+                  const SizedBox(width: 16), // Add space between buttons
+                  Expanded(
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      onPressed: () {
+                        if (supplierName.isNotEmpty &&
+                            wazna18.isNotEmpty &&
+                            wazna21.isNotEmpty &&
+                            nakdyia.isNotEmpty) {
+                          final newSupplier = Hesabmodel(
+                            transactions: [],
+                            id: '', // Ensure this matches how you initialize the ID
+                            suppliername: supplierName,
+                            wazna18: wazna18,
+                            wazna21: wazna21,
+                            wazna24: wazna24,
+                            nakdyia: nakdyia,
+                          );
+                          context
+                              .read<SupplierCubit>()
+                              .addSupplier(newSupplier);
+                          Navigator.of(context).pop();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Please fill all fields')),
+                          );
+                        }
+                      },
+                      child: Container(
+                        width: 130,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xff735600), Colors.amber],
+                            begin: Alignment.centerRight,
+                            end: Alignment.centerLeft,
+                          ),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'إضافة',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         );
       },

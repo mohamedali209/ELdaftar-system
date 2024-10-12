@@ -1,6 +1,6 @@
 import 'package:aldafttar/features/Gardview/presentation/view/Gardview.dart';
 import 'package:aldafttar/features/Hesabatview/presentation/view/hesabat_view.dart';
-import 'package:aldafttar/features/Loginview/view/Signinview.dart';
+import 'package:aldafttar/features/Loginview/view/signinview.dart';
 import 'package:aldafttar/features/Loginview/view/sign_up_view.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/desktop_layout.dart';
 import 'package:aldafttar/features/inventoryscreen/presentation/view/inventory_screen.dart';
