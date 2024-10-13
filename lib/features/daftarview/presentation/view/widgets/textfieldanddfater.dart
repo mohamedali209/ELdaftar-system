@@ -1,5 +1,4 @@
 import 'package:aldafttar/features/daftarview/presentation/view/models/daftar_check_model.dart';
-import 'package:aldafttar/features/daftarview/presentation/view/widgets/customtextfield.dart';
 import 'package:aldafttar/utils/custom_textfields.dart';
 import 'package:aldafttar/utils/styles.dart';
 import 'package:flutter/material.dart';
@@ -17,9 +16,9 @@ class Textfieldanddfater extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 10),
       child: Row(
+        textDirection: TextDirection.rtl,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const CustomTextField(hint: 'بحث'),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Row(
               children: [
@@ -50,6 +49,8 @@ class CustombuttonAddorSubtract extends StatelessWidget {
     final TextEditingController adadController = TextEditingController();
     final TextEditingController gramController = TextEditingController();
     final TextEditingController priceController = TextEditingController();
+    final TextEditingController detailsController = TextEditingController();
+
     final formKey = GlobalKey<FormState>();
 
     String selectedDetail = 'خاتم';
@@ -185,6 +186,19 @@ class CustombuttonAddorSubtract extends StatelessWidget {
                           validator: (value) =>
                               value == null ? 'Field required' : null,
                         ),
+                        CustomTextField2(
+                          keyboardType: TextInputType.number,
+                          controller: detailsController,
+                          hintText: '...يوجد تفاصيل ؟',
+                          validator: (value) {
+                            // If the value is empty, do not return an error (allow empty values)
+                            if (value == null || value.isEmpty) {
+                              return null; // No error message
+                            }
+                            // If the value is not empty, apply additional validation if needed
+                            return null;
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -219,6 +233,7 @@ class CustombuttonAddorSubtract extends StatelessWidget {
                       onPressed: () async {
                         if (formKey.currentState!.validate()) {
                           final newItem = Daftarcheckmodel(
+                            tfasel: detailsController.text,
                             gram: gramController.text,
                             num: '',
                             details: selectedDetail,
@@ -270,41 +285,42 @@ class CustombuttonAddorSubtract extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return GestureDetector(
-      onTap: () {
-        // Trigger the dialog when the container is tapped
+    return ElevatedButton(
+      onPressed: () {
+        // Trigger the dialog when the button is tapped
         _showAddItemDialog(context);
       },
-      child: Container(
-        height: screenHeight * 0.05, // Fixed height
-        width: screenWidth * 0.2, // Responsive width
-        decoration: BoxDecoration(
-          color: Colors.black, // Background color
-          border: Border.all(
-            color: const Color(0xFF4D4D4D), // Border color is grey
-          ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.black, // Solid black background color
+
+        elevation: 0,
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8), // Rounded corners
+          side: const BorderSide(color: Color(0xFF4D4D4D)), // Border color
         ),
-        child: Row(
-          mainAxisAlignment:
-              MainAxisAlignment.center, // Center content horizontally
-          children: [
-            Text(
-              'اضافة',
-              style: Appstyles.regular25(context).copyWith(
-                color: Colors.amber,
-                fontSize: screenWidth < 600
-                    ? 14
-                    : 16, // Adjust font size based on screen width
-              ),
+        fixedSize:
+            Size(screenWidth * 0.3, screenHeight * 0.03), // Responsive size
+      ),
+      child: Row(
+        mainAxisAlignment:
+            MainAxisAlignment.center, // Center content horizontally
+        children: [
+          Text(
+            'اضافة',
+            style: Appstyles.regular25(context).copyWith(
+              color: Colors.amber, // Text color
+              fontSize: screenWidth < 600
+                  ? 14
+                  : 16, // Adjust font size based on screen width
             ),
-            SvgPicture.asset(
-              'assets/images/plus.svg',
-              height: screenHeight * 0.015, // Adjusted size
-              width: screenWidth * 0.03, // Adjusted size
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(width: 4), // Space between text and icon
+          SvgPicture.asset(
+            'assets/images/plus.svg',
+            height: screenHeight * 0.015, // Adjusted size
+            width: screenWidth * 0.03, // Adjusted size
+          ),
+        ],
       ),
     );
   }

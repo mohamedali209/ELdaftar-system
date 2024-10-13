@@ -1,329 +1,14 @@
-import 'dart:async';
-
-import 'package:aldafttar/features/daftarview/presentation/view/manager/cubit/items_state.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/models/daftar_check_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class ItemsCubit extends Cubit<ItemsState> {
-  StreamSubscription<DocumentSnapshot>? _subscription;
+part 'modifying_state.dart';
 
-  ItemsCubit() : super(const ItemsState(sellingItems: [], buyingItems: [])) {
-    fetchInitialData();
-  }
-
+class ModifyingCubit extends Cubit<ModifyingState> {
+  ModifyingCubit()
+      : super(const ModifyingState(sellingItems: [], buyingItems: []));
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  void fetchInitialData() {
-    try {
-      // Stream real-time updates for the 'dailyTransactions' document
-      _subscription = _firestore
-          .collection('dailyTransactions')
-          .doc('today')
-          .snapshots()
-          .listen((snapshot) {
-        // Check if the document exists
-        if (snapshot.exists) {
-          List<Daftarcheckmodel> sellingItems = [];
-          List<Daftarcheckmodel> buyingItems = [];
-
-          // Safely handle sellingItems and buyingItems fields
-          if (snapshot.data() != null) {
-            if (snapshot['sellingItems'] != null) {
-              sellingItems = (snapshot['sellingItems'] as List)
-                  .map((item) => Daftarcheckmodel.fromFirestore(item))
-                  .toList();
-            }
-
-            if (snapshot['buyingItems'] != null) {
-              buyingItems = (snapshot['buyingItems'] as List)
-                  .map((item) => Daftarcheckmodel.fromFirestore(item))
-                  .toList();
-            }
-          }
-
-          // Emit the new state with updated selling and buying items
-          emit(
-              ItemsState(sellingItems: sellingItems, buyingItems: buyingItems));
-        } else {
-          // If the document doesn't exist, emit empty lists
-          emit(const ItemsState(sellingItems: [], buyingItems: []));
-        }
-      }, onError: (error) {
-        // Handle errors in the stream
-        print('Error fetching data: $error');
-      });
-    } catch (e) {
-      // Handle any exceptions that occur outside the stream
-      print('Error: $e');
-    }
-  }
-
-  @override
-  Future<void> close() {
-    _subscription
-        ?.cancel(); // Cancel the stream subscription to prevent memory leaks
-    return super.close();
-  }
-
-  void addSellingItem(Daftarcheckmodel newItem) async {
-    final nextNum = (state.sellingItems.length + 1).toString();
-    final newItemWithNum = newItem.copyWith(num: nextNum);
-
-    emit(ItemsState(
-      sellingItems: List.from(state.sellingItems)..add(newItemWithNum),
-      buyingItems: state.buyingItems,
-    ));
-
-    try {
-      await Future.wait([
-        _updateFirestore(),
-        _subtractFromInventory(newItemWithNum),
-        _updateTotals(),
-        _updateTotalCash(double.tryParse(newItemWithNum.price) ?? 0, add: true)
-      ]);
-    } catch (e) {
-      print('Error adding selling item: $e');
-    }
-//   if (!isClosed) {
-//   emit(ItemsState(
-//     sellingItems: List.from(state.sellingItems)..add(newItemWithNum),
-//     buyingItems: state.buyingItems,
-//   ));
-// }
-  }
-
-  void addBuyingItem(Daftarcheckmodel newItem) async {
-    final nextNum = (state.buyingItems.length + 1).toString();
-    final newItemWithNum = newItem.copyWith(num: nextNum);
-
-    emit(ItemsState(
-      sellingItems: state.sellingItems,
-      buyingItems: List.from(state.buyingItems)..add(newItemWithNum),
-    ));
-
-    try {
-      // Execute all async tasks concurrently for better performance
-      await Future.wait([
-        _updateFirestore(),
-        _addItemGramsToWeight(newItemWithNum), // Update weight collection
-        _updateTotals(),
-        _updateTotalCash(double.tryParse(newItemWithNum.price) ?? 0,
-            add: false), // Update total_cash for buying
-      ]);
-    } catch (e) {
-      print('Error adding buying item: $e');
-    }
-  }
-
-  Future<void> _addItemGramsToWeight(Daftarcheckmodel newItem) async {
-    // Fetch current totals from the weight collection
-    DocumentSnapshot weightSnapshot =
-        await _firestore.collection('weight').doc('HQWsDzc8ray5gwZp5XgF').get();
-
-    if (weightSnapshot.exists) {
-      double currentTotal18kKasr =
-          double.parse(weightSnapshot['total18kKasr'] ?? '0.0');
-      double currentTotal21kKasr =
-          double.parse(weightSnapshot['total21kKasr'] ?? '0.0');
-
-      // Add only the grams of the new item to the respective field based on ayar (18k or 21k)
-      if (newItem.ayar == '18k') {
-        currentTotal18kKasr += double.parse(newItem.gram);
-      } else if (newItem.ayar == '21k') {
-        currentTotal21kKasr += double.parse(newItem.gram);
-      }
-
-      // Update the weight collection with the new values
-      await _firestore.collection('weight').doc('HQWsDzc8ray5gwZp5XgF').update({
-        'total18kKasr': currentTotal18kKasr.toString(),
-        'total21kKasr': currentTotal21kKasr.toString(),
-      });
-    }
-  }
-
-  Future<void> _updateFirestore() async {
-    await _firestore.collection('dailyTransactions').doc('today').set({
-      'sellingItems':
-          state.sellingItems.map((item) => item.toFirestore()).toList(),
-      'buyingItems':
-          state.buyingItems.map((item) => item.toFirestore()).toList(),
-    });
-  }
-
-  Future<void> _subtractFromInventory(Daftarcheckmodel item) async {
-    DocumentSnapshot snapshot =
-        await _firestore.collection('weight').doc('HQWsDzc8ray5gwZp5XgF').get();
-
-    if (snapshot.exists) {
-      String itemType = '';
-      bool is18k = item.ayar.contains('18k');
-      bool is24k = item.ayar.contains('24k'); // For سبائك (24k gold)
-
-      // Determine item type based on the details of the item
-      if (item.details.contains('خاتم')) {
-        itemType = 'خواتم';
-      } else if (item.details.contains('اسورة')) {
-        itemType = 'اساور';
-      } else if (item.details.contains('محابس')) {
-        itemType = 'محابس';
-      } else if (item.details.contains('دبلة')) {
-        itemType = 'دبل';
-      } else if (item.details.contains('سلسلة')) {
-        itemType = 'سلاسل';
-      } else if (item.details.contains('غوايش')) {
-        itemType = 'غوايش';
-      } else if (item.details.contains('كوليه')) {
-        itemType = 'كوليهات';
-      } else if (item.details.contains('حلق')) {
-        itemType = 'حلقان';
-      } else if (item.details.contains('انسيال')) {
-        itemType = 'انسيالات';
-      } else if (item.details.contains('تعليقة')) {
-        itemType = 'تعاليق';
-      } else if (item.details.contains('سبائك')) {
-        itemType = 'سبائك';
-      } else if (item.details.contains('جنيهات')) {
-        itemType = 'جنيهات'; // Added جنيهات
-      }
-
-      // Proceed if item type is valid
-      if (itemType.isNotEmpty) {
-        if (is24k && itemType == 'سبائك') {
-          // Handle the case for سبائك (24k gold)
-          int currentSabaekCount = int.parse(snapshot['sabaek_count']);
-          double currentSabaekWeight = double.parse(snapshot['sabaek_weight']);
-
-          int newSabaekCount = currentSabaekCount - int.parse(item.adad);
-          double newSabaekWeight =
-              currentSabaekWeight - double.parse(item.gram);
-
-          // Update the specific سبائك fields (count and weight)
-          await _firestore
-              .collection('weight')
-              .doc('HQWsDzc8ray5gwZp5XgF')
-              .update({
-            'sabaek_count': newSabaekCount.toString(),
-            'sabaek_weight': newSabaekWeight.toString(),
-          });
-        } else if (itemType == 'جنيهات') {
-          // Handle the case for جنيهات
-          int currentGnihatCount = int.parse(snapshot['gnihat_count']);
-          double currentGnihatWeight = double.parse(snapshot['gnihat_weight']);
-
-          int newGnihatCount = currentGnihatCount - int.parse(item.adad);
-          double newGnihatWeight =
-              currentGnihatWeight - double.parse(item.gram);
-
-          // Update the specific جنيهات fields (count and weight)
-          await _firestore
-              .collection('weight')
-              .doc('HQWsDzc8ray5gwZp5XgF')
-              .update({
-            'gnihat_count': newGnihatCount.toString(),
-            'gnihat_weight': newGnihatWeight.toString(),
-          });
-
-          // Subtract جنيهات weight from total21kWeight
-          double total21kWeight = double.parse(snapshot['total21kWeight']);
-          total21kWeight -= double.parse(item.gram);
-
-          // Update total21kWeight in Firestore
-          await _firestore
-              .collection('weight')
-              .doc('HQWsDzc8ray5gwZp5XgF')
-              .update({
-            'total21kWeight': total21kWeight.toString(),
-          });
-        } else {
-          // Handle other item types (18k and 21k)
-          String quantityField =
-              '${itemType}_${is18k ? '18k' : '21k'}_quantity';
-          String weightField = '${itemType}_${is18k ? '18k' : '21k'}_weight';
-
-          int currentQuantity = int.parse(snapshot[quantityField]);
-          double currentWeight = double.parse(snapshot[weightField]);
-
-          int newQuantity = currentQuantity - int.parse(item.adad);
-          double newWeight = currentWeight - double.parse(item.gram);
-
-          // Update the specific item fields (quantity and weight)
-          await _firestore
-              .collection('weight')
-              .doc('HQWsDzc8ray5gwZp5XgF')
-              .update({
-            quantityField: newQuantity.toString(),
-            weightField: newWeight.toString(),
-          });
-
-          // Update the total weight fields
-          if (is18k) {
-            double total18kWeight = double.parse(snapshot['total18kWeight']);
-            total18kWeight -= double.parse(item.gram);
-            await _firestore
-                .collection('weight')
-                .doc('HQWsDzc8ray5gwZp5XgF')
-                .update({
-              'total18kWeight': total18kWeight.toString(),
-            });
-          } else {
-            double total21kWeight = double.parse(snapshot['total21kWeight']);
-            total21kWeight -= double.parse(item.gram);
-            await _firestore
-                .collection('weight')
-                .doc('HQWsDzc8ray5gwZp5XgF')
-                .update({
-              'total21kWeight': total21kWeight.toString(),
-            });
-          }
-        }
-      }
-    }
-  }
-
-  Future<void> _updateTotals() async {
-    int totalSalePrice = 0;
-    int totalBuyingPrice = 0;
-    double total18kasr = 0.0;
-    double total21kasr = 0.0;
-
-    for (var item in state.sellingItems) {
-      totalSalePrice += int.parse(item.price);
-    }
-
-    for (var item in state.buyingItems) {
-      totalBuyingPrice += int.parse(item.price);
-      if (item.ayar == '18k') {
-        total18kasr += double.parse(item.gram);
-      } else {
-        total21kasr += double.parse(item.gram);
-      }
-    }
-
-    await _firestore.collection('dailyTransactions').doc('today').update({
-      'totalSalePrice': totalSalePrice.toString(),
-      'totalBuyingPrice': totalBuyingPrice.toString(),
-      'total18kasr': total18kasr.toString(),
-      'total21kasr': total21kasr.toString(),
-    });
-  }
-
-  Future<void> _updateTotalCash(double amount, {required bool add}) async {
-    DocumentSnapshot snapshot =
-        await _firestore.collection('weight').doc('HQWsDzc8ray5gwZp5XgF').get();
-
-    if (snapshot.exists) {
-      double currentTotalCash = double.parse(snapshot['total_cash'] ?? '0.0');
-
-      double newTotalCash =
-          add ? currentTotalCash + amount : currentTotalCash - amount;
-
-      await _firestore
-          .collection('weight')
-          .doc('HQWsDzc8ray5gwZp5XgF')
-          .update({'total_cash': newTotalCash.toString()});
-    }
-  }
 
   void modifyItem(Daftarcheckmodel modifiedItem,
       {bool isBuyingItem = false}) async {
@@ -331,25 +16,15 @@ class ItemsCubit extends Cubit<ItemsState> {
     Daftarcheckmodel oldSellingItem = state.sellingItems.firstWhere(
       (item) => item.num == modifiedItem.num,
       orElse: () => Daftarcheckmodel(
-          tfasel: '',
-          num: '0',
-          adad: '0',
-          gram: '0',
-          ayar: '',
-          details: '',
-          price: '0'),
+        tfasel: '',
+          num: '0', adad: '0', gram: '0', ayar: '', details: '', price: '0'),
     );
 
     Daftarcheckmodel oldBuyingItem = state.buyingItems.firstWhere(
       (item) => item.num == modifiedItem.num,
       orElse: () => Daftarcheckmodel(
-          tfasel: '',
-          num: '0',
-          adad: '0',
-          gram: '0',
-          ayar: '',
-          details: '',
-          price: '0'),
+        tfasel: '',
+          num: '0', adad: '0', gram: '0', ayar: '', details: '', price: '0'),
     );
 
     // Update logic based on whether it's a buying or selling item
@@ -366,7 +41,7 @@ class ItemsCubit extends Cubit<ItemsState> {
           )
           .toList();
 
-      emit(ItemsState(
+      emit(ModifyingState(
         sellingItems: updatedSellingItems,
         buyingItems: state.buyingItems, // Do not modify buying items
       ));
@@ -383,7 +58,7 @@ class ItemsCubit extends Cubit<ItemsState> {
           )
           .toList();
 
-      emit(ItemsState(
+      emit(ModifyingState(
         sellingItems: state.sellingItems, // Do not modify selling items
         buyingItems: updatedBuyingItems,
       ));
@@ -665,7 +340,7 @@ class ItemsCubit extends Cubit<ItemsState> {
     }
 
     // Emit the new state with updated lists
-    emit(ItemsState(
+    emit(ModifyingState(
       sellingItems: updatedSellingItems,
       buyingItems: updatedBuyingItems,
     ));
@@ -697,5 +372,39 @@ class ItemsCubit extends Cubit<ItemsState> {
         'total_cash': totalCash.toString(),
       });
     }
+  }
+   Future<void> _updateTotals() async {
+    int totalSalePrice = 0;
+    int totalBuyingPrice = 0;
+    double total18kasr = 0.0;
+    double total21kasr = 0.0;
+
+    for (var item in state.sellingItems) {
+      totalSalePrice += int.parse(item.price);
+    }
+
+    for (var item in state.buyingItems) {
+      totalBuyingPrice += int.parse(item.price);
+      if (item.ayar == '18k') {
+        total18kasr += double.parse(item.gram);
+      } else {
+        total21kasr += double.parse(item.gram);
+      }
+    }
+
+    await _firestore.collection('dailyTransactions').doc('today').update({
+      'totalSalePrice': totalSalePrice.toString(),
+      'totalBuyingPrice': totalBuyingPrice.toString(),
+      'total18kasr': total18kasr.toString(),
+      'total21kasr': total21kasr.toString(),
+    });
+  }
+   Future<void> _updateFirestore() async {
+    await _firestore.collection('dailyTransactions').doc('today').set({
+      'sellingItems':
+          state.sellingItems.map((item) => item.toFirestore()).toList(),
+      'buyingItems':
+          state.buyingItems.map((item) => item.toFirestore()).toList(),
+    });
   }
 }

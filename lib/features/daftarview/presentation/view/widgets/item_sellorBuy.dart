@@ -1,4 +1,5 @@
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/num_daftar_container.dart';
+import 'package:aldafttar/utils/commas.dart';
 import 'package:flutter/material.dart';
 
 class ItemSellorBuy extends StatelessWidget {
@@ -11,6 +12,8 @@ class ItemSellorBuy extends StatelessWidget {
     required this.gram,
     this.onTap,
     required this.num,
+    this.onPressed,
+    required this.tfasel, // Added tfasel
   });
 
   final String details;
@@ -19,7 +22,9 @@ class ItemSellorBuy extends StatelessWidget {
   final String price;
   final String gram;
   final String num;
+  final String? tfasel; // Added tfasel as nullable field
   final void Function()? onTap;
+  final void Function()? onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -40,23 +45,51 @@ class ItemSellorBuy extends StatelessWidget {
                     Text(details,
                         style: const TextStyle(color: Color(0xffF7EAD1))),
                     const SizedBox(height: 5),
-                    const Text('تفاصيل',
-                        style: TextStyle(color: Color(0xff979796), fontSize: 9)),
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero, // No padding around the text
+                        minimumSize: Size
+                            .zero, // No minimum size, to avoid any extra space
+                        tapTargetSize: MaterialTapTargetSize
+                            .shrinkWrap, // Reduces tap area to match text size
+                      ),
+                      onPressed: onPressed,
+                      child: SizedBox(
+                        width:
+                            40, // Set a fixed width to ensure both texts take the same space
+                        child: Text(
+                          textDirection: TextDirection.rtl,
+                          tfasel != null && tfasel!.isNotEmpty
+                              ? 'تفاصيل' // Show "تفاصيل" if tfasel is not empty
+                              : 'لا يوجد تفاصيل', // Show "لا يوجد تفاصيل" if tfasel is empty or null
+                          textAlign:
+                              TextAlign.center, // Align text in the center
+                          style: const TextStyle(
+                            color: Color(0xff979796),
+                            fontSize: 9,
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
               IconButton(
-                  onPressed: onTap,
-                  icon: const Icon(
-                    Icons.edit,
-                    color: Colors.amber,
-                    size: 15,
-                  ))
+                onPressed: onTap,
+                icon: const Icon(
+                  Icons.edit,
+                  color: Colors.amber,
+                  size: 15,
+                ),
+              ),
             ],
           ),
-          SizedBox(
-            width: MediaQuery.of(context).size.width * .15,
-          ),
+        SizedBox(
+  width: MediaQuery.of(context).size.width < 600
+      ? 10 // Set width to 10 for mobile screens
+      : MediaQuery.of(context).size.width * .13, // Set to 13% for larger screens
+),
+
           Expanded(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -70,7 +103,6 @@ class ItemSellorBuy extends StatelessWidget {
                         style: const TextStyle(color: Color(0xffB8B8B8))),
                   ),
                 ),
-
                 // Container for 'gram' with FittedBox
                 Container(
                   color: Colors.black,
@@ -80,7 +112,6 @@ class ItemSellorBuy extends StatelessWidget {
                         style: const TextStyle(color: Color(0xffB8B8B8))),
                   ),
                 ),
-
                 // Container for 'ayar' with FittedBox
                 Container(
                   color: Colors.black,
@@ -90,21 +121,20 @@ class ItemSellorBuy extends StatelessWidget {
                         style: const TextStyle(color: Color(0xffB8B8B8))),
                   ),
                 ),
-
                 // Container for 'price' with FittedBox
                 Container(
+                  width: 50,
                   color: Colors.black,
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
-                    child: Text(price,
+                    child: Text(NumberFormatter.format(int.parse(price)),
                         style: const TextStyle(color: Color(0xffB8B8B8))),
                   ),
                 ),
-
                 const SizedBox(width: 1),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

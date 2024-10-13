@@ -4,7 +4,8 @@ class Daftarcheckmodel {
   final String adad;
   final String gram;
   final String price;
-  final String ayar;  // Added ayar field
+  final String ayar;
+  final String tfasel; // Added tfasel field
 
   Daftarcheckmodel({
     required this.num,
@@ -12,9 +13,11 @@ class Daftarcheckmodel {
     required this.adad,
     required this.gram,
     required this.price,
-    required this.ayar,  // Added ayar to constructor
+    required this.ayar,
+    required this.tfasel, // Added tfasel to constructor
   });
 
+  // Factory constructor to create a Daftarcheckmodel from Firestore data
   factory Daftarcheckmodel.fromFirestore(Map<String, dynamic> data) {
     return Daftarcheckmodel(
       num: data['num'],
@@ -22,10 +25,12 @@ class Daftarcheckmodel {
       adad: data['adad'],
       gram: data['gram'],
       price: data['price'],
-      ayar: data['ayar'],  // Added ayar to factory constructor
+      ayar: data['ayar'],
+      tfasel: data['tfasel'] ?? '', // Added tfasel to factory constructor
     );
   }
 
+  // Converts Daftarcheckmodel object to Firestore format
   Map<String, dynamic> toFirestore() {
     return {
       'num': num,
@@ -33,17 +38,20 @@ class Daftarcheckmodel {
       'adad': adad,
       'gram': gram,
       'price': price,
-      'ayar': ayar,  // Added ayar to toFirestore map
+      'ayar': ayar,
+      'tfasel': tfasel, // Added tfasel to toFirestore map
     };
   }
 
+  // CopyWith method for immutability
   Daftarcheckmodel copyWith({
     String? num,
     String? details,
     String? adad,
     String? gram,
     String? price,
-    String? ayar,  // Added ayar to copyWith method
+    String? ayar,
+    String? tfasel, // Added tfasel to copyWith method
   }) {
     return Daftarcheckmodel(
       num: num ?? this.num,
@@ -51,7 +59,8 @@ class Daftarcheckmodel {
       adad: adad ?? this.adad,
       gram: gram ?? this.gram,
       price: price ?? this.price,
-      ayar: ayar ?? this.ayar,  // Updated copyWith to include ayar
+      ayar: ayar ?? this.ayar,
+      tfasel: tfasel ?? this.tfasel, // Updated copyWith to include tfasel
     );
   }
 }

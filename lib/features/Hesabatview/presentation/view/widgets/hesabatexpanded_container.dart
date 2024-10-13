@@ -258,7 +258,44 @@ class Hesabatcontainer extends StatelessWidget {
                           horizontal: 30, vertical: 15),
                   child: Custombackgroundcontainer(
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            _showAddSupplierDialog(context);
+                          },
+                          icon: Container(
+                            height: screenHeight * 0.05, // Fixed height
+                            width: screenWidth * 0.2, // Responsive width
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Colors.amber, // Left color
+                                  Color(0xFF735600), // Right color
+                                ],
+                                begin:
+                                    Alignment.centerLeft, // Start from the left
+                                end: Alignment.centerRight, // End on the right
+                              ),
+                              borderRadius:
+                                  BorderRadius.circular(8), // Rounded corners
+                            ),
+                            child: Center(
+                              child: Text(
+                                '    اضافة حساب    ',
+                                style: Appstyles.regular25(context).copyWith(
+                                  color: Colors.white,
+                                  fontSize: screenWidth < 600
+                                      ? 14
+                                      : 16, // Adjust font size based on screen width// Change text color to white
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                         Expanded(
                           child: BlocBuilder<SupplierCubit, SupplierState>(
                             builder: (context, state) {
@@ -272,7 +309,7 @@ class Hesabatcontainer extends StatelessWidget {
                                 }
                                 return Padding(
                                   padding: const EdgeInsets.only(
-                                      top: 20, bottom: 20, left: 15, right: 15),
+                                      top: 5, bottom: 20, left: 15, right: 15),
                                   child: Container(
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(12),
@@ -284,46 +321,6 @@ class Hesabatcontainer extends StatelessWidget {
                                       children: [
                                         const SizedBox(
                                           height: 10,
-                                        ),
-                                        IconButton(
-                                          onPressed: () {
-                                            _showAddSupplierDialog(context);
-                                          },
-                                          icon: Container(
-                                            height: screenHeight *
-                                                0.05, // Fixed height
-                                            width: screenWidth *
-                                                0.2, // Responsive width
-                                            decoration: BoxDecoration(
-                                              gradient: const LinearGradient(
-                                                colors: [
-                                                  Colors.amber, // Left color
-                                                  Color(
-                                                      0xFF735600), // Right color
-                                                ],
-                                                begin: Alignment
-                                                    .centerLeft, // Start from the left
-                                                end: Alignment
-                                                    .centerRight, // End on the right
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                      8), // Rounded corners
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                '    اضافة حساب    ',
-                                                style:
-                                                    Appstyles.regular25(context)
-                                                        .copyWith(
-                                                  color: Colors.white,
-                                                  fontSize: screenWidth < 600
-                                                      ? 14
-                                                      : 16, // Adjust font size based on screen width// Change text color to white
-                                                ),
-                                              ),
-                                            ),
-                                          ),
                                         ),
                                         Expanded(
                                             child: Hesabatgridview(

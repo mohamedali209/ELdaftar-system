@@ -40,8 +40,9 @@ class Aldaftar extends StatelessWidget {
         BlocProvider(
           create: (context) => UpdateInventoryCubit(),
         ),
-         BlocProvider(
-          create: (context) => MarmatCubit(firestore: FirebaseFirestore.instance),
+        BlocProvider(
+          create: (context) =>
+              MarmatCubit(firestore: FirebaseFirestore.instance),
         ),
       ],
       child: MaterialApp.router(
