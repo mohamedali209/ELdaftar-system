@@ -1,5 +1,6 @@
 import 'package:aldafttar/features/Gardview/presentation/manager/cubit/updateinventory/cubit/updateinventory_cubit.dart';
 import 'package:aldafttar/features/Hesabatview/presentation/view/manager/cubit/supplier_cubit.dart';
+import 'package:aldafttar/features/Loginview/manager/signin/cubit/signin_cubit.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/manager/drawercubit/cubit/drawer_cubit.dart';
 import 'package:aldafttar/features/marmatview/manager/cubit/marmat_cubit.dart';
 import 'package:aldafttar/firebase_options.dart';
@@ -31,6 +32,9 @@ class Aldaftar extends StatelessWidget {
     SizeConfig.init(context);
     return MultiBlocProvider(
       providers: [
+         BlocProvider(
+          create: (context) => SigninCubit(),
+        ),
         BlocProvider(
           create: (context) => DrawerCubit(),
         ),

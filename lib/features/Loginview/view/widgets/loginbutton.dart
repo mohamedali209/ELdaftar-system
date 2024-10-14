@@ -1,12 +1,12 @@
-import 'package:aldafttar/utils/app_router.dart';
 import 'package:aldafttar/utils/styles.dart';
 import 'package:flutter/material.dart';
 
 class Loginbutton extends StatelessWidget {
   const Loginbutton({
     super.key,
+    this.onPressed,
   });
-
+  final void Function()? onPressed;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -30,9 +30,7 @@ class Loginbutton extends StatelessWidget {
           ),
           padding: const EdgeInsets.symmetric(vertical: 16),
         ),
-        onPressed: () {
-          AppRouter.router.go(AppRouter.kDaftarview);
-        },
+        onPressed: onPressed,
         child: Text(
           'تسجيل الدخول',
           style: Appstyles.regular12cairo(context)

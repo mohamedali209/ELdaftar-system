@@ -2,8 +2,13 @@ import 'package:aldafttar/utils/custom_textfields.dart';
 import 'package:flutter/material.dart';
 
 class SignTextfields extends StatelessWidget {
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+
   const SignTextfields({
     super.key,
+    required this.emailController,
+    required this.passwordController,
   });
 
   @override
@@ -15,14 +20,14 @@ class SignTextfields extends StatelessWidget {
         children: [
           CustomTextField2(
             hintText: 'البريد الالكتروني',
-            controller: TextEditingController(),
+            controller: emailController,
           ),
           const SizedBox(
             height: 15,
           ),
           CustomTextField2(
-            hintText: ' كلمة المرور',
-            controller: TextEditingController(),
+            hintText: 'كلمة المرور',
+            controller: passwordController,
           ),
           const SizedBox(
             height: 20,
