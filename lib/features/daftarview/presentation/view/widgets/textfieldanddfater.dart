@@ -220,7 +220,7 @@ class CustombuttonAddorSubtract extends StatelessWidget {
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: const Text('Cancel'),
+                      child: const Text('الغاء'),
                     ),
                   ),
                   const SizedBox(width: 16), // Add space between buttons
@@ -263,7 +263,7 @@ class CustombuttonAddorSubtract extends StatelessWidget {
                         ),
                         child: const Center(
                           child: Text(
-                            'Add',
+                            'اضافة',
                             style: TextStyle(color: Colors.white),
                           ),
                         ),
