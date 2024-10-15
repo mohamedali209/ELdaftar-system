@@ -74,104 +74,121 @@ class DaftarelgardHeader extends StatelessWidget {
 
         return SingleChildScrollView(
           child: AlertDialog(
-            backgroundColor: const Color.fromARGB(255, 12, 12, 12), // Set background color
+            backgroundColor:
+                const Color.fromARGB(255, 12, 12, 12), // Set background color
             title: Stack(
               children: [
                 Center(
-          child: ShaderMask(
-            shaderCallback: (Rect bounds) {
-              return const LinearGradient(
-                colors: [Color(0xff594300), Colors.amber],
-                begin: Alignment.centerRight,
-                end: Alignment.centerLeft,
-              ).createShader(bounds);
-            },
-            child: Text(
-              'إضافة أو تعديل وزنة',
-              style: Appstyles.regular12cairo(context)
-                  .copyWith(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.white),
-            ),
-          ),
+                  child: ShaderMask(
+                    shaderCallback: (Rect bounds) {
+                      return const LinearGradient(
+                        colors: [Color(0xff594300), Colors.amber],
+                        begin: Alignment.centerRight,
+                        end: Alignment.centerLeft,
+                      ).createShader(bounds);
+                    },
+                    child: Text(
+                      'إضافة أو تعديل وزنة',
+                      style: Appstyles.regular12cairo(context).copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 25,
+                          color: Colors.white),
+                    ),
+                  ),
                 ),
               ],
             ),
             content: Stack(
               children: [
                 Container(
-          width: 350,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            gradient: const LinearGradient(
-              colors: [
-                Colors.black, // First color
-                Color.fromARGB(255, 44, 33, 3), // Second color
-              ],
-              stops: [0.80, 1.0],
-              begin: Alignment.centerRight,
-              end: Alignment.centerLeft,
-            ),
-          ),
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField<String>(
-                decoration: const InputDecoration(labelText: 'اختيار العملية'),
-                items: const [
-                  DropdownMenuItem(value: 'add', child: Text('إضافة')),
-                  DropdownMenuItem(value: 'minus', child: Text('خصم')),
-                ],
-                onChanged: (value) {
-                  operation = value;
-                },
-              ),
-              const SizedBox(height: 10), // Space between fields
-              DropdownButtonFormField<String>(
-                decoration: const InputDecoration(labelText: 'اختيار النوع'),
-                items: const [
-                  DropdownMenuItem(value: 'خواتم', child: Text('خواتم')),
-                  DropdownMenuItem(value: 'دبل', child: Text('دبل')),
-                  DropdownMenuItem(value: 'محابس', child: Text('محابس')),
-                  DropdownMenuItem(value: 'انسيالات', child: Text('انسيالات')),
-                  DropdownMenuItem(value: 'غوايش', child: Text('غوايش')),
-                  DropdownMenuItem(value: 'حلقان', child: Text('حلقان')),
-                  DropdownMenuItem(value: 'تعاليق', child: Text('تعاليق')),
-                  DropdownMenuItem(value: 'كوليهات', child: Text('كوليهات')),
-                  DropdownMenuItem(value: 'سلاسل', child: Text('سلاسل')),
-                  DropdownMenuItem(value: 'اساور', child: Text('اساور')),
-                  DropdownMenuItem(value: 'جنيهات', child: Text('جنيهات')),
-                  DropdownMenuItem(value: 'سبائك', child: Text('سبائك')),
-                ],
-                onChanged: (value) {
-                  jewelryType = value;
-                },
-              ),
-              const SizedBox(height: 10), // Space between fields
-              DropdownButtonFormField<String>(
-                decoration: const InputDecoration(labelText: 'اختيار العيار'),
-                items: const [
-                  DropdownMenuItem(value: '18k', child: Text('18k')),
-                  DropdownMenuItem(value: '21k', child: Text('21k')),
-                  DropdownMenuItem(value: '24k', child: Text('24k')),
-                ],
-                onChanged: (value) {
-                  purity = value;
-                },
-              ),
-              const SizedBox(height: 10), // Space between fields
-              TextField(
-                controller: weightController,
-                decoration: const InputDecoration(labelText: 'الوزن'),
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 10), // Space between fields
-              TextField(
-                controller: quantityController,
-                decoration: const InputDecoration(labelText: 'الكمية'),
-                keyboardType: TextInputType.number,
-              ),
-            ],
-          ),
+                  width: 350,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    gradient: const LinearGradient(
+                      colors: [
+                        Colors.black, // First color
+                        Color.fromARGB(255, 44, 33, 3), // Second color
+                      ],
+                      stops: [0.80, 1.0],
+                      begin: Alignment.centerRight,
+                      end: Alignment.centerLeft,
+                    ),
+                  ),
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      DropdownButtonFormField<String>(
+                        decoration:
+                            const InputDecoration(labelText: 'اختيار العملية'),
+                        items: const [
+                          DropdownMenuItem(value: 'add', child: Text('إضافة')),
+                          DropdownMenuItem(value: 'minus', child: Text('خصم')),
+                        ],
+                        onChanged: (value) {
+                          operation = value;
+                        },
+                      ),
+                      const SizedBox(height: 10), // Space between fields
+                      DropdownButtonFormField<String>(
+                        decoration:
+                            const InputDecoration(labelText: 'اختيار النوع'),
+                        items: const [
+                          DropdownMenuItem(
+                              value: 'خواتم', child: Text('خواتم')),
+                          DropdownMenuItem(value: 'دبل', child: Text('دبل')),
+                          DropdownMenuItem(
+                              value: 'محابس', child: Text('محابس')),
+                          DropdownMenuItem(
+                              value: 'انسيالات', child: Text('انسيالات')),
+                          DropdownMenuItem(
+                              value: 'غوايش', child: Text('غوايش')),
+                          DropdownMenuItem(
+                              value: 'حلقان', child: Text('حلقان')),
+                          DropdownMenuItem(
+                              value: 'تعاليق', child: Text('تعاليق')),
+                          DropdownMenuItem(
+                              value: 'كوليهات', child: Text('كوليهات')),
+                          DropdownMenuItem(
+                              value: 'سلاسل', child: Text('سلاسل')),
+                          DropdownMenuItem(
+                              value: 'اساور', child: Text('اساور')),
+                          DropdownMenuItem(
+                              value: 'جنيهات', child: Text('جنيهات')),
+                          DropdownMenuItem(
+                              value: 'سبائك', child: Text('سبائك')),
+                        ],
+                        onChanged: (value) {
+                          jewelryType = value;
+                        },
+                      ),
+                      const SizedBox(height: 10), // Space between fields
+                      DropdownButtonFormField<String>(
+                        decoration:
+                            const InputDecoration(labelText: 'اختيار العيار'),
+                        items: const [
+                          DropdownMenuItem(value: '18k', child: Text('18k')),
+                          DropdownMenuItem(value: '21k', child: Text('21k')),
+                          DropdownMenuItem(value: '24k', child: Text('24k')),
+                        ],
+                        onChanged: (value) {
+                          purity = value;
+                        },
+                      ),
+                      const SizedBox(height: 10), // Space between fields
+                      TextField(
+                        controller: weightController,
+                        decoration: const InputDecoration(labelText: 'الوزن'),
+                        keyboardType: TextInputType.number,
+                      ),
+                      const SizedBox(height: 10), // Space between fields
+                      TextField(
+                        controller: quantityController,
+                        decoration: const InputDecoration(labelText: 'الكمية'),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -179,72 +196,73 @@ class DaftarelgardHeader extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-          Expanded(
-            child: TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: Colors.black,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('إلغاء'),
-            ),
-          ),
-          const SizedBox(width: 16), // Space between buttons
-          Expanded(
-            child: TextButton(
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-              onPressed: () {
-                if (operation != null &&
-                    weightController.text.isNotEmpty &&
-                    quantityController.text.isNotEmpty &&
-                    jewelryType != null &&
-                    purity != null) {
-                  double weight = double.tryParse(weightController.text) ?? 0;
-                  int quantity = int.tryParse(quantityController.text) ?? 0;
-          
-                  BlocProvider.of<UpdateInventoryCubit>(context)
-                      .updateInventory(
-                    type: jewelryType!,
-                    weight: weight,
-                    quantity: quantity,
-                    purity: purity!,
-                    operation: operation!,
-                  );
-                }
-          
-                Navigator.of(context).pop();
-              },
-              child: Container(
-                width: 130,
-                height: 30,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xff735600), Colors.amber],
-                    begin: Alignment.centerRight,
-                    end: Alignment.centerLeft,
+                  Expanded(
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('إلغاء'),
+                    ),
                   ),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: const Center(
-                  child: Text(
-                    'تأكيد',
-                    style: TextStyle(color: Colors.white),
+                  const SizedBox(width: 16), // Space between buttons
+                  Expanded(
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      onPressed: () {
+                        if (operation != null &&
+                            weightController.text.isNotEmpty &&
+                            quantityController.text.isNotEmpty &&
+                            jewelryType != null &&
+                            purity != null) {
+                          double weight =
+                              double.tryParse(weightController.text) ?? 0;
+                          int quantity =
+                              int.tryParse(quantityController.text) ?? 0;
+
+                          BlocProvider.of<UpdateInventoryCubit>(context)
+                              .updateInventory(
+                            type: jewelryType!,
+                            weight: weight,
+                            quantity: quantity,
+                            purity: purity!,
+                            operation: operation!,
+                          );
+                        }
+
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        width: 130,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xff735600), Colors.amber],
+                            begin: Alignment.centerRight,
+                            end: Alignment.centerLeft,
+                          ),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'تأكيد',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ),
-          ),
                 ],
               ),
             ],
           ),
         );
-
       },
     );
   }

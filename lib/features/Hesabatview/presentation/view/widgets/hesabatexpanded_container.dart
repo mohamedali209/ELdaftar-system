@@ -6,6 +6,7 @@ import 'package:aldafttar/features/Hesabatview/presentation/view/widgets/summary
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/custom_background_container.dart';
 import 'package:aldafttar/utils/custom_loading.dart';
 import 'package:aldafttar/utils/styles.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -22,164 +23,167 @@ class Hesabatcontainer extends StatelessWidget {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return SingleChildScrollView(
-          child: AlertDialog(
-            backgroundColor: const Color.fromARGB(255, 12, 12, 12),
-            title: Stack(
-              children: [
-                Center(
-                  child: ShaderMask(
-                    shaderCallback: (Rect bounds) {
-                      return const LinearGradient(
-                        colors: [Color(0xff594300), Colors.amber],
-                        begin: Alignment.centerRight,
-                        end: Alignment.centerLeft,
-                      ).createShader(bounds);
-                    },
-                    child: const Text(
-                      'اضافة حساب',
-                      style: TextStyle(
-                        fontSize: 25,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            content: Stack(
-              children: [
-                // Main container with padding to make space for the image at the bottom
-                Padding(
-                  padding: const EdgeInsets.only(
-                      bottom: 20.0), // Padding to leave space for the image
-                  child: Container(
-                    width: 350,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      gradient: const LinearGradient(
-                        colors: [
-                          Colors.black,
-                          Color.fromARGB(255, 44, 33, 3),
-                        ],
-                        stops: [0.80, 1.0],
-                        begin: Alignment.centerRight,
-                        end: Alignment.centerLeft,
-                      ),
-                    ),
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _buildTextField(
-                            'الاسم',
-                            (value) => supplierName = value,
-                            TextInputType.text),
-                        const SizedBox(height: 10),
-                        _buildTextField('وزنة 18', (value) => wazna18 = value,
-                            TextInputType.number),
-                        const SizedBox(height: 10),
-                        _buildTextField('وزنة 21', (value) => wazna21 = value,
-                            TextInputType.number),
-                        const SizedBox(height: 10),
-                        _buildTextField('وزنة 24', (value) => wazna24 = value,
-                            TextInputType.number),
-                        const SizedBox(height: 10),
-                        _buildTextField('نقدية', (value) => nakdyia = value,
-                            TextInputType.number),
-                      ],
-                    ),
-                  ),
-                ),
-                // Positioned image at the bottom but behind the content
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  left: 0, // Make the image full width to look like a footer
-                  child: IgnorePointer(
-                    // This makes sure the image doesn't block taps
-                    child: Image.asset(
-                      'assets/images/edafethesab.png', // Adjust the path if needed
-                      width: 200, // Set desired width
-                      height: 60, // Set desired height
-                      fit: BoxFit.cover, // Adjust fit as needed
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+        return BlocProvider(
+          create: (context) => SupplierCubit(FirebaseFirestore.instance),
+          child: SingleChildScrollView(
+            child: AlertDialog(
+              backgroundColor: const Color.fromARGB(255, 12, 12, 12),
+              title: Stack(
                 children: [
-                  Expanded(
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
+                  Center(
+                    child: ShaderMask(
+                      shaderCallback: (Rect bounds) {
+                        return const LinearGradient(
+                          colors: [Color(0xff594300), Colors.amber],
+                          begin: Alignment.centerRight,
+                          end: Alignment.centerLeft,
+                        ).createShader(bounds);
                       },
-                      child: const Text('إلغاء'),
-                    ),
-                  ),
-                  const SizedBox(width: 16), // Add space between buttons
-                  Expanded(
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      onPressed: () {
-                        if (supplierName.isNotEmpty &&
-                            wazna18.isNotEmpty &&
-                            wazna21.isNotEmpty &&
-                            nakdyia.isNotEmpty) {
-                          final newSupplier = Hesabmodel(
-                            transactions: [],
-                            id: '', // Ensure this matches how you initialize the ID
-                            suppliername: supplierName,
-                            wazna18: wazna18,
-                            wazna21: wazna21,
-                            wazna24: wazna24,
-                            nakdyia: nakdyia,
-                          );
-                          context
-                              .read<SupplierCubit>()
-                              .addSupplier(newSupplier);
-                          Navigator.of(context).pop();
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Please fill all fields')),
-                          );
-                        }
-                      },
-                      child: Container(
-                        width: 130,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xff735600), Colors.amber],
-                            begin: Alignment.centerRight,
-                            end: Alignment.centerLeft,
-                          ),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'إضافة',
-                            style: TextStyle(color: Colors.white),
-                          ),
+                      child: const Text(
+                        'اضافة حساب',
+                        style: TextStyle(
+                          fontSize: 25,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ),
                 ],
               ),
-            ],
+              content: Stack(
+                children: [
+                  // Main container with padding to make space for the image at the bottom
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        bottom: 20.0), // Padding to leave space for the image
+                    child: Container(
+                      width: 350,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        gradient: const LinearGradient(
+                          colors: [
+                            Colors.black,
+                            Color.fromARGB(255, 44, 33, 3),
+                          ],
+                          stops: [0.80, 1.0],
+                          begin: Alignment.centerRight,
+                          end: Alignment.centerLeft,
+                        ),
+                      ),
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildTextField(
+                              'الاسم',
+                              (value) => supplierName = value,
+                              TextInputType.text),
+                          const SizedBox(height: 10),
+                          _buildTextField('وزنة 18', (value) => wazna18 = value,
+                              TextInputType.number),
+                          const SizedBox(height: 10),
+                          _buildTextField('وزنة 21', (value) => wazna21 = value,
+                              TextInputType.number),
+                          const SizedBox(height: 10),
+                          _buildTextField('وزنة 24', (value) => wazna24 = value,
+                              TextInputType.number),
+                          const SizedBox(height: 10),
+                          _buildTextField('نقدية', (value) => nakdyia = value,
+                              TextInputType.number),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Positioned image at the bottom but behind the content
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    left: 0, // Make the image full width to look like a footer
+                    child: IgnorePointer(
+                      // This makes sure the image doesn't block taps
+                      child: Image.asset(
+                        'assets/images/edafethesab.png', // Adjust the path if needed
+                        width: 200, // Set desired width
+                        height: 60, // Set desired height
+                        fit: BoxFit.cover, // Adjust fit as needed
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('إلغاء'),
+                      ),
+                    ),
+                    const SizedBox(width: 16), // Add space between buttons
+                    Expanded(
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        onPressed: () {
+                          if (supplierName.isNotEmpty &&
+                              wazna18.isNotEmpty &&
+                              wazna21.isNotEmpty &&
+                              nakdyia.isNotEmpty) {
+                            final newSupplier = Hesabmodel(
+                              transactions: [],
+                              id: '', // Ensure this matches how you initialize the ID
+                              suppliername: supplierName,
+                              wazna18: wazna18,
+                              wazna21: wazna21,
+                              wazna24: wazna24,
+                              nakdyia: nakdyia,
+                            );
+                            context
+                                .read<SupplierCubit>()
+                                .addSupplier(newSupplier);
+                            Navigator.of(context).pop();
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Please fill all fields')),
+                            );
+                          }
+                        },
+                        child: Container(
+                          width: 130,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xff735600), Colors.amber],
+                              begin: Alignment.centerRight,
+                              end: Alignment.centerLeft,
+                            ),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'إضافة',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -304,8 +308,9 @@ class Hesabatcontainer extends StatelessWidget {
                                     child: CustomLoadingIndicator());
                               } else if (state is SupplierLoadSuccess) {
                                 if (state.suppliers.isEmpty) {
-                                  return const Center(
-                                      child: Text('No suppliers found'));
+                                  return Center(
+                                      child: Text('لا يوجد حسابات',
+                                          style: Appstyles.regular25(context)));
                                 }
                                 return Padding(
                                   padding: const EdgeInsets.only(

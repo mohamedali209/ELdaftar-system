@@ -23,7 +23,7 @@ class TransactionModel {
       wazna24: data['wazna24'] ?? '0',
       nakdyia: data['nakdyia'] ?? '0',
       date: data['date'] ?? '',
-      isAddition: data['isAddition'] ?? true, // Default to true if not present
+      isAddition: data['isAdd'] ?? true, // Default to true if not present
     );
   }
 
@@ -35,7 +35,7 @@ class TransactionModel {
       'wazna24': wazna24,
       'nakdyia': nakdyia,
       'date': date,
-      'isAddition': isAddition, // Include isAddition in the map
+      'isAdd': isAddition, // Include isAddition in the map
     };
   }
 }

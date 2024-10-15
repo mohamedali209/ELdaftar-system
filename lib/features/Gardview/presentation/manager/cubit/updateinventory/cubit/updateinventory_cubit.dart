@@ -1,7 +1,7 @@
 import 'package:aldafttar/features/Gardview/presentation/manager/cubit/updateinventory/cubit/updateinventory_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 
 class UpdateInventoryCubit extends Cubit<UpdateInventoryState> {
   UpdateInventoryCubit() : super(UpdateInventoryInitial());
@@ -18,7 +18,20 @@ class UpdateInventoryCubit extends Cubit<UpdateInventoryState> {
     emit(UpdateInventoryLoading());
 
     try {
-      final documentRef = _firestore.collection('weight').doc('HQWsDzc8ray5gwZp5XgF');
+      final auth = FirebaseAuth.instance;
+      final User? user = auth.currentUser;
+
+      if (user == null) {
+        emit(UpdateInventoryFailure(error: 'User not authenticated'));
+        return;
+      }
+
+      final userId = user.uid;
+      final documentRef = _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('weight')
+          .doc('init'); // Update based on your Firestore structure
 
       String fieldQuantity;
       String fieldWeight;
@@ -57,8 +70,10 @@ class UpdateInventoryCubit extends Cubit<UpdateInventoryState> {
           fieldWeight: newWeight.toString(),
         });
 
-        final total18kWeight = double.tryParse(data['total18kWeight'] ?? '0') ?? 0;
-        final total21kWeight = double.tryParse(data['total21kWeight'] ?? '0') ?? 0;
+        final total18kWeight =
+            double.tryParse(data['total18kWeight'] ?? '0') ?? 0;
+        final total21kWeight =
+            double.tryParse(data['total21kWeight'] ?? '0') ?? 0;
 
         double updatedTotal18kWeight = total18kWeight;
         double updatedTotal21kWeight = total21kWeight;
@@ -73,7 +88,8 @@ class UpdateInventoryCubit extends Cubit<UpdateInventoryState> {
               : total21kWeight - weight;
         }
 
-        final totalInventoryWeight21 = (updatedTotal18kWeight * 6 / 7) + updatedTotal21kWeight;
+        final totalInventoryWeight21 =
+            (updatedTotal18kWeight * 6 / 7) + updatedTotal21kWeight;
 
         transaction.update(documentRef, {
           'total18kWeight': updatedTotal18kWeight.toString(),

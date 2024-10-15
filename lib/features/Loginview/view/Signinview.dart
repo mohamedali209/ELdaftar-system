@@ -21,7 +21,7 @@ class _SigninScreenState extends State<SigninScreen> {
     context.read<SigninCubit>().checkIfSignedIn(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         
-        GoRouter.of(context).go(AppRouter.kDaftarview);
+        GoRouter.of(context).go(AppRouter.kinventoryview);
       });
     });
   }

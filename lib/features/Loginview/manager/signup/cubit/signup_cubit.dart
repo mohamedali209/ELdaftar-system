@@ -30,7 +30,7 @@ class SignupCubit extends Cubit<SignupState> {
       final String userId = userCredential.user?.uid ?? '';
 
       // Create the main collection with the store name
-      await _firestore.collection(storeName).doc(userId).set({
+      await _firestore.collection('users').doc(userId).set({
         'name': name,
         'storeName': storeName,
         'phone': phone,
@@ -39,7 +39,7 @@ class SignupCubit extends Cubit<SignupState> {
       });
 
       // Create subcollections for the user within the store-named collection
-      await _createSubcollections(storeName, userId);
+      await _createSubcollections('users', userId);
 
       emit(SignupState(isSuccess: true));
     } on FirebaseAuthException catch (e) {
@@ -58,31 +58,31 @@ class SignupCubit extends Cubit<SignupState> {
   Future<void> _createSubcollections(String storeName, String userId) async {
     // Create empty subcollections under the store-named collection
     await _firestore
-        .collection(storeName)
+        .collection('users')
         .doc(userId)
         .collection('dailyTransactions')
         .doc('init')
         .set({});
     await _firestore
-        .collection(storeName)
+        .collection('users')
         .doc(userId)
         .collection('suppliers')
         .doc('init')
         .set({});
     await _firestore
-        .collection(storeName)
+        .collection('users')
         .doc(userId)
         .collection('marmat')
         .doc('init')
         .set({});
     await _firestore
-        .collection(storeName)
+        .collection('users')
         .doc(userId)
         .collection('totals')
         .doc('init')
         .set({});
     await _firestore
-        .collection(storeName)
+        .collection('users')
         .doc(userId)
         .collection('weight')
         .doc('init')

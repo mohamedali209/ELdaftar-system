@@ -3,6 +3,7 @@ import 'package:aldafttar/features/Hesabatview/presentation/view/manager/cubit/s
 import 'package:aldafttar/features/Hesabatview/presentation/view/models/hesab_item_model.dart';
 import 'package:aldafttar/features/Hesabatview/presentation/view/widgets/supplierwazna_nkdyia.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/daftar_container_item.dart';
+import 'package:aldafttar/utils/custom_loading.dart';
 import 'package:aldafttar/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,115 +26,176 @@ class Hesabitem extends StatelessWidget {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
-              title: const Center(child: Text('تعديل الحساب')),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      DaftarcontainerItem(
-                        title: 'جرام 18',
-                      ),
-                      DaftarcontainerItem(
-                        title: 'جرام 21',
-                      ),
-                      DaftarcontainerItem(
-                        title: 'جرام 24',
-                      ),
-                      DaftarcontainerItem(
-                        title: 'نقدية',
-                      ),
-                      DaftarcontainerItem(
-                        title: 'التاريخ',
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  BlocBuilder<SupplierCubit, SupplierState>(
-                    builder: (context, state) {
-                      if (state is SupplierTransactionsLoadSuccess) {
-                        final transactions = state.transactions;
+  backgroundColor: const Color.fromARGB(255, 12, 12, 12),
+  title: Stack(
+    children: [
+      Center(
+        child: ShaderMask(
+          shaderCallback: (Rect bounds) {
+            return const LinearGradient(
+              colors: [Color(0xff594300), Colors.amber],
+              begin: Alignment.centerRight,
+              end: Alignment.centerLeft,
+            ).createShader(bounds);
+          },
+          child: Text(
+            'تعديل الحساب',
+            style: Appstyles.daftartodayheader(context).copyWith(
+              fontSize: 25,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    ],
+  ),
+  content: Stack(
+    children: [
+      Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          gradient: const LinearGradient(
+            colors: [
+              Colors.black, // First color
+              Color.fromARGB(255, 44, 33, 3), // Second color
+            ],
+            stops: [0.80, 1.0], // Adjusts where each color starts and ends
+            begin: Alignment.centerRight,
+            end: Alignment.centerLeft,
+          ),
+        ),
+        padding: const EdgeInsets.all(5.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                DaftarcontainerItem(title: 'جرام 18'),
+                DaftarcontainerItem(title: 'جرام 21'),
+                DaftarcontainerItem(title: 'جرام 24'),
+                DaftarcontainerItem(title: 'نقدية'),
+                DaftarcontainerItem(title: 'التاريخ'),
+              ],
+            ),
+            const SizedBox(height: 10),
+            BlocBuilder<SupplierCubit, SupplierState>(
+              builder: (context, state) {
+                if (state is SupplierTransactionsLoadSuccess) {
+                  final transactions = state.transactions;
 
-                        return SizedBox(
-                          height: 400,
-                          width: 950,
-                          child: ListView.builder(
-                            itemCount: transactions.length,
-                            itemBuilder: (context, index) {
-                              final transaction = transactions[index];
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * .4,
+                    width: MediaQuery.of(context).size.width*.9,
+                    child: ListView.builder(
+                      itemCount: transactions.length,
+                      itemBuilder: (context, index) {
+                        final transaction = transactions[index];
 
-                              // Determine color based on whether it's an addition or subtraction
-                              final color = transaction.isAddition
-                                  ? Colors.green
-                                  : Colors.red;
+                        // Determine color based on whether it's an addition or subtraction
+                        final color = transaction.isAddition
+                            ? Colors.green
+                            : Colors.red;
 
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 15, bottom: 10),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    DaftarcontainerItem(
-                                      color: color,
-                                      title: transaction.wazna18.toString(),
-                                    ),
-                                    DaftarcontainerItem(
-                                      color: color,
-                                      title: transaction.wazna21.toString(),
-                                    ),
-                                    DaftarcontainerItem(
-                                      color: color,
-                                      title: transaction.wazna24.toString(),
-                                    ),
-                                    DaftarcontainerItem(
-                                      color: color,
-                                      title: transaction.nakdyia.toString(),
-                                    ),
-                                    DaftarcontainerItem(
-                                      color: color,
-                                      title: transaction.date.toString(),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 0, bottom: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              DaftarcontainerItem(
+                                color: color,
+                                title: transaction.wazna18.toString(),
+                              ),
+                              DaftarcontainerItem(
+                                color: color,
+                                title: transaction.wazna21.toString(),
+                              ),
+                              DaftarcontainerItem(
+                                color: color,
+                                title: transaction.wazna24.toString(),
+                              ),
+                              DaftarcontainerItem(
+                                color: color,
+                                title: transaction.nakdyia.toString(),
+                              ),
+                              DaftarcontainerItem(
+                                color: color,
+                                title: transaction.date.toString(),
+                              ),
+                            ],
                           ),
                         );
-                      }
+                      },
+                    ),
+                  );
+                }
 
-                      if (state is SupplierLoadInProgress) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
+                if (state is SupplierLoadInProgress) {
+                  return const Center(child: CustomLoadingIndicator());
+                }
 
-                      return const Center(
-                          child: Text('No transactions available'));
-                    },
-                  ),
-                ],
+                return const Center(child: Text('لا توجد معاملات متاحة'));
+              },
+            ),
+          ],
+        ),
+      ),
+    ],
+  ),
+  actions: [
+    Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Expanded(
+          child: TextButton(
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop(); // Close dialog without changes
+              context.read<SupplierCubit>().fetchSuppliers(); // Reload suppliers
+            },
+            child: const Text('إلغاء'),
+          ),
+        ),
+        const SizedBox(width: 16), // Add space between buttons
+        Expanded(
+          child: TextButton(
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+            ),
+            onPressed: () {
+              _showTransactionDialog(context); // Open the transaction dialog
+              context.read<SupplierCubit>().fetchSuppliers(); // Reload suppliers
+            },
+            child: Container(
+              width: 130,
+              height: 30,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xff735600), Colors.amber],
+                  begin: Alignment.centerRight,
+                  end: Alignment.centerLeft,
+                ),
+                borderRadius: BorderRadius.circular(15), // Adjust as needed
               ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Close dialog without changes
-                    context
-                        .read<SupplierCubit>()
-                        .fetchSuppliers(); // Reload suppliers
-                  },
-                  child: const Text('إلغاء'),
+              child: const Center(
+                child: Text(
+                  'تعديل',
+                  style: TextStyle(color: Colors.white),
                 ),
-                TextButton(
-                  onPressed: () {
-                    _showTransactionDialog(
-                        context); // Open the transaction dialog
-                    context
-                        .read<SupplierCubit>()
-                        .fetchSuppliers(); // Reload suppliers
-                  },
-                  child: const Text('تعديل'),
-                ),
-              ],
-            );
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  ],
+);
+
           },
         );
       },
@@ -150,75 +212,159 @@ class Hesabitem extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Center(child: Text('تعديل القيم')),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
+          backgroundColor: const Color.fromARGB(255, 12, 12, 12),
+          title: Stack(
             children: [
-              TextField(
-                controller: ayar18Controller,
-                decoration: const InputDecoration(labelText: 'عيار 18'),
-                keyboardType: TextInputType.number,
+              Center(
+                child: ShaderMask(
+                  shaderCallback: (Rect bounds) {
+                    return const LinearGradient(
+                      colors: [Color(0xff594300), Colors.amber],
+                      begin: Alignment.centerRight,
+                      end: Alignment.centerLeft,
+                    ).createShader(bounds);
+                  },
+                  child: const Text(
+                    'زيادة او خصم',
+                    style: TextStyle(
+                      fontSize: 25,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ),
-              TextField(
-                controller: ayar21Controller,
-                decoration: const InputDecoration(labelText: 'عيار 21'),
-                keyboardType: TextInputType.number,
-              ),
-              TextField(
-                controller: ayar24Controller,
-                decoration: const InputDecoration(labelText: 'عيار 24'),
-                keyboardType: TextInputType.number,
-              ),
-              TextField(
-                controller: nakdyiaController,
-                decoration: const InputDecoration(labelText: 'نقدية'),
-                keyboardType: TextInputType.number,
+            ],
+          ),
+          content: Stack(
+            children: [
+              Container(
+                width: 350,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  gradient: const LinearGradient(
+                    colors: [
+                      Colors.black, // First color
+                      Color.fromARGB(255, 44, 33, 3), // Second color
+                    ],
+                    stops: [
+                      0.80,
+                      1.0
+                    ], // Adjusts where each color starts and ends
+                    begin: Alignment.centerRight,
+                    end: Alignment.centerLeft,
+                  ),
+                ),
+                padding: const EdgeInsets.all(10.0),
+                child: Form(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: ayar18Controller,
+                        decoration: const InputDecoration(labelText: 'عيار 18'),
+                        keyboardType: TextInputType.number,
+                      ),
+                      const SizedBox(height: 10), // Space between fields
+                      TextField(
+                        controller: ayar21Controller,
+                        decoration: const InputDecoration(labelText: 'عيار 21'),
+                        keyboardType: TextInputType.number,
+                      ),
+                      const SizedBox(height: 10), // Space between fields
+                      TextField(
+                        controller: ayar24Controller,
+                        decoration: const InputDecoration(labelText: 'عيار 24'),
+                        keyboardType: TextInputType.number,
+                      ),
+                      const SizedBox(height: 10), // Space between fields
+                      TextField(
+                        controller: nakdyiaController,
+                        decoration: const InputDecoration(labelText: 'نقدية'),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
           actions: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                TextButton(
-                  onPressed: () {
-                    // Add the entered values to the current values
-                    context.read<SupplierCubit>().addTransaction(
-                          hesabmodel.id,
-                          ayar18Controller.text,
-                          ayar21Controller.text,
-                          ayar24Controller.text,
-                          nakdyiaController.text,
-                          true, // true indicates an addition
-                        );
-                    Navigator.of(context).pop(); // Close dialog
-                    context
-                        .read<SupplierCubit>()
-                        .fetchTransactions(hesabmodel.id);
-                  },
-                  child: const Text('إضافة'),
+                Expanded(
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () {
+                      // Add the entered values to the current values
+                      context.read<SupplierCubit>().addTransaction(
+                            hesabmodel.id,
+                            ayar18Controller.text,
+                            ayar21Controller.text,
+                            ayar24Controller.text,
+                            nakdyiaController.text,
+                            true, // true indicates an addition
+                          );
+                      Navigator.of(context).pop(); // Close dialog
+                      context
+                          .read<SupplierCubit>()
+                          .fetchTransactions(hesabmodel.id);
+                    },
+                    child:Container(
+                        width: 130,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xff735600), Colors.amber],
+                            begin: Alignment.centerRight,
+                            end: Alignment.centerLeft,
+                          ),
+                          borderRadius:
+                              BorderRadius.circular(15), // Adjust as needed
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'اضافة',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                  ),
                 ),
-                TextButton(
-                  onPressed: () {
-                    // Subtract the entered values from the current values
-                    context.read<SupplierCubit>().addTransaction(
-                          hesabmodel.id,
-                          ayar18Controller.text,
-                          ayar21Controller.text,
-                          ayar24Controller.text,
-                          nakdyiaController.text,
-                          false, // false indicates a subtraction
-                        );
-                    Navigator.of(context).pop(); // Close dialog
-                    context
-                        .read<SupplierCubit>()
-                        .fetchTransactions(hesabmodel.id);
-                  },
-                  child: const Text('طرح'),
+                const SizedBox(width: 16), // Add space between buttons
+                Expanded(
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 152, 2, 2),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () {
+                      // Subtract the entered values from the current values
+                      context.read<SupplierCubit>().addTransaction(
+                            hesabmodel.id,
+                            ayar18Controller.text,
+                            ayar21Controller.text,
+                            ayar24Controller.text,
+                            nakdyiaController.text,
+                            false, // false indicates a subtraction
+                          );
+                      Navigator.of(context).pop(); // Close dialog
+                      context
+                          .read<SupplierCubit>()
+                          .fetchTransactions(hesabmodel.id);
+                    },
+                    child: const Text('خصم'),
+                  ),
                 ),
               ],
             ),
             TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+              ),
               onPressed: () {
                 Navigator.of(context).pop(); // Close dialog without changes
                 context.read<SupplierCubit>().fetchTransactions(hesabmodel.id);

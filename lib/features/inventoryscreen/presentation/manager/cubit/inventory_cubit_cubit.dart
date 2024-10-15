@@ -1,9 +1,12 @@
 import 'package:aldafttar/features/inventoryscreen/presentation/manager/cubit/inventory_cubit_state.dart' as state;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class InventoryCubit extends Cubit<state.InventoryState> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   InventoryCubit() : super(state.InventoryInitial()) {
     _loadDataFromFirestore();
@@ -11,18 +14,32 @@ class InventoryCubit extends Cubit<state.InventoryState> {
 
   final Map<String, String> _controllers = {};
 
+  // Fetch data for the authenticated user
   void _loadDataFromFirestore() async {
     try {
-      DocumentSnapshot doc = await _firestore.collection('weight').doc('HQWsDzc8ray5gwZp5XgF').get();
-      if (doc.exists) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        data.forEach((key, value) {
-          _controllers[key] = value.toString();
-        });
-        emit(state.InventoryUpdated(_controllers));
+      // Get the current user's userId
+      User? user = _auth.currentUser;
+      if (user != null) {
+        String userId = user.uid;
+
+        // Fetch the 'weight' document for the logged-in user
+        DocumentSnapshot doc = await _firestore
+            .collection('users')
+            .doc(userId)
+            .collection('weight')
+            .doc('init')  // Adjust document ID if needed
+            .get();
+
+        if (doc.exists) {
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          data.forEach((key, value) {
+            _controllers[key] = value.toString();
+          });
+          emit(state.InventoryUpdated(_controllers));
+        }
       }
     } catch (e) {
-      print('Failed to load data: $e');
+      debugPrint('Failed to load data: $e');
     }
   }
 
@@ -114,39 +131,45 @@ class InventoryCubit extends Cubit<state.InventoryState> {
     double ginehatWeight,
   ) async {
     try {
-      await _firestore.collection('weight').doc('HQWsDzc8ray5gwZp5XgF').update({
-        'total18kWeight': total18kWeight.toStringAsFixed(2),
-        'total21kWeight': total21kWeight.toStringAsFixed(2),
-        'total18kKasr': total18kKasr.toStringAsFixed(2),
-        'total21kKasr': total21kKasr.toStringAsFixed(2),
-        'total_cash': totalCash.toStringAsFixed(0),
-        'totalInventoryWeight21': totalInventoryWeight21.toStringAsFixed(2),
-        'sabaek_count': sabekatQuantity.toStringAsFixed(0),
-        'sabaek_weight': sabekatWeight.toStringAsFixed(2),
-        'gnihat_count': ginehatQuantity.toStringAsFixed(0),
-        'gnihat_weight': ginehatWeight.toStringAsFixed(2),
-        // Add fields for the new categories
-        for (String type in [
-          'خواتم',
-          'دبل',
-          'محابس',
-          'انسيالات',
-          'غوايش',
-          'حلقان',
-          'تعاليق',
-          'كوليهات',
-          'سلاسل',
-          'اساور'
-        ]) ...{
-          '${type}_18k_quantity': double.tryParse(_controllers['${type}_18k_quantity'] ?? '')?.toStringAsFixed(0) ?? '0',
-          '${type}_21k_quantity': double.tryParse(_controllers['${type}_21k_quantity'] ?? '')?.toStringAsFixed(0) ?? '0',
-          '${type}_18k_weight': double.tryParse(_controllers['${type}_18k_weight'] ?? '')?.toStringAsFixed(2) ?? '0',
-          '${type}_21k_weight': double.tryParse(_controllers['${type}_21k_weight'] ?? '')?.toStringAsFixed(2) ?? '0',
-        },
-      });
-      print('Data successfully updated to Firestore');
+      // Get the current user's userId
+      User? user = _auth.currentUser;
+      if (user != null) {
+        String userId = user.uid;
+
+        // Update the 'weight' document for the logged-in user
+        await _firestore.collection('users').doc(userId).collection('weight').doc('init').update({
+          'total18kWeight': total18kWeight.toStringAsFixed(2),
+          'total21kWeight': total21kWeight.toStringAsFixed(2),
+          'total18kKasr': total18kKasr.toStringAsFixed(2),
+          'total21kKasr': total21kKasr.toStringAsFixed(2),
+          'total_cash': totalCash.toStringAsFixed(0),
+          'totalInventoryWeight21': totalInventoryWeight21.toStringAsFixed(2),
+          'sabaek_count': sabekatQuantity.toStringAsFixed(0),
+          'sabaek_weight': sabekatWeight.toStringAsFixed(2),
+          'gnihat_count': ginehatQuantity.toStringAsFixed(0),
+          'gnihat_weight': ginehatWeight.toStringAsFixed(2),
+          // Add fields for the new categories
+          for (String type in [
+            'خواتم',
+            'دبل',
+            'محابس',
+            'انسيالات',
+            'غوايش',
+            'حلقان',
+            'تعاليق',
+            'كوليهات',
+            'سلاسل',
+            'اساور'
+          ]) ...{
+            '${type}_18k_quantity': double.tryParse(_controllers['${type}_18k_quantity'] ?? '')?.toStringAsFixed(0) ?? '0',
+            '${type}_21k_quantity': double.tryParse(_controllers['${type}_21k_quantity'] ?? '')?.toStringAsFixed(0) ?? '0',
+            '${type}_18k_weight': double.tryParse(_controllers['${type}_18k_weight'] ?? '')?.toStringAsFixed(2) ?? '0',
+            '${type}_21k_weight': double.tryParse(_controllers['${type}_21k_weight'] ?? '')?.toStringAsFixed(2) ?? '0',
+          },
+        });
+      }
     } catch (e) {
-      print('Failed to update data: $e');
+      debugPrint('Failed to update data: $e');
     }
   }
 }
