@@ -73,196 +73,246 @@ class DaftarelgardHeader extends StatelessWidget {
         TextEditingController quantityController = TextEditingController();
 
         return SingleChildScrollView(
-          child: AlertDialog(
-            backgroundColor:
-                const Color.fromARGB(255, 12, 12, 12), // Set background color
-            title: Stack(
-              children: [
-                Center(
-                  child: ShaderMask(
-                    shaderCallback: (Rect bounds) {
-                      return const LinearGradient(
-                        colors: [Color(0xff594300), Colors.amber],
-                        begin: Alignment.centerRight,
-                        end: Alignment.centerLeft,
-                      ).createShader(bounds);
-                    },
-                    child: Text(
-                      'إضافة أو تعديل وزنة',
-                      style: Appstyles.regular12cairo(context).copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 25,
-                          color: Colors.white),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            content: Stack(
-              children: [
-                Container(
-                  width: 350,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    gradient: const LinearGradient(
-                      colors: [
-                        Colors.black, // First color
-                        Color.fromARGB(255, 44, 33, 3), // Second color
-                      ],
-                      stops: [0.80, 1.0],
+            child: AlertDialog(
+          backgroundColor: const Color.fromARGB(255, 12, 12, 12),
+          title: Stack(
+            children: [
+              Center(
+                child: ShaderMask(
+                  shaderCallback: (Rect bounds) {
+                    return const LinearGradient(
+                      colors: [Color(0xff594300), Colors.amber],
                       begin: Alignment.centerRight,
                       end: Alignment.centerLeft,
+                    ).createShader(bounds);
+                  },
+                  child: Text(
+                    'إضافة أو تعديل وزنة',
+                    style: Appstyles.regular12cairo(context).copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 25,
+                      color: Colors.white,
                     ),
-                  ),
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      DropdownButtonFormField<String>(
-                        decoration:
-                            const InputDecoration(labelText: 'اختيار العملية'),
-                        items: const [
-                          DropdownMenuItem(value: 'add', child: Text('إضافة')),
-                          DropdownMenuItem(value: 'minus', child: Text('خصم')),
-                        ],
-                        onChanged: (value) {
-                          operation = value;
-                        },
-                      ),
-                      const SizedBox(height: 10), // Space between fields
-                      DropdownButtonFormField<String>(
-                        decoration:
-                            const InputDecoration(labelText: 'اختيار النوع'),
-                        items: const [
-                          DropdownMenuItem(
-                              value: 'خواتم', child: Text('خواتم')),
-                          DropdownMenuItem(value: 'دبل', child: Text('دبل')),
-                          DropdownMenuItem(
-                              value: 'محابس', child: Text('محابس')),
-                          DropdownMenuItem(
-                              value: 'انسيالات', child: Text('انسيالات')),
-                          DropdownMenuItem(
-                              value: 'غوايش', child: Text('غوايش')),
-                          DropdownMenuItem(
-                              value: 'حلقان', child: Text('حلقان')),
-                          DropdownMenuItem(
-                              value: 'تعاليق', child: Text('تعاليق')),
-                          DropdownMenuItem(
-                              value: 'كوليهات', child: Text('كوليهات')),
-                          DropdownMenuItem(
-                              value: 'سلاسل', child: Text('سلاسل')),
-                          DropdownMenuItem(
-                              value: 'اساور', child: Text('اساور')),
-                          DropdownMenuItem(
-                              value: 'جنيهات', child: Text('جنيهات')),
-                          DropdownMenuItem(
-                              value: 'سبائك', child: Text('سبائك')),
-                        ],
-                        onChanged: (value) {
-                          jewelryType = value;
-                        },
-                      ),
-                      const SizedBox(height: 10), // Space between fields
-                      DropdownButtonFormField<String>(
-                        decoration:
-                            const InputDecoration(labelText: 'اختيار العيار'),
-                        items: const [
-                          DropdownMenuItem(value: '18k', child: Text('18k')),
-                          DropdownMenuItem(value: '21k', child: Text('21k')),
-                          DropdownMenuItem(value: '24k', child: Text('24k')),
-                        ],
-                        onChanged: (value) {
-                          purity = value;
-                        },
-                      ),
-                      const SizedBox(height: 10), // Space between fields
-                      TextField(
-                        controller: weightController,
-                        decoration: const InputDecoration(labelText: 'الوزن'),
-                        keyboardType: TextInputType.number,
-                      ),
-                      const SizedBox(height: 10), // Space between fields
-                      TextField(
-                        controller: quantityController,
-                        decoration: const InputDecoration(labelText: 'الكمية'),
-                        keyboardType: TextInputType.number,
-                      ),
-                    ],
                   ),
                 ),
-              ],
-            ),
-            actions: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('إلغاء'),
-                    ),
-                  ),
-                  const SizedBox(width: 16), // Space between buttons
-                  Expanded(
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      onPressed: () {
-                        if (operation != null &&
-                            weightController.text.isNotEmpty &&
-                            quantityController.text.isNotEmpty &&
-                            jewelryType != null &&
-                            purity != null) {
-                          double weight =
-                              double.tryParse(weightController.text) ?? 0;
-                          int quantity =
-                              int.tryParse(quantityController.text) ?? 0;
-
-                          BlocProvider.of<UpdateInventoryCubit>(context)
-                              .updateInventory(
-                            type: jewelryType!,
-                            weight: weight,
-                            quantity: quantity,
-                            purity: purity!,
-                            operation: operation!,
-                          );
-                        }
-
-                        Navigator.of(context).pop();
-                      },
-                      child: Container(
-                        width: 130,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xff735600), Colors.amber],
-                            begin: Alignment.centerRight,
-                            end: Alignment.centerLeft,
-                          ),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'تأكيد',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
               ),
             ],
           ),
-        );
+          content: Stack(
+            children: [
+              Container(
+                width: 350,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  gradient: const LinearGradient(
+                    colors: [
+                      Colors.black, // First color
+                      Color.fromARGB(255, 44, 33, 3), // Second color
+                    ],
+                    stops: [0.80, 1.0],
+                    begin: Alignment.centerRight,
+                    end: Alignment.centerLeft,
+                  ),
+                ),
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DropdownButtonFormField<String>(
+                      decoration:
+                          const InputDecoration(labelText: 'اختيار العملية'),
+                      items: const [
+                        DropdownMenuItem(value: 'add', child: Text('إضافة')),
+                        DropdownMenuItem(value: 'minus', child: Text('خصم')),
+                      ],
+                      onChanged: (value) {
+                        operation = value;
+                      },
+                    ),
+                    const SizedBox(height: 10), // Space between fields
+                    DropdownButtonFormField<String>(
+                      decoration:
+                          const InputDecoration(labelText: 'اختيار النوع'),
+                      items: const [
+                        DropdownMenuItem(value: 'خواتم', child: Text('خواتم')),
+                        DropdownMenuItem(value: 'دبل', child: Text('دبل')),
+                        DropdownMenuItem(value: 'محابس', child: Text('محابس')),
+                        DropdownMenuItem(
+                            value: 'انسيالات', child: Text('انسيالات')),
+                        DropdownMenuItem(value: 'غوايش', child: Text('غوايش')),
+                        DropdownMenuItem(value: 'حلقان', child: Text('حلقان')),
+                        DropdownMenuItem(
+                            value: 'تعاليق', child: Text('تعاليق')),
+                        DropdownMenuItem(
+                            value: 'كوليهات', child: Text('كوليهات')),
+                        DropdownMenuItem(value: 'سلاسل', child: Text('سلاسل')),
+                        DropdownMenuItem(value: 'اساور', child: Text('اساور')),
+                        DropdownMenuItem(
+                            value: 'جنيهات', child: Text('جنيهات')),
+                        DropdownMenuItem(value: 'سبائك', child: Text('سبائك')),
+                      ],
+                      onChanged: (value) {
+                        jewelryType = value;
+                      },
+                    ),
+                    const SizedBox(height: 10), // Space between fields
+                    DropdownButtonFormField<String>(
+                      decoration:
+                          const InputDecoration(labelText: 'اختيار العيار'),
+                      items: const [
+                        DropdownMenuItem(value: '18k', child: Text('18k')),
+                        DropdownMenuItem(value: '21k', child: Text('21k')),
+                        DropdownMenuItem(value: '24k', child: Text('24k')),
+                      ],
+                      onChanged: (value) {
+                        purity = value;
+                      },
+                    ),
+                    const SizedBox(height: 10), // Space between fields
+                    TextField(
+                      controller: weightController,
+                      decoration: const InputDecoration(labelText: 'الوزن'),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 10), // Space between fields
+                    TextField(
+                      controller: quantityController,
+                      decoration: const InputDecoration(labelText: 'الكمية'),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('إلغاء'),
+                  ),
+                ),
+                const SizedBox(width: 16), // Space between buttons
+                Expanded(
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () {
+                      // Validate input before proceeding
+                      if (operation != null &&
+                          jewelryType != null &&
+                          purity != null) {
+                        final weightInput = weightController.text;
+                        final quantityInput = quantityController.text;
+
+                        // Validate weight
+                        final weight = double.tryParse(weightInput);
+                        if (weight == null) {
+                          // Show error message if weight is invalid
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              backgroundColor: Colors.black,
+                              title: const Center(child: Text('خطأ')),
+                              content:  Text('الرجاء إدخال وزن صحيح',style: Appstyles.regular25(context),),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text('موافق'),
+                                ),
+                              ],
+                            ),
+                          );
+                          return;
+                        }
+
+                        // Validate quantity
+                        final quantity = int.tryParse(quantityInput);
+                        if (quantity == null) {
+                          // Show error message if quantity is invalid
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              backgroundColor: Colors.black,
+                              title: const Center(child: Text('خطأ')),
+                              content:  Text('الرجاء إدخال كمية صحيحة',style: Appstyles.regular25(context),),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text('موافق'),
+                                ),
+                              ],
+                            ),
+                          );
+                          return;
+                        }
+
+                        // Proceed to update the inventory
+                        BlocProvider.of<UpdateInventoryCubit>(context)
+                            .updateInventory(
+                          type: jewelryType!,
+                          weight: weight,
+                          quantity: quantity,
+                          purity: purity!,
+                          operation: operation!,
+                        );
+
+                        // Close the dialog after the operation
+                        Navigator.of(context).pop();
+                      } else {
+                        // Show error if any dropdown is not selected
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            backgroundColor: Colors.black,
+                            title: const Center(child: Text('خطأ')),
+                            content:  Text(
+                                'الرجاء اختيار جميع الحقول المطلوبة',style: Appstyles.regular25(context),),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: const Text('موافق'),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                    },
+                    child: Container(
+                      width: 130,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xff735600), Colors.amber],
+                          begin: Alignment.centerRight,
+                          end: Alignment.centerLeft,
+                        ),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          'تأكيد',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ));
       },
     );
   }

@@ -148,9 +148,14 @@ class InventoryScreen extends StatelessWidget {
                                                                   '${type}_18k_quantity',
                                                                   value),
                                                           validator: (value) {
-                                                            if (value == null ||
-                                                                value.isEmpty) {
-                                                              return 'الرجاء إدخال الكمية';
+                                                            if (value!
+                                                                .isEmpty) {
+                                                              return 'Field required';
+                                                            }
+                                                            if (double.tryParse(
+                                                                    value) ==
+                                                                null) {
+                                                              return 'رقم فقط';
                                                             }
                                                             return null;
                                                           },
@@ -177,9 +182,14 @@ class InventoryScreen extends StatelessWidget {
                                                                   '${type}_21k_quantity',
                                                                   value),
                                                           validator: (value) {
-                                                            if (value == null ||
-                                                                value.isEmpty) {
-                                                              return 'الرجاء إدخال الكمية';
+                                                            if (value!
+                                                                .isEmpty) {
+                                                              return 'Field required';
+                                                            }
+                                                            if (double.tryParse(
+                                                                    value) ==
+                                                                null) {
+                                                              return 'رقم فقط';
                                                             }
                                                             return null;
                                                           },
@@ -210,9 +220,14 @@ class InventoryScreen extends StatelessWidget {
                                                                   '${type}_18k_weight',
                                                                   value),
                                                           validator: (value) {
-                                                            if (value == null ||
-                                                                value.isEmpty) {
-                                                              return 'الرجاء إدخال الوزن';
+                                                            if (value!
+                                                                .isEmpty) {
+                                                              return 'Field required';
+                                                            }
+                                                            if (double.tryParse(
+                                                                    value) ==
+                                                                null) {
+                                                              return 'رقم فقط';
                                                             }
                                                             return null;
                                                           },
@@ -239,9 +254,14 @@ class InventoryScreen extends StatelessWidget {
                                                                   '${type}_21k_weight',
                                                                   value),
                                                           validator: (value) {
-                                                            if (value == null ||
-                                                                value.isEmpty) {
-                                                              return 'الرجاء إدخال الوزن';
+                                                            if (value!
+                                                                .isEmpty) {
+                                                              return 'Field required';
+                                                            }
+                                                            if (double.tryParse(
+                                                                    value) ==
+                                                                null) {
+                                                              return 'رقم فقط';
                                                             }
                                                             return null;
                                                           },
@@ -301,8 +321,11 @@ class InventoryScreen extends StatelessWidget {
                                             .setControllerValue(
                                                 'sabaek_count', value),
                                         validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'الرجاء إدخال الكمية';
+                                          if (value!.isEmpty) {
+                                            return 'Field required';
+                                          }
+                                          if (double.tryParse(value) == null) {
+                                            return 'رقم فقط';
                                           }
                                           return null;
                                         },
@@ -321,8 +344,11 @@ class InventoryScreen extends StatelessWidget {
                                             .setControllerValue(
                                                 'sabaek_weight', value),
                                         validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'الرجاء إدخال الوزن';
+                                          if (value!.isEmpty) {
+                                            return 'Field required';
+                                          }
+                                          if (double.tryParse(value) == null) {
+                                            return 'رقم فقط';
                                           }
                                           return null;
                                         },
@@ -364,8 +390,11 @@ class InventoryScreen extends StatelessWidget {
                                             .setControllerValue(
                                                 'gnihat_count', value),
                                         validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'الرجاء إدخال الكمية';
+                                          if (value!.isEmpty) {
+                                            return 'Field required';
+                                          }
+                                          if (double.tryParse(value) == null) {
+                                            return 'رقم فقط';
                                           }
                                           return null;
                                         },
@@ -384,8 +413,11 @@ class InventoryScreen extends StatelessWidget {
                                             .setControllerValue(
                                                 'gnihat_weight', value),
                                         validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'الرجاء إدخال الوزن';
+                                          if (value!.isEmpty) {
+                                            return 'Field required';
+                                          }
+                                          if (double.tryParse(value) == null) {
+                                            return 'رقم فقط';
                                           }
                                           return null;
                                         },
@@ -433,8 +465,11 @@ class InventoryScreen extends StatelessWidget {
                                             .setControllerValue(
                                                 '18k_kasr', value),
                                         validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'الرجاء إدخال الكسر';
+                                          if (value!.isEmpty) {
+                                            return 'Field required';
+                                          }
+                                          if (double.tryParse(value) == null) {
+                                            return 'رقم فقط';
                                           }
                                           return null;
                                         },
@@ -453,8 +488,11 @@ class InventoryScreen extends StatelessWidget {
                                             .setControllerValue(
                                                 '21k_kasr', value),
                                         validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'الرجاء إدخال الكسر';
+                                          if (value!.isEmpty) {
+                                            return 'Field required';
+                                          }
+                                          if (double.tryParse(value) == null) {
+                                            return 'رقم فقط';
                                           }
                                           return null;
                                         },
@@ -492,8 +530,11 @@ class InventoryScreen extends StatelessWidget {
                                       .read<InventoryCubit>()
                                       .setControllerValue('total_cash', value),
                                   validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'الرجاء إدخال النقدية';
+                                    if (value!.isEmpty) {
+                                      return 'Field required';
+                                    }
+                                    if (double.tryParse(value) == null) {
+                                      return 'رقم فقط';
                                     }
                                     return null;
                                   },
@@ -531,7 +572,7 @@ class InventoryScreen extends StatelessWidget {
                                         .read<InventoryCubit>()
                                         .calculateTotals();
                                   } else {
-                                    print('Form validation failed');
+                                    debugPrint('Form validation failed');
                                   }
                                 },
                                 child: const Text(
@@ -547,7 +588,7 @@ class InventoryScreen extends StatelessWidget {
                   );
                 } else if (state is InventoryTotalsCalculated) {
                   // Debugging statement
-                  print('InventoryTotalsCalculated state reached');
+                  debugPrint('InventoryTotalsCalculated state reached');
 
                   SchedulerBinding.instance.addPostFrameCallback((_) {
                     ScaffoldMessenger.of(context).showSnackBar(

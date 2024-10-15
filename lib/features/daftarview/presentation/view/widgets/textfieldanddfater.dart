@@ -82,199 +82,218 @@ class CustombuttonAddorSubtract extends StatelessWidget {
       context: context,
       builder: (context) {
         return SingleChildScrollView(
-          child: AlertDialog(
-            backgroundColor: const Color.fromARGB(255, 12, 12, 12),
-            title: Stack(
-              children: [
-                Center(
-                  child: ShaderMask(
-                    shaderCallback: (Rect bounds) {
-                      return const LinearGradient(
-                        colors: [Color(0xff594300), Colors.amber],
-                        begin: Alignment.centerRight,
-                        end: Alignment.centerLeft,
-                      ).createShader(bounds);
-                    },
-                    child: Text(
-                      'اضافة منتج',
-                      style: Appstyles.daftartodayheader(context).copyWith(
-                        fontSize: 25,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            content: Stack(
-              children: [
-                Container(
-                  width: 350,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    gradient: const LinearGradient(
-                      colors: [
-                        Colors.black, // First color
-                        Color.fromARGB(255, 44, 33, 3), // Second color
-                      ],
-                      stops: [
-                        0.80,
-                        1.0
-                      ], // Adjusts where each color starts and ends
+            child: AlertDialog(
+          backgroundColor: const Color.fromARGB(255, 12, 12, 12),
+          title: Stack(
+            children: [
+              Center(
+                child: ShaderMask(
+                  shaderCallback: (Rect bounds) {
+                    return const LinearGradient(
+                      colors: [Color(0xff594300), Colors.amber],
                       begin: Alignment.centerRight,
                       end: Alignment.centerLeft,
-                    ),
-                  ),
-                  padding: const EdgeInsets.all(10.0),
-                  child: Form(
-                    key: formKey,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CustomDropdown(
-                          value: selectedDetail,
-                          items: detailsOptions,
-                          onChanged: (newValue) {
-                            selectedDetail = newValue!;
-                          },
-                          labelText: 'الصنف',
-                          validator: (value) =>
-                              value == null ? 'Field required' : null,
-                        ),
-                        const SizedBox(height: 10), // Space between fields
-                        CustomTextField2(
-                          keyboardType: TextInputType.number,
-                          controller: adadController,
-                          hintText: '...ادخل العدد',
-                          validator: (value) =>
-                              value!.isEmpty ? 'Field required' : null,
-                        ),
-                        const SizedBox(height: 10), // Space between fields
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: CustomTextField2(
-                                keyboardType: TextInputType.number,
-                                controller: gramController,
-                                hintText: '...ادخل الجرام',
-                                validator: (value) =>
-                                    value!.isEmpty ? 'Field required' : null,
-                              ),
-                            ),
-                            const SizedBox(
-                                width: 16), // Add space between fields
-                            Expanded(
-                              child: CustomTextField2(
-                                keyboardType: TextInputType.number,
-                                controller: priceController,
-                                hintText: '...ادخل السعر',
-                                validator: (value) =>
-                                    value!.isEmpty ? 'Field required' : null,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10), // Space between fields
-                        CustomDropdown(
-                          value: selectedAyar,
-                          items: ayarOptions,
-                          onChanged: (newValue) {
-                            selectedAyar = newValue!;
-                          },
-                          labelText: 'عيار',
-                          validator: (value) =>
-                              value == null ? 'Field required' : null,
-                        ),
-                        CustomTextField2(
-                          keyboardType: TextInputType.number,
-                          controller: detailsController,
-                          hintText: '...يوجد تفاصيل ؟',
-                          validator: (value) {
-                            // If the value is empty, do not return an error (allow empty values)
-                            if (value == null || value.isEmpty) {
-                              return null; // No error message
-                            }
-                            // If the value is not empty, apply additional validation if needed
-                            return null;
-                          },
-                        ),
-                      ],
+                    ).createShader(bounds);
+                  },
+                  child: Text(
+                    'اضافة منتج',
+                    style: Appstyles.daftartodayheader(context).copyWith(
+                      fontSize: 25,
+                      color: Colors.white,
                     ),
                   ),
                 ),
-              ],
-            ),
-            actions: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 12), // Match padding here
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('الغاء'),
-                    ),
-                  ),
-                  const SizedBox(width: 16), // Add space between buttons
-                  Expanded(
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 12), // Match padding here
-                      ),
-                      onPressed: () async {
-                        if (formKey.currentState!.validate()) {
-                          final newItem = Daftarcheckmodel(
-                            tfasel: detailsController.text,
-                            gram: gramController.text,
-                            num: '',
-                            details: selectedDetail,
-                            adad: adadController.text,
-                            price: priceController.text,
-                            ayar: selectedAyar,
-                          );
-
-                          // Add the item first
-                          onItemAdded(newItem);
-
-                          // Close the dialog after fetching data
-                          Navigator.of(context).pop();
-                        }
-                      },
-                      child: Container(
-                        width: 130,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xff735600), Colors.amber],
-                            begin: Alignment.centerRight,
-                            end: Alignment.centerLeft,
-                          ),
-                          borderRadius:
-                              BorderRadius.circular(15), // Adjust as needed
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'اضافة',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
               ),
             ],
           ),
-        );
+          content: Stack(
+            children: [
+              Container(
+                width: 350,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  gradient: const LinearGradient(
+                    colors: [
+                      Colors.black, // First color
+                      Color.fromARGB(255, 44, 33, 3), // Second color
+                    ],
+                    stops: [
+                      0.80,
+                      1.0
+                    ], // Adjusts where each color starts and ends
+                    begin: Alignment.centerRight,
+                    end: Alignment.centerLeft,
+                  ),
+                ),
+                padding: const EdgeInsets.all(10.0),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CustomDropdown(
+                        value: selectedDetail,
+                        items: detailsOptions,
+                        onChanged: (newValue) {
+                          selectedDetail = newValue!;
+                        },
+                        labelText: 'الصنف',
+                        validator: (value) =>
+                            value == null ? 'Field required' : null,
+                      ),
+                      const SizedBox(height: 10), // Space between fields
+                      CustomTextField2(
+                        keyboardType: TextInputType.number,
+                        controller: adadController,
+                        hintText: '...ادخل العدد',
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Field required';
+                          }
+                          if (double.tryParse(value) == null) {
+                            return 'رقم فقط';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10), // Space between fields
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: CustomTextField2(
+                              keyboardType: TextInputType.number,
+                              controller: gramController,
+                              hintText: '...ادخل الجرام',
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Field required';
+                                }
+                                if (double.tryParse(value) == null) {
+                                  return 'رقم فقط';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 16), // Add space between fields
+                          Expanded(
+                            child: CustomTextField2(
+                              keyboardType: TextInputType.number,
+                              controller: priceController,
+                              hintText: '...ادخل السعر',
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Field required';
+                                }
+                                if (double.tryParse(value) == null) {
+                                  return 'رقم فقط';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10), // Space between fields
+                      CustomDropdown(
+                        value: selectedAyar,
+                        items: ayarOptions,
+                        onChanged: (newValue) {
+                          selectedAyar = newValue!;
+                        },
+                        labelText: 'عيار',
+                        validator: (value) =>
+                            value == null ? 'Field required' : null,
+                      ),
+                      CustomTextField2(
+                        keyboardType: TextInputType.number,
+                        controller: detailsController,
+                        hintText: '...يوجد تفاصيل ؟',
+                        validator: (value) {
+                          // If the value is empty, do not return an error (allow empty values)
+                          if (value == null || value.isEmpty) {
+                            return null; // No error message
+                          }
+                          // If the value is not empty, apply additional validation if needed
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12), // Match padding here
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('الغاء'),
+                  ),
+                ),
+                const SizedBox(width: 16), // Add space between buttons
+                Expanded(
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12), // Match padding here
+                    ),
+                    onPressed: () async {
+                      if (formKey.currentState!.validate()) {
+                        final newItem = Daftarcheckmodel(
+                          tfasel: detailsController.text,
+                          gram: gramController.text,
+                          num: '',
+                          details: selectedDetail,
+                          adad: adadController.text,
+                          price: priceController.text,
+                          ayar: selectedAyar,
+                        );
+
+                        // Add the item first
+                        onItemAdded(newItem);
+
+                        // Close the dialog after fetching data
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: Container(
+                      width: 130,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xff735600), Colors.amber],
+                          begin: Alignment.centerRight,
+                          end: Alignment.centerLeft,
+                        ),
+                        borderRadius:
+                            BorderRadius.circular(15), // Adjust as needed
+                      ),
+                      child: const Center(
+                        child: Text(
+                          'اضافة',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ));
       },
     );
   }

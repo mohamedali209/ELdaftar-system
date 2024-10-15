@@ -32,7 +32,7 @@ class Aldaftar extends StatelessWidget {
     SizeConfig.init(context);
     return MultiBlocProvider(
       providers: [
-         BlocProvider(
+        BlocProvider(
           create: (context) => SigninCubit(),
         ),
         BlocProvider(

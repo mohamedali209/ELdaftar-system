@@ -48,7 +48,8 @@ class AlertdialogMarmat extends StatelessWidget {
           children: [
             // Main container with padding to make space for the image at the bottom
             Padding(
-              padding: const EdgeInsets.only(bottom: 20.0), // Padding to leave space for the image
+              padding: const EdgeInsets.only(
+                  bottom: 20.0), // Padding to leave space for the image
               child: Container(
                 width: 350,
                 decoration: BoxDecoration(
@@ -68,21 +69,40 @@ class AlertdialogMarmat extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _buildTextField(
-                      
-                      'المنتج', (value) => product = value,TextInputType.text,),
+                      'المنتج',
+                      (value) => product = value,
+                      TextInputType.text,
+                    ),
                     const SizedBox(height: 5),
                     _buildTextField(
-                        'متطلبات التصليح', (value) => repairRequirements = value,TextInputType.text,),
-                    const SizedBox(height: 5),
-                    _buildTextField('تم دفعه', (value) => paidAmount = value,TextInputType.number,),
-                    const SizedBox(height: 5),
-                    _buildTextField(
-                        'المتبقي من الحساب', (value) => remainingAmount = value,TextInputType.number,),
+                      'متطلبات التصليح',
+                      (value) => repairRequirements = value,
+                      TextInputType.text,
+                    ),
                     const SizedBox(height: 5),
                     _buildTextField(
-                        'اسم العميل', (value) => customerName = value,TextInputType.text,),
+                      'تم دفعه',
+                      (value) => paidAmount = value,
+                      TextInputType.number,
+                    ),
                     const SizedBox(height: 5),
-                    _buildTextField('ملحوظة ', (value) => note = value,TextInputType.text,),
+                    _buildTextField(
+                      'المتبقي من الحساب',
+                      (value) => remainingAmount = value,
+                      TextInputType.number,
+                    ),
+                    const SizedBox(height: 5),
+                    _buildTextField(
+                      'اسم العميل',
+                      (value) => customerName = value,
+                      TextInputType.text,
+                    ),
+                    const SizedBox(height: 5),
+                    _buildTextField(
+                      'ملحوظة ',
+                      (value) => note = value,
+                      TextInputType.text,
+                    ),
                   ],
                 ),
               ),
@@ -92,7 +112,8 @@ class AlertdialogMarmat extends StatelessWidget {
               bottom: 0,
               right: 0,
               left: 0, // Make the image full width to look like a footer
-              child: IgnorePointer( // This makes sure the image doesn't block taps
+              child: IgnorePointer(
+                // This makes sure the image doesn't block taps
                 child: Image.asset(
                   'assets/images/edafethesab.png',
                   width: 200,
@@ -128,13 +149,41 @@ class AlertdialogMarmat extends StatelessWidget {
                   ),
                   onPressed: () {
                     // Create a new MarmatModel instance
+                    if (customerName.isEmpty) {
+                      customerName = 'لا يوجد';
+                    }
+
+                    // Default note to "لا يوجد" if empty
+                    if (note.isEmpty) {
+                      note = 'لا يوجد';
+                    }
+
+                    // Validate and check if remainingAmount is a number
+                    double remainingAmountValue = double.tryParse(
+                            remainingAmount.isNotEmpty
+                                ? remainingAmount
+                                : '0') ??
+                        0;
+
+                    // Ensure remainingAmount is a valid number and required
+                    if (remainingAmount.isEmpty || remainingAmountValue == 0) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text(
+                                'يرجى ملء الحقل الخاص بالمتبقي من الحساب بشكل صحيح')),
+                      );
+                      return; // Stop execution if remaining amount is invalid
+                    }
+
+                    // Create a new MarmatModel instance
                     final newMarmat = MarmatModel(
                       isRepaired: false,
                       id: '',
                       product: product,
                       repairRequirements: repairRequirements,
                       paidAmount: paidAmount,
-                      remainingAmount: remainingAmount,
+                      remainingAmount: remainingAmountValue
+                          .toString(), // Ensure it's a valid number
                       customerName: customerName,
                       note: note,
                     );
@@ -171,11 +220,12 @@ class AlertdialogMarmat extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(String label, Function(String) onChanged,TextInputType? keyboardType) {
+  Widget _buildTextField(
+      String label, Function(String) onChanged, TextInputType? keyboardType) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
-        keyboardType:keyboardType ,
+        keyboardType: keyboardType,
         decoration: InputDecoration(
           labelText: label,
           labelStyle: const TextStyle(color: Colors.white),
