@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:aldafttar/features/daftarview/presentation/view/manager/summarylist/cubit/summary_item_state.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/models/daftar_header_model.dart';
 import 'package:aldafttar/utils/commas.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'dart:async';
 
 class SummaryDftarCubit extends Cubit<SummaryDftarState> {
   SummaryDftarCubit() : super(SummaryDftarInitial());
@@ -11,15 +13,26 @@ class SummaryDftarCubit extends Cubit<SummaryDftarState> {
   StreamSubscription<DocumentSnapshot>? _weightSubscription;
   StreamSubscription<DocumentSnapshot>? _dailyTransactionsSubscription;
 
-  // Fetch data from Firestore and listen to real-time changes
+  // Fetch data from Firestore and listen to real-time changes based on user authentication
   void fetchData() {
     emit(SummaryDftarLoading());
 
+    // Get the current user ID from Firebase Authentication
+    String? userId = FirebaseAuth.instance.currentUser?.uid;
+
+    if (userId == null) {
+      // Handle case where the user is not authenticated
+      emit(SummaryDftarError('No authenticated user found.'));
+      return;
+    }
+
     try {
-      // Listen to 'weight' document changes
+      // Listen to 'weight' document changes under the authenticated user's document
       _weightSubscription = FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
           .collection('weight')
-          .doc('HQWsDzc8ray5gwZp5XgF')
+          .doc('init') // Assuming 'init' is the document for weight
           .snapshots()
           .listen((weightSnapshot) {
         if (!weightSnapshot.exists) {
@@ -29,15 +42,19 @@ class SummaryDftarCubit extends Cubit<SummaryDftarState> {
           return;
         }
 
-        // Listen to 'dailyTransactions' document changes
+        // Listen to 'dailyTransactions' document changes under the authenticated user's document
         _dailyTransactionsSubscription = FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
             .collection('dailyTransactions')
-            .doc('today')
+            .doc(
+                'today') // Assuming 'today' is the document for today's transactions
             .snapshots()
             .listen((dailyTransactionsSnapshot) {
           if (!dailyTransactionsSnapshot.exists) {
             if (!isClosed) {
-              emit(SummaryDftarError('Daily transactions document does not exist.'));
+              emit(SummaryDftarError(
+                  'Daily transactions document does not exist.'));
             }
             return;
           }
@@ -47,16 +64,24 @@ class SummaryDftarCubit extends Cubit<SummaryDftarState> {
 
           // Safely fetch and format values
           final totalSalePrice = NumberFormatter.format(
-            int.tryParse(dailyTransactionsData['totalSalePrice']?.toString() ?? '0') ?? 0,
+            int.tryParse(dailyTransactionsData['totalSalePrice']?.toString() ??
+                    '0') ??
+                0,
           );
 
           final totalBuyingPrice = NumberFormatter.format(
-            int.tryParse(dailyTransactionsData['totalBuyingPrice']?.toString() ?? '0') ?? 0,
+            int.tryParse(
+                    dailyTransactionsData['totalBuyingPrice']?.toString() ??
+                        '0') ??
+                0,
           );
 
-          final total18kasr = dailyTransactionsData['total18kasr']?.toString() ?? '0';
-          final total21kasr = dailyTransactionsData['total21kasr']?.toString() ?? '0';
-          final totalCash = NumberFormatter.formatDoubleString(weightData['total_cash'] ?? 0);
+          final total18kasr =
+              dailyTransactionsData['total18kasr']?.toString() ?? '0';
+          final total21kasr =
+              dailyTransactionsData['total21kasr']?.toString() ?? '0';
+          final totalCash =
+              NumberFormatter.formatDoubleString(weightData['total_cash'] ?? 0);
 
           // Create list of items for display
           final items = [
@@ -72,12 +97,14 @@ class SummaryDftarCubit extends Cubit<SummaryDftarState> {
           }
         }, onError: (error) {
           if (!isClosed) {
-            emit(SummaryDftarError('Error fetching daily transactions: ${error.toString()}'));
+            emit(SummaryDftarError(
+                'Error fetching daily transactions: ${error.toString()}'));
           }
         });
       }, onError: (error) {
         if (!isClosed) {
-          emit(SummaryDftarError('Error fetching weight data: ${error.toString()}'));
+          emit(SummaryDftarError(
+              'Error fetching weight data: ${error.toString()}'));
         }
       });
     } catch (e) {
