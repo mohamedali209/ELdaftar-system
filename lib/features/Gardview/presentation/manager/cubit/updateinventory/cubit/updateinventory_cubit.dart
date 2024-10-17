@@ -103,4 +103,56 @@ class UpdateInventoryCubit extends Cubit<UpdateInventoryState> {
       emit(UpdateInventoryFailure(error: e.toString()));
     }
   }
+  Future<void> updateTotalCash({
+  required String operation,  // Either 'إضافة' (add) or 'سحب' (subtract)
+  required double amount,     // The cash amount to add or subtract
+}) async {
+  try {
+    // Get the current authenticated user
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    User? user = auth.currentUser;
+    if (user == null) {
+      throw Exception("User not authenticated");
+    }
+
+    // Get user ID
+    String userId = user.uid;
+
+    // Reference the document in the 'weight' collection (specific to the user)
+    DocumentReference weightDoc = firestore
+        .collection('users')
+        .doc(userId)
+        .collection('weight')
+        .doc('init');  // Reference to the 'init' document in 'weight'
+
+    // Run a transaction to update the total cash field
+    await firestore.runTransaction((transaction) async {
+      DocumentSnapshot snapshot = await transaction.get(weightDoc);
+
+      if (!snapshot.exists) {
+        throw Exception("Weight document does not exist!");
+      }
+
+      // Get the current total cash value
+      double currentCash = double.tryParse(snapshot['total_cash'].toString()) ?? 0;
+
+      // Calculate the updated cash value based on the operation (add or subtract)
+      double updatedCash = operation == 'إضافة'
+          ? currentCash + amount
+          : currentCash - amount;
+
+      // Update the total_cash field in the 'weight' document
+      transaction.update(weightDoc, {'total_cash': updatedCash.toString()});
+    });
+
+    // Emit success state after the update
+    emit(UpdateInventorySuccess());
+  } catch (e) {
+    // Emit failure state if an error occurs
+    emit(UpdateInventoryFailure(error: e.toString()));
+  }
+}
+
 }

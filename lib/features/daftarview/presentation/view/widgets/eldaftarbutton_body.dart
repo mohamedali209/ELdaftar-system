@@ -2,6 +2,7 @@ import 'package:aldafttar/features/daftarview/presentation/view/manager/cubit/it
 import 'package:aldafttar/features/daftarview/presentation/view/manager/cubit/items_state.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/manager/summarylist/cubit/summary_item_cubit.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/buy_container.dart';
+import 'package:aldafttar/features/daftarview/presentation/view/widgets/end_day_button.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/sell_container.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/summary_daftr_list.dart';
 import 'package:aldafttar/utils/styles.dart';
@@ -61,7 +62,6 @@ class DaftarTodayContent extends StatelessWidget {
                       ],
                     ),
                   ),
-
                   const SliverToBoxAdapter(
                     child: Divider(
                       thickness: 2,
@@ -101,7 +101,6 @@ class DaftarTodayContent extends StatelessWidget {
                       items: state.sellingItems,
                     ),
                   ),
-
                   const SliverToBoxAdapter(
                     child: SizedBox(height: 15),
                   ),
@@ -142,15 +141,26 @@ class DaftarTodayContent extends StatelessWidget {
                       items: state.buyingItems,
                     ),
                   ),
-
                   const SliverToBoxAdapter(
                     child: Divider(
                       color: Color.fromARGB(255, 114, 110, 110),
                     ),
                   ),
+                  const SliverToBoxAdapter(
+                      child: SizedBox(
+                    height: 10,
+                  )),
+                  const SliverToBoxAdapter(
+                    child: EndDayButton(),
+                  ),
+                  const SliverToBoxAdapter(
+                      child: SizedBox(
+                    height: 20,
+                  ))
                 ],
               ),
             ),
+            // Red button at the bottom-right of the screen
           ],
         );
       },
