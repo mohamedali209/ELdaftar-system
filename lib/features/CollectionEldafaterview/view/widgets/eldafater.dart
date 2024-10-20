@@ -1,4 +1,5 @@
 import 'package:aldafttar/features/CollectionEldafaterview/manager/cubit/collectiondfater_cubit.dart';
+import 'package:aldafttar/features/CollectionEldafaterview/view/widgets/collection_titles.dart';
 import 'package:aldafttar/features/CollectionEldafaterview/view/widgets/date_picker.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/buy_container.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/sell_container.dart';
@@ -32,12 +33,11 @@ class Eldafater extends StatelessWidget {
           child: CustomScrollView(
             slivers: [
               const SliverToBoxAdapter(
-                child: DatePicker(), // This triggers the date selection
+                child: DatePicker(),
               ),
               BlocBuilder<CollectiondfaterCubit, CollectiondfaterState>(
                 builder: (context, state) {
                   if (state is CollectiondfaterLoading) {
-                    // Show loading indicator after date is selected
                     return const SliverToBoxAdapter(
                       child: Center(child: CircularProgressIndicator()),
                     );
@@ -45,51 +45,35 @@ class Eldafater extends StatelessWidget {
                     return SliverToBoxAdapter(
                       child: Column(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                right: 15, top: 10, bottom: 10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                const Text(
-                                  'بيع',
-                                  style: TextStyle(
-                                      color: Colors.amber, fontSize: 16),
-                                ),
-                                Text(
-                                  ' -الدفتر ',
-                                  style: Appstyles.regular25(context)
-                                      .copyWith(fontSize: 30),
-                                ),
-                              ],
-                            ),
-                          ),
+                          // Selling Section
+                          const TitlesellingCollection(),
                           SellingWidget(
                             items: state.sellingItems,
                             onItemAdded: (newItem) {},
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                right: 15, top: 10, bottom: 10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                const Text(
-                                  'شراء',
-                                  style: TextStyle(
-                                      color: Colors.amber, fontSize: 16),
-                                ),
-                                Text(
-                                  ' -الدفتر ',
-                                  style: Appstyles.regular25(context)
-                                      .copyWith(fontSize: 30),
-                                ),
-                              ],
-                            ),
-                          ),
+                          // Buying Section
+                          const TitleBuyingCollection(),
                           BuyingWidget(
                             items: state.buyingItems,
                             onItemAdded: (newItem) {},
+                          ),
+                          // Expenses Section
+                          const TitleexpensesCollection(),
+                          // Display the expenses in a ListView
+                          ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: state.expenses.length,
+                            itemBuilder: (context, index) {
+                              final expense = state.expenses[index];
+                              return ListTile(
+                                title:
+                                    Text(expense.description), // Example field
+                                trailing: Text(
+                                  '${expense.amount}',
+                                  style: Appstyles.regular25(context),
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),

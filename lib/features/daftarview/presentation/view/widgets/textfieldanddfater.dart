@@ -99,7 +99,6 @@ class CustombuttonAddorSubtract extends StatelessWidget {
                     'اضافة منتج',
                     style: Appstyles.daftartodayheader(context).copyWith(
                       fontSize: 25,
-                      color: Colors.white,
                     ),
                   ),
                 ),

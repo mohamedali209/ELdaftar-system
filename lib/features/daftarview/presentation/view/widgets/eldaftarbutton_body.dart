@@ -1,9 +1,12 @@
 import 'package:aldafttar/features/daftarview/presentation/view/manager/cubit/items_cubit.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/manager/cubit/items_state.dart';
+import 'package:aldafttar/features/daftarview/presentation/view/manager/expensescubit/cubit/expenses_cubit.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/manager/summarylist/cubit/summary_item_cubit.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/buy_container.dart';
+import 'package:aldafttar/features/daftarview/presentation/view/widgets/expenses_modal_sheet.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/sell_container.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/summary_daftr_list.dart';
+import 'package:aldafttar/features/daftarview/presentation/view/widgets/titles_daftar.dart';
 import 'package:aldafttar/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -70,25 +73,8 @@ class DaftarTodayContent extends StatelessWidget {
                     ),
                   ),
                   // Sell Section
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding:
-                          const EdgeInsets.only(right: 15, top: 10, bottom: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          const Text(
-                            'بيع',
-                            style: TextStyle(color: Colors.amber, fontSize: 16),
-                          ),
-                          Text(
-                            ' -الدفتر اليومي',
-                            style: Appstyles.regular25(context)
-                                .copyWith(fontSize: 30),
-                          ),
-                        ],
-                      ),
-                    ),
+                  const SliverToBoxAdapter(
+                    child: TitleSelling(),
                   ),
                   SliverToBoxAdapter(
                     child: SellingWidget(
@@ -112,25 +98,8 @@ class DaftarTodayContent extends StatelessWidget {
                     ),
                   ),
                   // Buy Section
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding:
-                          const EdgeInsets.only(right: 15, top: 10, bottom: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          const Text(
-                            'شراء',
-                            style: TextStyle(color: Colors.amber, fontSize: 16),
-                          ),
-                          Text(
-                            ' -الدفتر اليومي',
-                            style: Appstyles.regular25(context)
-                                .copyWith(fontSize: 30),
-                          ),
-                        ],
-                      ),
-                    ),
+                  const SliverToBoxAdapter(
+                    child: TitleBuying(),
                   ),
                   SliverToBoxAdapter(
                     child: BuyingWidget(
@@ -149,9 +118,48 @@ class DaftarTodayContent extends StatelessWidget {
                       child: SizedBox(
                     height: 10,
                   )),
+                  SliverToBoxAdapter(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                      ),
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return BlocProvider(
+                              create: (context) => ExpensesCubit(),
+                              child: const ExpenseModalSheet(),
+                            );
+                          },
+                        );
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [
+                              Colors.amber, // Color on the left
+                              Color(0xFFBF8F00), // Color on the right
+                            ],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'المصاريف اليومية',
+                            style: Appstyles.regular25(context),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
+
             // Red button at the bottom-right of the screen
           ],
         );

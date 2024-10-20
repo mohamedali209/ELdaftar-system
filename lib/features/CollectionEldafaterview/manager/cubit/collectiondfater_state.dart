@@ -4,13 +4,20 @@ abstract class CollectiondfaterState {}
 
 class CollectiondfaterInitial extends CollectiondfaterState {}
 
+class CollectiondfaterLoading extends CollectiondfaterState {}
+
 class CollectiondfaterLoaded extends CollectiondfaterState {
   final List<Daftarcheckmodel> sellingItems;
   final List<Daftarcheckmodel> buyingItems;
+  final List<Expense> expenses; // Add expenses field
 
-  CollectiondfaterLoaded({required this.sellingItems, required this.buyingItems});
+  CollectiondfaterLoaded({
+    required this.sellingItems,
+    required this.buyingItems,
+    required this.expenses, // Include expenses in the constructor
+  });
 }
-class CollectiondfaterLoading extends CollectiondfaterState{}
+
 class CollectiondfaterError extends CollectiondfaterState {
   final String errorMessage;
 

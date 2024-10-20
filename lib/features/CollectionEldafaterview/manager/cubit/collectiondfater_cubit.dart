@@ -1,4 +1,5 @@
 import 'package:aldafttar/features/daftarview/presentation/view/models/daftar_check_model.dart';
+import 'package:aldafttar/features/daftarview/presentation/view/models/expenses_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,47 +15,61 @@ void selectDateAndFetchTransactions(String year, String month, String day) async
 }
 
   void fetchTransactionsForDate(String year, String month, String day) async {
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        final userId = user.uid;
+  try {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final userId = user.uid;
 
-        // Fetch data from Firestore for the specific date
-        final DocumentSnapshot snapshot = await _firestore
-            .collection('users')
-            .doc(userId)
-            .collection('dailyTransactions')
-            .doc(year)
-            .collection(month)
-            .doc(day)
-            .get();
+      // Fetch data from Firestore for the specific date
+      final DocumentSnapshot snapshot = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('dailyTransactions')
+          .doc(year)
+          .collection(month)
+          .doc(day)
+          .get();
 
-        if (snapshot.exists) {
-          List<Daftarcheckmodel> sellingItems = [];
-          List<Daftarcheckmodel> buyingItems = [];
+      List<Daftarcheckmodel> sellingItems = [];
+      List<Daftarcheckmodel> buyingItems = [];
+      List<Expense> expenses = []; // Initialize the expenses list
 
-          if (snapshot.data() != null) {
-            if (snapshot['sellingItems'] != null) {
-              sellingItems = (snapshot['sellingItems'] as List)
-                  .map((item) => Daftarcheckmodel.fromFirestore(item))
-                  .toList();
-            }
-            if (snapshot['buyingItems'] != null) {
-              buyingItems = (snapshot['buyingItems'] as List)
-                  .map((item) => Daftarcheckmodel.fromFirestore(item))
-                  .toList();
-            }
-          }
+      if (snapshot.exists && snapshot.data() != null) {
+        final data = snapshot.data() as Map<String, dynamic>;
 
-          emit(CollectiondfaterLoaded(sellingItems: sellingItems, buyingItems: buyingItems));
-        } else {
-          emit( CollectiondfaterLoaded(sellingItems: [], buyingItems: []));
+        // Fetch selling items
+        if (data['sellingItems'] != null) {
+          sellingItems = (data['sellingItems'] as List)
+              .map((item) => Daftarcheckmodel.fromFirestore(item))
+              .toList();
         }
-      } else {
-        emit(CollectiondfaterError('User is not logged in.'));
+
+        // Fetch buying items
+        if (data['buyingItems'] != null) {
+          buyingItems = (data['buyingItems'] as List)
+              .map((item) => Daftarcheckmodel.fromFirestore(item))
+              .toList();
+        }
+
+        // Fetch expenses
+        if (data['expenses'] != null) {
+          expenses = (data['expenses'] as List)
+              .map((expense) => Expense.fromMap(expense))
+              .toList();
+        }
       }
-    } catch (e) {
-      emit(CollectiondfaterError('Error fetching data: $e'));
+
+      emit(CollectiondfaterLoaded(
+        sellingItems: sellingItems,
+        buyingItems: buyingItems,
+        expenses: expenses, // Pass expenses to the state
+      ));
+    } else {
+      emit(CollectiondfaterError('User is not logged in.'));
     }
+  } catch (e) {
+    emit(CollectiondfaterError('Error fetching data: $e'));
   }
+}
+
 }
