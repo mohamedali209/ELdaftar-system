@@ -8,101 +8,130 @@ class UpdateInventoryCubit extends Cubit<UpdateInventoryState> {
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> updateInventory({
-    required String type,
-    required double weight,
-    required int quantity,
-    required String purity,
-    required String operation,
-  }) async {
-    emit(UpdateInventoryLoading());
+ Future<void> updateInventory({
+  required String type,
+  required double weight,
+  required int quantity,
+  required String purity,
+  required String operation,
+}) async {
+  emit(UpdateInventoryLoading());
 
-    try {
-      final auth = FirebaseAuth.instance;
-      final User? user = auth.currentUser;
+  try {
+    final auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
 
-      if (user == null) {
-        emit(UpdateInventoryFailure(error: 'User not authenticated'));
-        return;
+    if (user == null) {
+      emit(UpdateInventoryFailure(error: 'User not authenticated'));
+      return;
+    }
+
+    final userId = user.uid;
+    final documentRef = _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('weight')
+        .doc('init'); // Update based on your Firestore structure
+
+    String fieldQuantity;
+    String fieldWeight;
+
+    if (type == 'جنيهات') {
+      fieldQuantity = 'gnihat_count';
+      fieldWeight = 'gnihat_weight';
+    } else if (type == 'سبائك') {
+      fieldQuantity = 'sabaek_count';
+      fieldWeight = 'sabaek_weight';
+    } else if (type == 'كسر') { // Check if the item is كسر
+      fieldQuantity = '${purity}_kasr_quantity'; // Assuming you have fields for kasr
+      fieldWeight = '${purity}_kasr_weight';
+    } else {
+      fieldQuantity = '${type}_${purity}_quantity';
+      fieldWeight = '${type}_${purity}_weight';
+    }
+
+    await _firestore.runTransaction((transaction) async {
+      final snapshot = await transaction.get(documentRef);
+
+      if (!snapshot.exists) {
+        throw Exception("Document does not exist!");
       }
 
-      final userId = user.uid;
-      final documentRef = _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('weight')
-          .doc('init'); // Update based on your Firestore structure
+      final data = snapshot.data()!;
+      final currentQuantity = int.tryParse(data[fieldQuantity] ?? '0') ?? 0;
+      final currentWeight = double.tryParse(data[fieldWeight] ?? '0') ?? 0;
 
-      String fieldQuantity;
-      String fieldWeight;
+      final newQuantity = operation == 'add'
+          ? currentQuantity + quantity
+          : currentQuantity - quantity;
+      final newWeight = operation == 'add'
+          ? currentWeight + weight
+          : currentWeight - weight;
 
-      if (type == 'جنيهات') {
-        fieldQuantity = 'gnihat_count';
-        fieldWeight = 'gnihat_weight';
-      } else if (type == 'سبائك') {
-        fieldQuantity = 'sabaek_count';
-        fieldWeight = 'sabaek_weight';
-      } else {
-        fieldQuantity = '${type}_${purity}_quantity';
-        fieldWeight = '${type}_${purity}_weight';
-      }
+      transaction.update(documentRef, {
+        fieldQuantity: newQuantity.toString(),
+        fieldWeight: newWeight.toString(),
+      });
 
-      await _firestore.runTransaction((transaction) async {
-        final snapshot = await transaction.get(documentRef);
+      final total18kWeight =
+          double.tryParse(data['total18kWeight'] ?? '0') ?? 0;
+      final total21kWeight =
+          double.tryParse(data['total21kWeight'] ?? '0') ?? 0;
 
-        if (!snapshot.exists) {
-          throw Exception("Document does not exist!");
-        }
+      double updatedTotal18kWeight = total18kWeight;
+      double updatedTotal21kWeight = total21kWeight;
 
-        final data = snapshot.data()!;
-        final currentQuantity = int.tryParse(data[fieldQuantity] ?? '0') ?? 0;
-        final currentWeight = double.tryParse(data[fieldWeight] ?? '0') ?? 0;
+      // Update totals based on purity and type
+      if (purity == '18k') {
+        if (type == 'كسر') {
+          // Update for broken items
+          final currentTotalKasr = double.tryParse(data['total18kKasr'] ?? '0') ?? 0;
+          final newTotalKasr = operation == 'add'
+              ? currentTotalKasr + weight
+              : currentTotalKasr - weight;
 
-        final newQuantity = operation == 'add'
-            ? currentQuantity + quantity
-            : currentQuantity - quantity;
-        final newWeight = operation == 'add'
-            ? currentWeight + weight
-            : currentWeight - weight;
-
-        transaction.update(documentRef, {
-          fieldQuantity: newQuantity.toString(),
-          fieldWeight: newWeight.toString(),
-        });
-
-        final total18kWeight =
-            double.tryParse(data['total18kWeight'] ?? '0') ?? 0;
-        final total21kWeight =
-            double.tryParse(data['total21kWeight'] ?? '0') ?? 0;
-
-        double updatedTotal18kWeight = total18kWeight;
-        double updatedTotal21kWeight = total21kWeight;
-
-        if (purity == '18k') {
+          transaction.update(documentRef, {
+            'total18kKasr': newTotalKasr.toString(),
+          });
+        } else {
           updatedTotal18kWeight = operation == 'add'
               ? total18kWeight + weight
               : total18kWeight - weight;
-        } else if (purity == '21k') {
+        }
+      } else if (purity == '21k') {
+        if (type == 'كسر') {
+          // Update for broken items
+          final currentTotalKasr = double.tryParse(data['total21kKasr'] ?? '0') ?? 0;
+          final newTotalKasr = operation == 'add'
+              ? currentTotalKasr + weight
+              : currentTotalKasr - weight;
+
+          transaction.update(documentRef, {
+            'total21kKasr': newTotalKasr.toString(),
+          });
+        } else {
           updatedTotal21kWeight = operation == 'add'
               ? total21kWeight + weight
               : total21kWeight - weight;
         }
+      }
 
-        final totalInventoryWeight21 =
-            (updatedTotal18kWeight * 6 / 7) + updatedTotal21kWeight;
+      final totalInventoryWeight21 =
+          (updatedTotal18kWeight * 6 / 7) + updatedTotal21kWeight;
 
-        transaction.update(documentRef, {
-          'total18kWeight': updatedTotal18kWeight.toString(),
-          'total21kWeight': updatedTotal21kWeight.toString(),
-          'totalInventoryWeight21': totalInventoryWeight21.toString(),
-        });
-
-        emit(UpdateInventorySuccess());
+      transaction.update(documentRef, {
+        'total18kWeight': updatedTotal18kWeight.toString(),
+        'total21kWeight': updatedTotal21kWeight.toString(),
+        'totalInventoryWeight21': totalInventoryWeight21.toString(),
       });
-    } catch (e) {
-      emit(UpdateInventoryFailure(error: e.toString()));
-    }
+
+      emit(UpdateInventorySuccess());
+    });
+  } catch (e) {
+    emit(UpdateInventoryFailure(error: e.toString()));
   }
+}
+
   Future<void> updateTotalCash({
   required String operation,  // Either 'إضافة' (add) or 'سحب' (subtract)
   required double amount,     // The cash amount to add or subtract

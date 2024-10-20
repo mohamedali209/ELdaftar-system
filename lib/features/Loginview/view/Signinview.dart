@@ -10,10 +10,10 @@ class SigninScreen extends StatefulWidget {
   const SigninScreen({super.key});
 
   @override
-  _SigninScreenState createState() => _SigninScreenState();
+  SigninScreenState createState() => SigninScreenState();
 }
 
-class _SigninScreenState extends State<SigninScreen> {
+class SigninScreenState extends State<SigninScreen> {
   @override
   void initState() {
     super.initState();

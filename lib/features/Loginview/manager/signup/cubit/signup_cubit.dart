@@ -56,6 +56,35 @@ class SignupCubit extends Cubit<SignupState> {
 
   // Helper function to create subcollections for the user
   Future<void> _createSubcollections(String storeName, String userId) async {
+     Map<String, dynamic> initialWeightData = {
+    'total18kWeight': '0.00',
+    'total21kWeight': '0.00',
+    'total18kKasr': '0.00',
+    'total21kKasr': '0.00',
+    'total_cash': '0',
+    'totalInventoryWeight21': '0.00',
+    'sabaek_count': '0',
+    'sabaek_weight': '0.00',
+    'gnihat_count': '0',
+    'gnihat_weight': '0.00',
+    for (String type in [
+      'خواتم',
+      'دبل',
+      'محابس',
+      'انسيالات',
+      'غوايش',
+      'حلقان',
+      'تعاليق',
+      'كوليهات',
+      'سلاسل',
+      'اساور'
+    ]) ...{
+      '${type}_18k_quantity': '0',
+      '${type}_21k_quantity': '0',
+      '${type}_18k_weight': '0.00',
+      '${type}_21k_weight': '0.00',
+    }
+  };
     // Create empty subcollections under the store-named collection
     await _firestore
         .collection('users')
@@ -86,6 +115,6 @@ class SignupCubit extends Cubit<SignupState> {
         .doc(userId)
         .collection('weight')
         .doc('init')
-        .set({});
+        .set(initialWeightData);
   }
 }

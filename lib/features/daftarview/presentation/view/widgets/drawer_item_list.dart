@@ -25,7 +25,7 @@ class DraweritemlistState extends State<Draweritemlist> {
           context.read<DrawerCubit>().updateIndex(0);
           GoRouter.of(context).go(AppRouter.kDaftarview);
         },
-        title: 'الدفتر',
+        title: 'الدفتر اليومي',
         image: 'assets/images/Pie chart.svg',
       ),
       DrawerItemModel(
@@ -59,6 +59,14 @@ class DraweritemlistState extends State<Draweritemlist> {
           GoRouter.of(context).go(AppRouter.ktahlelView);
         },
         title: 'تحليلات',
+        image: 'assets/images/tahlelat.svg',
+      ),
+        DrawerItemModel(
+        onTap: () {
+          context.read<DrawerCubit>().updateIndex(5);
+          GoRouter.of(context).go(AppRouter.kcollectiondafterView);
+        },
+        title: 'الدفاتر',
         image: 'assets/images/tahlelat.svg',
       ),
     ];

@@ -34,11 +34,25 @@ class InventoryScreen extends StatelessWidget {
           Positioned(
             top: 50, // Adjust this value to position the text vertically
             right: 16, // Adjust the right padding as needed
+            child: Row(
+              children: [
+                  TextButton(
+            onPressed: () {
+              GoRouter.of(context).go(AppRouter.kDaftarview);
+            },
             child: Text(
-              'تسجيل المخزون',
-              style: Appstyles.bold50(context),
+              'تخطي الان',
+              style: Appstyles.regular25(context).copyWith(color: Colors.grey),
             ),
           ),
+                Text(
+                  'تسجيل المخزون',
+                  style: Appstyles.bold50(context),
+                ),
+              ],
+            ),
+          ),
+        
           Padding(
             padding: const EdgeInsets.only(top: 100),
             child: BlocBuilder<InventoryCubit, InventoryState>(
@@ -68,7 +82,11 @@ class InventoryScreen extends StatelessWidget {
                               'اساور'
                             ])
                               Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
                                   Custombackgroundcontainer(
                                     child: Padding(
                                       padding: const EdgeInsets.only(

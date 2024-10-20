@@ -1,3 +1,4 @@
+import 'package:aldafttar/features/CollectionEldafaterview/view/eldafater_view.dart';
 import 'package:aldafttar/features/Gardview/presentation/view/Gardview.dart';
 import 'package:aldafttar/features/Hesabatview/presentation/view/hesabat_view.dart';
 import 'package:aldafttar/features/Loginview/view/signinview.dart';
@@ -21,6 +22,8 @@ abstract class AppRouter {
   static const khesabatview = '/hesabatview';
   static const kmarmatview = '/marmatview';
   static const ktahlelView = '/tahlelView';
+    static const kcollectiondafterView = '/collectiondafterView';
+
   static final router = GoRouter(
     routes: [
       GoRoute(
@@ -58,6 +61,10 @@ abstract class AppRouter {
       GoRoute(
         path: ktahlelView,
         builder: (context, state) => const Tahlelview(),
+      ),
+        GoRoute(
+        path: kcollectiondafterView,
+        builder: (context, state) => const Eldafaterview(),
       ),
     ],
   );

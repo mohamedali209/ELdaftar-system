@@ -1,8 +1,9 @@
-import 'package:aldafttar/features/inventoryscreen/presentation/manager/cubit/inventory_cubit_state.dart' as state;
+import 'package:aldafttar/features/inventoryscreen/presentation/manager/cubit/inventory_cubit_state.dart'
+    as state;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class InventoryCubit extends Cubit<state.InventoryState> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -27,7 +28,7 @@ class InventoryCubit extends Cubit<state.InventoryState> {
             .collection('users')
             .doc(userId)
             .collection('weight')
-            .doc('init')  // Adjust document ID if needed
+            .doc('init') // Adjust document ID if needed
             .get();
 
         if (doc.exists) {
@@ -137,7 +138,12 @@ class InventoryCubit extends Cubit<state.InventoryState> {
         String userId = user.uid;
 
         // Update the 'weight' document for the logged-in user
-        await _firestore.collection('users').doc(userId).collection('weight').doc('init').update({
+        await _firestore
+            .collection('users')
+            .doc(userId)
+            .collection('weight')
+            .doc('init')
+            .update({
           'total18kWeight': total18kWeight.toStringAsFixed(2),
           'total21kWeight': total21kWeight.toStringAsFixed(2),
           'total18kKasr': total18kKasr.toStringAsFixed(2),
@@ -161,10 +167,22 @@ class InventoryCubit extends Cubit<state.InventoryState> {
             'سلاسل',
             'اساور'
           ]) ...{
-            '${type}_18k_quantity': double.tryParse(_controllers['${type}_18k_quantity'] ?? '')?.toStringAsFixed(0) ?? '0',
-            '${type}_21k_quantity': double.tryParse(_controllers['${type}_21k_quantity'] ?? '')?.toStringAsFixed(0) ?? '0',
-            '${type}_18k_weight': double.tryParse(_controllers['${type}_18k_weight'] ?? '')?.toStringAsFixed(2) ?? '0',
-            '${type}_21k_weight': double.tryParse(_controllers['${type}_21k_weight'] ?? '')?.toStringAsFixed(2) ?? '0',
+            '${type}_18k_quantity':
+                double.tryParse(_controllers['${type}_18k_quantity'] ?? '')
+                        ?.toStringAsFixed(0) ??
+                    '0',
+            '${type}_21k_quantity':
+                double.tryParse(_controllers['${type}_21k_quantity'] ?? '')
+                        ?.toStringAsFixed(0) ??
+                    '0',
+            '${type}_18k_weight':
+                double.tryParse(_controllers['${type}_18k_weight'] ?? '')
+                        ?.toStringAsFixed(2) ??
+                    '0',
+            '${type}_21k_weight':
+                double.tryParse(_controllers['${type}_21k_weight'] ?? '')
+                        ?.toStringAsFixed(2) ??
+                    '0',
           },
         });
       }

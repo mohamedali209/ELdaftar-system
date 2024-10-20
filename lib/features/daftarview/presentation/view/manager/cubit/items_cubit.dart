@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
 class ItemsCubit extends Cubit<ItemsState> {
   StreamSubscription<DocumentSnapshot>? _subscription;
@@ -18,34 +19,37 @@ class ItemsCubit extends Cubit<ItemsState> {
 
   void fetchInitialData() {
     try {
-      // Get the current user
       final user = FirebaseAuth.instance.currentUser;
 
       if (user != null) {
-        // Use the user's ID to construct the path
         final userId = user.uid;
 
-        // Stream real-time updates for the user's 'dailyTransactions/today' document
+        // Get the current date components (year, month, day)
+        final now = DateTime.now();
+        final String year = DateFormat('yyyy').format(now);
+        final String month = DateFormat('MM').format(now);
+        final String day = DateFormat('dd').format(now);
+
+        // Stream real-time updates for the user's 'dailyTransactions/{year}/{month}/{day}' document
         _subscription = _firestore
             .collection('users')
-            .doc(userId) // Use userId here
+            .doc(userId)
             .collection('dailyTransactions')
-            .doc('today')
+            .doc(year)
+            .collection(month)
+            .doc(day)
             .snapshots()
             .listen((snapshot) {
-          // Check if the document exists
           if (snapshot.exists) {
             List<Daftarcheckmodel> sellingItems = [];
             List<Daftarcheckmodel> buyingItems = [];
 
-            // Safely handle sellingItems and buyingItems fields
             if (snapshot.data() != null) {
               if (snapshot['sellingItems'] != null) {
                 sellingItems = (snapshot['sellingItems'] as List)
                     .map((item) => Daftarcheckmodel.fromFirestore(item))
                     .toList();
               }
-
               if (snapshot['buyingItems'] != null) {
                 buyingItems = (snapshot['buyingItems'] as List)
                     .map((item) => Daftarcheckmodel.fromFirestore(item))
@@ -53,23 +57,18 @@ class ItemsCubit extends Cubit<ItemsState> {
               }
             }
 
-            // Emit the new state with updated selling and buying items
             emit(ItemsState(
                 sellingItems: sellingItems, buyingItems: buyingItems));
           } else {
-            // If the document doesn't exist, emit empty lists
             emit(const ItemsState(sellingItems: [], buyingItems: []));
           }
         }, onError: (error) {
-          // Handle errors in the stream
           debugPrint('Error fetching data: $error');
         });
       } else {
         debugPrint('User is not logged in.');
-        // Handle case when user is not logged in (if needed)
       }
     } catch (e) {
-      // Handle any exceptions that occur outside the stream
       debugPrint('Error: $e');
     }
   }
@@ -152,12 +151,21 @@ class ItemsCubit extends Cubit<ItemsState> {
             double.parse(weightSnapshot['total18kKasr'] ?? '0.0');
         double currentTotal21kKasr =
             double.parse(weightSnapshot['total21kKasr'] ?? '0.0');
+            double currentTotal24kKasr =
+            double.parse(weightSnapshot['sabaek_weight'] ?? '0.0');
+            double currentTotal24kKasrquatatiy =
+            double.parse(weightSnapshot['sabaek_count'] ?? '0.0');
 
         // Add only the grams of the new item to the respective field based on ayar (18k or 21k)
         if (newItem.ayar == '18k') {
           currentTotal18kKasr += double.parse(newItem.gram);
         } else if (newItem.ayar == '21k') {
           currentTotal21kKasr += double.parse(newItem.gram);
+        }
+        else if (newItem.ayar == '24k') {
+          currentTotal24kKasr += double.parse(newItem.gram);
+          currentTotal24kKasrquatatiy += int.parse(newItem.adad);
+
         }
 
         // Update the user's weight collection with the new values
@@ -169,6 +177,8 @@ class ItemsCubit extends Cubit<ItemsState> {
             .update({
           'total18kKasr': currentTotal18kKasr.toString(),
           'total21kKasr': currentTotal21kKasr.toString(),
+          'sabaek_weight': currentTotal24kKasr.toString(),
+          'sabaek_count': currentTotal24kKasrquatatiy.toString(),
         });
       }
     } else {
@@ -178,19 +188,25 @@ class ItemsCubit extends Cubit<ItemsState> {
   }
 
   Future<void> _updateFirestore() async {
-    // Get the current user
     final user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      // Use the user's ID to construct the path
       final userId = user.uid;
 
-      // Update the user's daily transactions
+      // Get the current date components (year, month, day)
+      final now = DateTime.now();
+      final String year = DateFormat('yyyy').format(now);
+      final String month = DateFormat('MM').format(now);
+      final String day = DateFormat('dd').format(now);
+
+      // Update the user's daily transactions for the specific day
       await _firestore
           .collection('users')
-          .doc(userId) // Use userId here
+          .doc(userId)
           .collection('dailyTransactions')
-          .doc('today')
+          .doc(year)
+          .collection(month)
+          .doc(day)
           .set({
         'sellingItems':
             state.sellingItems.map((item) => item.toFirestore()).toList(),
@@ -199,176 +215,206 @@ class ItemsCubit extends Cubit<ItemsState> {
       });
     } else {
       debugPrint('User is not logged in.');
-      // Handle case when user is not logged in
     }
   }
 
   Future<void> _subtractFromInventory(Daftarcheckmodel item) async {
-    // Get the current user
-    final user = FirebaseAuth.instance.currentUser;
+  // Get the current user
+  final user = FirebaseAuth.instance.currentUser;
 
-    if (user != null) {
-      // Use the user's ID to construct the path
-      final userId = user.uid;
+  if (user != null) {
+    // Use the user's ID to construct the path
+    final userId = user.uid;
 
-      // Fetch the weight document using the user's specific Firestore path
-      DocumentSnapshot snapshot = await _firestore
-          .collection('users')
-          .doc(userId) // Use userId here
-          .collection('weight')
-          .doc('init')
-          .get();
+    // Fetch the weight document using the user's specific Firestore path
+    DocumentSnapshot snapshot = await _firestore
+        .collection('users')
+        .doc(userId) // Use userId here
+        .collection('weight')
+        .doc('init')
+        .get();
 
-      if (snapshot.exists) {
-        String itemType = '';
-        bool is18k = item.ayar.contains('18k');
-        bool is24k = item.ayar.contains('24k'); // For سبائك (24k gold)
+    if (snapshot.exists) {
+      String itemType = '';
+      bool is18k = item.ayar.contains('18k');
+      bool is24k = item.ayar.contains('24k'); // For سبائك (24k gold)
 
-        // Determine the item type based on the details of the item
-        if (item.details.contains('خاتم')) {
-          itemType = 'خواتم';
-        } else if (item.details.contains('اسورة')) {
-          itemType = 'اساور';
-        } else if (item.details.contains('محابس')) {
-          itemType = 'محابس';
-        } else if (item.details.contains('دبلة')) {
-          itemType = 'دبل';
-        } else if (item.details.contains('سلسلة')) {
-          itemType = 'سلاسل';
-        } else if (item.details.contains('غوايش')) {
-          itemType = 'غوايش';
-        } else if (item.details.contains('كوليه')) {
-          itemType = 'كوليهات';
-        } else if (item.details.contains('حلق')) {
-          itemType = 'حلقان';
-        } else if (item.details.contains('انسيال')) {
-          itemType = 'انسيالات';
-        } else if (item.details.contains('تعليقة')) {
-          itemType = 'تعاليق';
-        } else if (item.details.contains('سبائك')) {
-          itemType = 'سبائك';
-        } else if (item.details.contains('جنيهات')) {
-          itemType = 'جنيهات'; // Added جنيهات
-        }
+      // Determine the item type based on the details of the item
+      if (item.details.contains('خاتم')) {
+        itemType = 'خواتم';
+      } else if (item.details.contains('اسورة')) {
+        itemType = 'اساور';
+      } else if (item.details.contains('محابس')) {
+        itemType = 'محابس';
+      } else if (item.details.contains('دبلة')) {
+        itemType = 'دبل';
+      } else if (item.details.contains('سلسلة')) {
+        itemType = 'سلاسل';
+      } else if (item.details.contains('غوايش')) {
+        itemType = 'غوايش';
+      } else if (item.details.contains('كوليه')) {
+        itemType = 'كوليهات';
+      } else if (item.details.contains('حلق')) {
+        itemType = 'حلقان';
+      } else if (item.details.contains('انسيال')) {
+        itemType = 'انسيالات';
+      } else if (item.details.contains('تعليقة')) {
+        itemType = 'تعاليق';
+      } else if (item.details.contains('سبائك')) {
+        itemType = 'سبائك';
+      } else if (item.details.contains('جنيهات')) {
+        itemType = 'جنيهات'; // Added جنيهات
+      } else if (item.details.contains('كسر')) {
+        itemType = 'كسر'; // Added كسر case
+      }
 
-        // Proceed if the item type is valid
-        if (itemType.isNotEmpty) {
-          if (is24k && itemType == 'سبائك') {
-            // Handle the case for سبائك (24k gold)
-            int currentSabaekCount = int.parse(snapshot['sabaek_count']);
-            double currentSabaekWeight =
-                double.parse(snapshot['sabaek_weight']);
+      // Proceed if the item type is valid
+      if (itemType.isNotEmpty) {
+        if (itemType == 'كسر') {
+          // Handle the case for كسر (18k and 21k)
+          if (is18k) {
+            double total18kKasr = double.parse(snapshot['total18kKasr']);
+            total18kKasr -= double.parse(item.gram);
 
-            int newSabaekCount = currentSabaekCount - int.parse(item.adad);
-            double newSabaekWeight =
-                currentSabaekWeight - double.parse(item.gram);
-
-            // Update the سبائك fields (count and weight)
+            // Update total18kKasr in Firestore
             await _firestore
                 .collection('users')
-                .doc(userId) // Use userId here
+                .doc(userId)
                 .collection('weight')
                 .doc('init')
                 .update({
-              'sabaek_count': newSabaekCount.toString(),
-              'sabaek_weight': newSabaekWeight.toString(),
+              'total18kKasr': total18kKasr.toString(),
             });
-          } else if (itemType == 'جنيهات') {
-            // Handle the case for جنيهات
-            int currentGnihatCount = int.parse(snapshot['gnihat_count']);
-            double currentGnihatWeight =
-                double.parse(snapshot['gnihat_weight']);
+          } else {
+            double total21kKasr = double.parse(snapshot['total21kKasr']);
+            total21kKasr -= double.parse(item.gram);
 
-            int newGnihatCount = currentGnihatCount - int.parse(item.adad);
-            double newGnihatWeight =
-                currentGnihatWeight - double.parse(item.gram);
-
-            // Update the جنيهات fields (count and weight)
+            // Update total21kKasr in Firestore
             await _firestore
                 .collection('users')
-                .doc(userId) // Use userId here
+                .doc(userId)
                 .collection('weight')
                 .doc('init')
                 .update({
-              'gnihat_count': newGnihatCount.toString(),
-              'gnihat_weight': newGnihatWeight.toString(),
+              'total21kKasr': total21kKasr.toString(),
             });
+          }
+        } else if (is24k && itemType == 'سبائك') {
+          // Handle the case for سبائك (24k gold)
+          int currentSabaekCount = int.parse(snapshot['sabaek_count']);
+          double currentSabaekWeight =
+              double.parse(snapshot['sabaek_weight']);
 
-            // Subtract جنيهات weight from total21kWeight
+          int newSabaekCount = currentSabaekCount - int.parse(item.adad);
+          double newSabaekWeight =
+              currentSabaekWeight - double.parse(item.gram);
+
+          // Update the سبائك fields (count and weight)
+          await _firestore
+              .collection('users')
+              .doc(userId)
+              .collection('weight')
+              .doc('init')
+              .update({
+            'sabaek_count': newSabaekCount.toString(),
+            'sabaek_weight': newSabaekWeight.toString(),
+          });
+        } else if (itemType == 'جنيهات') {
+          // Handle the case for جنيهات
+          int currentGnihatCount = int.parse(snapshot['gnihat_count']);
+          double currentGnihatWeight =
+              double.parse(snapshot['gnihat_weight']);
+
+          int newGnihatCount = currentGnihatCount - int.parse(item.adad);
+          double newGnihatWeight =
+              currentGnihatWeight - double.parse(item.gram);
+
+          // Update the جنيهات fields (count and weight)
+          await _firestore
+              .collection('users')
+              .doc(userId)
+              .collection('weight')
+              .doc('init')
+              .update({
+            'gnihat_count': newGnihatCount.toString(),
+            'gnihat_weight': newGnihatWeight.toString(),
+          });
+
+          // Subtract جنيهات weight from total21kWeight
+          double total21kWeight = double.parse(snapshot['total21kWeight']);
+          total21kWeight -= double.parse(item.gram);
+
+          // Update total21kWeight in Firestore
+          await _firestore
+              .collection('users')
+              .doc(userId)
+              .collection('weight')
+              .doc('init')
+              .update({
+            'total21kWeight': total21kWeight.toString(),
+          });
+        } else {
+          // Handle other item types (18k and 21k)
+          String quantityField =
+              '${itemType}_${is18k ? '18k' : '21k'}_quantity';
+          String weightField = '${itemType}_${is18k ? '18k' : '21k'}_weight';
+
+          int currentQuantity = int.parse(snapshot[quantityField]);
+          double currentWeight = double.parse(snapshot[weightField]);
+
+          int newQuantity = currentQuantity - int.parse(item.adad);
+          double newWeight = currentWeight - double.parse(item.gram);
+
+          // Update the specific item fields (quantity and weight)
+          await _firestore
+              .collection('users')
+              .doc(userId)
+              .collection('weight')
+              .doc('init')
+              .update({
+            quantityField: newQuantity.toString(),
+            weightField: newWeight.toString(),
+          });
+
+          // Update the total weight fields
+          if (is18k) {
+            double total18kWeight = double.parse(snapshot['total18kWeight']);
+            total18kWeight -= double.parse(item.gram);
+            await _firestore
+                .collection('users')
+                .doc(userId)
+                .collection('weight')
+                .doc('init')
+                .update({
+              'total18kWeight': total18kWeight.toString(),
+            });
+          } else {
             double total21kWeight = double.parse(snapshot['total21kWeight']);
             total21kWeight -= double.parse(item.gram);
-
-            // Update total21kWeight in Firestore
             await _firestore
                 .collection('users')
-                .doc(userId) // Use userId here
+                .doc(userId)
                 .collection('weight')
                 .doc('init')
                 .update({
               'total21kWeight': total21kWeight.toString(),
             });
-          } else {
-            // Handle other item types (18k and 21k)
-            String quantityField =
-                '${itemType}_${is18k ? '18k' : '21k'}_quantity';
-            String weightField = '${itemType}_${is18k ? '18k' : '21k'}_weight';
-
-            int currentQuantity = int.parse(snapshot[quantityField]);
-            double currentWeight = double.parse(snapshot[weightField]);
-
-            int newQuantity = currentQuantity - int.parse(item.adad);
-            double newWeight = currentWeight - double.parse(item.gram);
-
-            // Update the specific item fields (quantity and weight)
-            await _firestore
-                .collection('users')
-                .doc(userId) // Use userId here
-                .collection('weight')
-                .doc('init')
-                .update({
-              quantityField: newQuantity.toString(),
-              weightField: newWeight.toString(),
-            });
-
-            // Update the total weight fields
-            if (is18k) {
-              double total18kWeight = double.parse(snapshot['total18kWeight']);
-              total18kWeight -= double.parse(item.gram);
-              await _firestore
-                  .collection('users')
-                  .doc(userId) // Use userId here
-                  .collection('weight')
-                  .doc('init')
-                  .update({
-                'total18kWeight': total18kWeight.toString(),
-              });
-            } else {
-              double total21kWeight = double.parse(snapshot['total21kWeight']);
-              total21kWeight -= double.parse(item.gram);
-              await _firestore
-                  .collection('users')
-                  .doc(userId) // Use userId here
-                  .collection('weight')
-                  .doc('init')
-                  .update({
-                'total21kWeight': total21kWeight.toString(),
-              });
-            }
           }
         }
       }
-    } else {
-      debugPrint('User is not logged in.');
-      // Handle case when user is not logged in
     }
+  } else {
+    debugPrint('User is not logged in.');
+    // Handle case when user is not logged in
   }
+}
+
 
   Future<void> _updateTotals() async {
-    User? user =
-        FirebaseAuth.instance.currentUser; // Get the authenticated user
-    if (user == null)return; // If the user is not authenticated, exit the function
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
 
-    String userId = user.uid; // Get the user's ID
+    final userId = user.uid;
     int totalSalePrice = 0;
     int totalBuyingPrice = 0;
     double total18kasr = 0.0;
@@ -387,12 +433,20 @@ class ItemsCubit extends Cubit<ItemsState> {
       }
     }
 
-    // Update the totals for this user in the Firestore path 'users/{userId}/dailyTransactions/today'
+    // Get the current date components (year, month, day)
+    final now = DateTime.now();
+    final String year = DateFormat('yyyy').format(now);
+    final String month = DateFormat('MM').format(now);
+    final String day = DateFormat('dd').format(now);
+
+    // Update the totals for this user in the Firestore path 'users/{userId}/dailyTransactions/{year}/{month}/{day}'
     await _firestore
         .collection('users')
         .doc(userId)
         .collection('dailyTransactions')
-        .doc('today')
+        .doc(year)
+        .collection(month)
+        .doc(day)
         .update({
       'totalSalePrice': totalSalePrice.toString(),
       'totalBuyingPrice': totalBuyingPrice.toString(),
@@ -413,7 +467,7 @@ class ItemsCubit extends Cubit<ItemsState> {
         .collection('users')
         .doc(userId)
         .collection('weight')
-        .doc('HQWsDzc8ray5gwZp5XgF')
+        .doc('init')
         .get();
 
     if (snapshot.exists) {
@@ -675,106 +729,112 @@ class ItemsCubit extends Cubit<ItemsState> {
     }
   }
 
- Future<void> updateInventory(Daftarcheckmodel item, int adadDifference, double gramDifference,
-    {bool isAyarChange = false}) async {
-  User? user = FirebaseAuth.instance.currentUser;
-  if (user == null) return; // Ensure the user is authenticated
-  
-  String userId = user.uid;
+  Future<void> updateInventory(
+      Daftarcheckmodel item, int adadDifference, double gramDifference,
+      {bool isAyarChange = false}) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) return; // Ensure the user is authenticated
 
-  DocumentSnapshot snapshot = await _firestore
-      .collection('users')
-      .doc(userId)
-      .collection('weight')
-      .doc('init')
-      .get();
+    String userId = user.uid;
 
-  if (snapshot.exists) {
-    String itemType = _getItemType(item.details); // Helper function to get item type
-    bool is18k = item.ayar.contains('18k');
-    bool is24k = item.ayar.contains('24k'); // For سبائك (Sabaek)
+    DocumentSnapshot snapshot = await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('weight')
+        .doc('init')
+        .get();
 
-    if (itemType.isNotEmpty) {
-      if (itemType == 'سبائك' && is24k) {
-        int currentSabaekCount = int.parse(snapshot['sabaek_count'] ?? '0');
-        double currentSabaekWeight = double.parse(snapshot['sabaek_weight'] ?? '0.0');
+    if (snapshot.exists) {
+      String itemType =
+          _getItemType(item.details); // Helper function to get item type
+      bool is18k = item.ayar.contains('18k');
+      bool is24k = item.ayar.contains('24k'); // For سبائك (Sabaek)
 
-        int newSabaekCount = currentSabaekCount + adadDifference;
-        double newSabaekWeight = currentSabaekWeight + gramDifference;
+      if (itemType.isNotEmpty) {
+        if (itemType == 'سبائك' && is24k) {
+          int currentSabaekCount = int.parse(snapshot['sabaek_count'] ?? '0');
+          double currentSabaekWeight =
+              double.parse(snapshot['sabaek_weight'] ?? '0.0');
 
-        await _firestore
-            .collection('users')
-            .doc(userId)
-            .collection('weight')
-            .doc('init')
-            .update({
-          'sabaek_count': newSabaekCount.toString(),
-          'sabaek_weight': newSabaekWeight.toString(),
-        });
-      } else if (itemType == 'جنيهات') {
-        int currentGnihatCount = int.parse(snapshot['gnihat_count'] ?? '0');
-        double currentGnihatWeight = double.parse(snapshot['gnihat_weight'] ?? '0.0');
+          int newSabaekCount = currentSabaekCount + adadDifference;
+          double newSabaekWeight = currentSabaekWeight + gramDifference;
 
-        int newGnihatCount = currentGnihatCount + adadDifference;
-        double newGnihatWeight = currentGnihatWeight + gramDifference;
-
-        await _firestore
-            .collection('users')
-            .doc(userId)
-            .collection('weight')
-            .doc('init')
-            .update({
-          'gnihat_count': newGnihatCount.toString(),
-          'gnihat_weight': newGnihatWeight.toString(),
-        });
-      } else {
-        String quantityField = '${itemType}_${is18k ? '18k' : '21k'}_quantity';
-        String weightField = '${itemType}_${is18k ? '18k' : '21k'}_weight';
-
-        int currentQuantity = int.parse(snapshot[quantityField] ?? '0');
-        double currentWeight = double.parse(snapshot[weightField] ?? '0.0');
-
-        int newQuantity = currentQuantity + adadDifference;
-        double newWeight = currentWeight + gramDifference;
-
-        await _firestore
-            .collection('users')
-            .doc(userId)
-            .collection('weight')
-            .doc('init')
-            .update({
-          quantityField: newQuantity.toString(),
-          weightField: newWeight.toString(),
-        });
-
-        if (is18k) {
-          double total18kWeight = double.parse(snapshot['total18kWeight'] ?? '0.0');
-          total18kWeight += gramDifference;
           await _firestore
               .collection('users')
               .doc(userId)
               .collection('weight')
               .doc('init')
               .update({
-            'total18kWeight': total18kWeight.toString(),
+            'sabaek_count': newSabaekCount.toString(),
+            'sabaek_weight': newSabaekWeight.toString(),
+          });
+        } else if (itemType == 'جنيهات') {
+          int currentGnihatCount = int.parse(snapshot['gnihat_count'] ?? '0');
+          double currentGnihatWeight =
+              double.parse(snapshot['gnihat_weight'] ?? '0.0');
+
+          int newGnihatCount = currentGnihatCount + adadDifference;
+          double newGnihatWeight = currentGnihatWeight + gramDifference;
+
+          await _firestore
+              .collection('users')
+              .doc(userId)
+              .collection('weight')
+              .doc('init')
+              .update({
+            'gnihat_count': newGnihatCount.toString(),
+            'gnihat_weight': newGnihatWeight.toString(),
           });
         } else {
-          double total21kWeight = double.parse(snapshot['total21kWeight'] ?? '0.0');
-          total21kWeight += gramDifference;
+          String quantityField =
+              '${itemType}_${is18k ? '18k' : '21k'}_quantity';
+          String weightField = '${itemType}_${is18k ? '18k' : '21k'}_weight';
+
+          int currentQuantity = int.parse(snapshot[quantityField] ?? '0');
+          double currentWeight = double.parse(snapshot[weightField] ?? '0.0');
+
+          int newQuantity = currentQuantity + adadDifference;
+          double newWeight = currentWeight + gramDifference;
+
           await _firestore
               .collection('users')
               .doc(userId)
               .collection('weight')
               .doc('init')
               .update({
-            'total21kWeight': total21kWeight.toString(),
+            quantityField: newQuantity.toString(),
+            weightField: newWeight.toString(),
           });
+
+          if (is18k) {
+            double total18kWeight =
+                double.parse(snapshot['total18kWeight'] ?? '0.0');
+            total18kWeight += gramDifference;
+            await _firestore
+                .collection('users')
+                .doc(userId)
+                .collection('weight')
+                .doc('init')
+                .update({
+              'total18kWeight': total18kWeight.toString(),
+            });
+          } else {
+            double total21kWeight =
+                double.parse(snapshot['total21kWeight'] ?? '0.0');
+            total21kWeight += gramDifference;
+            await _firestore
+                .collection('users')
+                .doc(userId)
+                .collection('weight')
+                .doc('init')
+                .update({
+              'total21kWeight': total21kWeight.toString(),
+            });
+          }
         }
       }
     }
   }
-}
-
 
 // Helper function to determine the item type based on details
   String _getItemType(String details) {
@@ -831,46 +891,46 @@ class ItemsCubit extends Cubit<ItemsState> {
   }
 
 // Helper function to update total_cash based on the item being deleted
- Future<void> _updateCash(Daftarcheckmodel item, {required bool isSellingItem}) async {
-  // Get the current user ID from Firebase Authentication
-  String? userId = FirebaseAuth.instance.currentUser?.uid;
+  Future<void> _updateCash(Daftarcheckmodel item,
+      {required bool isSellingItem}) async {
+    // Get the current user ID from Firebase Authentication
+    String? userId = FirebaseAuth.instance.currentUser?.uid;
 
-  if (userId == null) {
-    // Handle case where the user is not authenticated
-    debugPrint('Error: No authenticated user found.');
-    return;
-  }
-
-  // Access the 'weight' collection under the user's document
-  DocumentSnapshot cashSnapshot = await _firestore
-      .collection('users')
-      .doc(userId)
-      .collection('weight')
-      .doc('init')
-      .get();
-
-  if (cashSnapshot.exists) {
-    double totalCash = double.parse(cashSnapshot['total_cash'] ?? '0.0');
-    double itemPrice = double.parse(item.price);
-
-    if (isSellingItem) {
-      // Subtract from total_cash if it's a selling item
-      totalCash -= itemPrice;
-    } else {
-      // Add to total_cash if it's a buying item
-      totalCash += itemPrice;
+    if (userId == null) {
+      // Handle case where the user is not authenticated
+      debugPrint('Error: No authenticated user found.');
+      return;
     }
 
-    // Update the total_cash in Firestore for the authenticated user
-    await _firestore
+    // Access the 'weight' collection under the user's document
+    DocumentSnapshot cashSnapshot = await _firestore
         .collection('users')
         .doc(userId)
         .collection('weight')
         .doc('init')
-        .update({
-      'total_cash': totalCash.toString(),
-    });
-  }
-}
+        .get();
 
+    if (cashSnapshot.exists) {
+      double totalCash = double.parse(cashSnapshot['total_cash'] ?? '0.0');
+      double itemPrice = double.parse(item.price);
+
+      if (isSellingItem) {
+        // Subtract from total_cash if it's a selling item
+        totalCash -= itemPrice;
+      } else {
+        // Add to total_cash if it's a buying item
+        totalCash += itemPrice;
+      }
+
+      // Update the total_cash in Firestore for the authenticated user
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('weight')
+          .doc('init')
+          .update({
+        'total_cash': totalCash.toString(),
+      });
+    }
+  }
 }

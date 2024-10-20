@@ -93,6 +93,7 @@ class AddOrMinusDialogState extends State<AddOrMinusDialog> {
                       DropdownMenuItem(value: 'اساور', child: Text('اساور')),
                       DropdownMenuItem(value: 'جنيهات', child: Text('جنيهات')),
                       DropdownMenuItem(value: 'سبائك', child: Text('سبائك')),
+                      DropdownMenuItem(value: 'كسر', child: Text('كسر')),
                     ],
                     onChanged: (value) {
                       jewelryType = value;

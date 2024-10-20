@@ -74,22 +74,32 @@ class ItemSellorBuy extends StatelessWidget {
                   ],
                 ),
               ),
-              IconButton(
-                onPressed: onTap,
-                icon: const Icon(
-                  Icons.edit,
-                  color: Colors.amber,
-                  size: 15,
-                ),
-              ),
+              // Conditionally show the edit icon button
+              ModalRoute.of(context)?.settings.name == '/DaftarView'
+                  ? IconButton(
+                      onPressed: onTap,
+                      icon: const Icon(
+                        Icons.edit,
+                        color: Colors.amber,
+                        size: 15,
+                      ),
+                    )
+                  : Container(),
             ],
           ),
-        SizedBox(
-  width: MediaQuery.of(context).size.width < 600
-      ? 10 // Set width to 10 for mobile screens
-      : MediaQuery.of(context).size.width * .13, // Set to 13% for larger screens
-),
-
+          SizedBox(
+            width: ModalRoute.of(context)?.settings.name == '/DaftarView'
+                ? (MediaQuery.of(context).size.width < 600
+                    ? MediaQuery.of(context).size.width *
+                        .05 // Width for mobile when at DaftarView
+                    : MediaQuery.of(context).size.width *
+                        .13) // Width for larger screens at DaftarView
+                : (MediaQuery.of(context).size.width < 600
+                    ? MediaQuery.of(context).size.width *
+                        .13// Width for mobile when not at DaftarView
+                    : MediaQuery.of(context).size.width *
+                        .17), // Width for larger screens when not at DaftarView
+          ),
           Expanded(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

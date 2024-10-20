@@ -16,13 +16,13 @@ class Gardfawryview extends StatefulWidget {
 }
 
 class _GardfawryviewState extends State<Gardfawryview> {
-    final GlobalKey<ScaffoldState> key = GlobalKey();
+  final GlobalKey<ScaffoldState> key = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-       key: key,
+      key: key,
       drawer: MediaQuery.sizeOf(context).width < 600
           ? Customdrawer(drawerKey: drawerKey)
           : null,
@@ -34,7 +34,6 @@ class _GardfawryviewState extends State<Gardfawryview> {
     );
   }
 }
-
 
 class Gardviewmobilelayout extends StatelessWidget {
   const Gardviewmobilelayout({super.key});

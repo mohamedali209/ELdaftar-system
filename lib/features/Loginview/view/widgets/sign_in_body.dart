@@ -71,6 +71,7 @@ class Signinbody extends StatelessWidget {
                       email: emailController.text,
                       password: passwordController.text,
                     );
+                    AppRouter.router.push(AppRouter.kinventoryview);
                   },
                 ),
                 const SizedBox(height: 20),

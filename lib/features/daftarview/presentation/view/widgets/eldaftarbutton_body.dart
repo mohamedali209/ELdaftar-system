@@ -2,7 +2,6 @@ import 'package:aldafttar/features/daftarview/presentation/view/manager/cubit/it
 import 'package:aldafttar/features/daftarview/presentation/view/manager/cubit/items_state.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/manager/summarylist/cubit/summary_item_cubit.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/buy_container.dart';
-import 'package:aldafttar/features/daftarview/presentation/view/widgets/end_day_button.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/sell_container.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/summary_daftr_list.dart';
 import 'package:aldafttar/utils/styles.dart';
@@ -150,13 +149,6 @@ class DaftarTodayContent extends StatelessWidget {
                       child: SizedBox(
                     height: 10,
                   )),
-                  const SliverToBoxAdapter(
-                    child: EndDayButton(),
-                  ),
-                  const SliverToBoxAdapter(
-                      child: SizedBox(
-                    height: 20,
-                  ))
                 ],
               ),
             ),

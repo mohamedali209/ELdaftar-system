@@ -55,12 +55,12 @@ class SellingWidget extends StatelessWidget {
                         child: SizedBox(height: 15),
                       ),
                       SliverToBoxAdapter(
-                        child: Textfieldanddfater(
+                        child:ModalRoute.of(context)?.settings.name == '/DaftarView' ? Textfieldanddfater(
                           onItemAdded: (Daftarcheckmodel newItem) {
                             // Add the new item
                             onItemAdded(newItem);
                           },
-                        ),
+                        ):Container()
                       ),
                       const SliverToBoxAdapter(
                         child:
