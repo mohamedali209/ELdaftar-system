@@ -74,58 +74,79 @@ class Marmatexpandedcontainer extends StatelessWidget {
                               borderRadius: BorderRadius.circular(12),
                               color: Colors.black,
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
+                            child: Stack(
                               children: [
-                                const SizedBox(height: 10),
-                                IconButton(
-                                  onPressed: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return const AlertdialogMarmat();
-                                      },
-                                    );
-                                  },
-                                  icon: Container(
-                                    height: screenHeight * 0.05, // Fixed height
-                                    width:
-                                        screenWidth * 0.2, // Responsive width
-                                    decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        colors: [
-                                          Colors.amber,
-                                          Color(0xFF735600),
-                                        ],
-                                        begin: Alignment.centerLeft,
-                                        end: Alignment.centerRight,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: const Center(
-                                      child: Text(
-                                        'اضافة مرمة',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
+                                // Image positioned at the bottom-right
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Image.asset(
+                                    'assets/images/marmatbackground.png',
+                                    height: 300, // Adjust the height as needed
+                                    fit: BoxFit.cover,
                                   ),
                                 ),
-                                Expanded(
-                                  child: state is MarmatLoading
-                                      ? const Center(
-                                          child: CustomLoadingIndicator())
-                                      : state is MarmatError
-                                          ? Center(
-                                              child: Text(
-                                                  'Error: ${state.message}'))
-                                          : state is MarmatLoaded
-                                              ? Marmatgridview(
-                                                  items: state.items)
-                                              : Center(
-                                                  child: Text('لا يوجد مرمات',
-                                                      style: Appstyles
-                                                          .regular12cairo(
-                                                              context))),
+                                // Content inside the black container
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    const SizedBox(height: 10),
+                                    IconButton(
+                                      onPressed: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return const AlertdialogMarmat();
+                                          },
+                                        );
+                                      },
+                                      icon: Container(
+                                        height:
+                                            screenHeight * 0.05, // Fixed height
+                                        width: screenWidth *
+                                            0.2, // Responsive width
+                                        decoration: BoxDecoration(
+                                          gradient: const LinearGradient(
+                                            colors: [
+                                              Colors.amber,
+                                              Color(0xFF735600),
+                                            ],
+                                            begin: Alignment.centerLeft,
+                                            end: Alignment.centerRight,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                        child: const Center(
+                                          child: Text(
+                                            'اضافة مرمة',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: state is MarmatLoading
+                                          ? const Center(
+                                              child: CustomLoadingIndicator())
+                                          : state is MarmatError
+                                              ? Center(
+                                                  child: Text(
+                                                      'Error: ${state.message}'))
+                                              : state is MarmatLoaded
+                                                  ? Marmatgridview(
+                                                      items: state.items)
+                                                  : Center(
+                                                      child: Text(
+                                                        'لا يوجد مرمات',
+                                                        style: Appstyles
+                                                            .regular12cairo(
+                                                                context),
+                                                      ),
+                                                    ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),

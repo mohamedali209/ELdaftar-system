@@ -38,40 +38,44 @@ class ItemSellorBuy extends StatelessWidget {
               Numdaftarcontainer(title: num),
               SizedBox(width: MediaQuery.of(context).size.width * .02),
               Container(
+                width: 35,
                 color: Colors.black,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(details,
-                        style: const TextStyle(color: Color(0xffF7EAD1))),
-                    const SizedBox(height: 5),
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero, // No padding around the text
-                        minimumSize: Size
-                            .zero, // No minimum size, to avoid any extra space
-                        tapTargetSize: MaterialTapTargetSize
-                            .shrinkWrap, // Reduces tap area to match text size
-                      ),
-                      onPressed: onPressed,
-                      child: SizedBox(
-                        width:
-                            40, // Set a fixed width to ensure both texts take the same space
-                        child: Text(
-                          textDirection: TextDirection.rtl,
-                          tfasel != null && tfasel!.isNotEmpty
-                              ? 'تفاصيل' // Show "تفاصيل" if tfasel is not empty
-                              : 'لا يوجد تفاصيل', // Show "لا يوجد تفاصيل" if tfasel is empty or null
-                          textAlign:
-                              TextAlign.center, // Align text in the center
-                          style: const TextStyle(
-                            color: Color(0xff979796),
-                            fontSize: 9,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(details,
+                          style: const TextStyle(color: Color(0xffF7EAD1))),
+                      const SizedBox(height: 5),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero, // No padding around the text
+                          minimumSize: Size
+                              .zero, // No minimum size, to avoid any extra space
+                          tapTargetSize: MaterialTapTargetSize
+                              .shrinkWrap, // Reduces tap area to match text size
+                        ),
+                        onPressed: onPressed,
+                        child: SizedBox(
+                          width:
+                              40, // Set a fixed width to ensure both texts take the same space
+                          child: Text(
+                            textDirection: TextDirection.rtl,
+                            tfasel != null && tfasel!.isNotEmpty
+                                ? 'تفاصيل' // Show "تفاصيل" if tfasel is not empty
+                                : 'لا يوجد تفاصيل', // Show "لا يوجد تفاصيل" if tfasel is empty or null
+                            textAlign:
+                                TextAlign.center, // Align text in the center
+                            style: const TextStyle(
+                              color: Color(0xff979796),
+                              fontSize: 9,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               // Conditionally show the edit icon button
@@ -81,7 +85,7 @@ class ItemSellorBuy extends StatelessWidget {
                       icon: const Icon(
                         Icons.edit,
                         color: Colors.amber,
-                        size: 15,
+                        size: 13,
                       ),
                     )
                   : Container(),
@@ -106,6 +110,7 @@ class ItemSellorBuy extends StatelessWidget {
               children: [
                 // Container for 'adad' with FittedBox
                 Container(
+                  width: 20,
                   color: Colors.black,
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
@@ -115,6 +120,7 @@ class ItemSellorBuy extends StatelessWidget {
                 ),
                 // Container for 'gram' with FittedBox
                 Container(
+                  width: 20,
                   color: Colors.black,
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
@@ -124,6 +130,7 @@ class ItemSellorBuy extends StatelessWidget {
                 ),
                 // Container for 'ayar' with FittedBox
                 Container(
+                  width: 20,
                   color: Colors.black,
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
@@ -133,7 +140,7 @@ class ItemSellorBuy extends StatelessWidget {
                 ),
                 // Container for 'price' with FittedBox
                 Container(
-                  width: 50,
+                  width: 30,
                   color: Colors.black,
                   child: FittedBox(
                     fit: BoxFit.scaleDown,

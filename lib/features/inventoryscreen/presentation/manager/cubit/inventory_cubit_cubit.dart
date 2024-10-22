@@ -49,48 +49,71 @@ class InventoryCubit extends Cubit<state.InventoryState> {
     emit(state.InventoryUpdated(_controllers));
   }
 
-  void calculateTotals() {
-    double total18kWeight = 0.0;
-    double total21kWeight = 0.0;
-    double total18kKasr = 0.0;
-    double total21kKasr = 0.0;
-    double totalCash = double.tryParse(_controllers['total_cash'] ?? '') ?? 0.0;
+ void calculateTotals() {
+  double total18kWeight = 0.0;
+  double total21kWeight = 0.0;
+  double total18kKasr = 0.0;
+  double total21kKasr = 0.0;
+  double totalCash = double.tryParse(_controllers['total_cash'] ?? '') ?? 0.0;
 
-    for (String type in [
-      'خواتم',
-      'دبل',
-      'محابس',
-      'انسيالات',
-      'غوايش',
-      'حلقان',
-      'تعاليق',
-      'كوليهات',
-      'سلاسل',
-      'اساور'
-    ]) {
-      double weight18k =
-          double.tryParse(_controllers['${type}_18k_weight'] ?? '') ?? 0.0;
-      double weight21k =
-          double.tryParse(_controllers['${type}_21k_weight'] ?? '') ?? 0.0;
-      total18kWeight += weight18k;
-      total21kWeight += weight21k;
-    }
+  // Loop through the jewelry types to calculate total weights
+  for (String type in [
+    'خواتم',
+    'دبل',
+    'محابس',
+    'انسيالات',
+    'غوايش',
+    'حلقان',
+    'تعاليق',
+    'كوليهات',
+    'سلاسل',
+    'اساور'
+  ]) {
+    double weight18k =
+        double.tryParse(_controllers['${type}_18k_weight'] ?? '') ?? 0.0;
+    double weight21k =
+        double.tryParse(_controllers['${type}_21k_weight'] ?? '') ?? 0.0;
+    total18kWeight += weight18k;
+    total21kWeight += weight21k;
+  }
 
-    total18kKasr = double.tryParse(_controllers['18k_kasr'] ?? '') ?? 0.0;
-    total21kKasr = double.tryParse(_controllers['21k_kasr'] ?? '') ?? 0.0;
+  // Add kasr values
+  total18kKasr = double.tryParse(_controllers['18k_kasr'] ?? '') ?? 0.0;
+  total21kKasr = double.tryParse(_controllers['21k_kasr'] ?? '') ?? 0.0;
 
-    double sabekatQuantity =
-        double.tryParse(_controllers['sabaek_count'] ?? '') ?? 0.0;
-    double sabekatWeight =
-        double.tryParse(_controllers['sabaek_weight'] ?? '') ?? 0.0;
-    double ginehatQuantity =
-        double.tryParse(_controllers['gnihat_count'] ?? '') ?? 0.0;
-    double ginehatWeight =
-        double.tryParse(_controllers['gnihat_weight'] ?? '') ?? 0.0;
+  // Fetch sabaek and ginehat values
+  double sabekatQuantity =
+      double.tryParse(_controllers['sabaek_count'] ?? '') ?? 0.0;
+  double sabekatWeight =
+      double.tryParse(_controllers['sabaek_weight'] ?? '') ?? 0.0;
+  double ginehatQuantity =
+      double.tryParse(_controllers['gnihat_count'] ?? '') ?? 0.0;
+  double ginehatWeight =
+      double.tryParse(_controllers['gnihat_weight'] ?? '') ?? 0.0;
 
-    double totalInventoryWeight21 = (total18kWeight * 6 / 7) + total21kWeight;
+  // Add ginehatWeight to total21kWeight
+  total21kWeight += ginehatWeight;
 
-    _updateDataToFirestore(
+  // Calculate total inventory weight for 21k gold
+  double totalInventoryWeight21 = (total18kWeight * 6 / 7) + total21kWeight;
+
+  // Update Firestore with the new totals
+  _updateDataToFirestore(
+    total18kWeight,
+    total21kWeight,
+    total18kKasr,
+    total21kKasr,
+    totalCash,
+    totalInventoryWeight21,
+    sabekatQuantity,
+    sabekatWeight,
+    ginehatQuantity,
+    ginehatWeight,
+  );
+
+  // Emit new state with calculated totals
+  emit(
+    state.InventoryTotalsCalculated(
       total18kWeight,
       total21kWeight,
       total18kKasr,
@@ -101,23 +124,9 @@ class InventoryCubit extends Cubit<state.InventoryState> {
       sabekatWeight,
       ginehatQuantity,
       ginehatWeight,
-    );
-
-    emit(
-      state.InventoryTotalsCalculated(
-        total18kWeight,
-        total21kWeight,
-        total18kKasr,
-        total21kKasr,
-        totalCash,
-        totalInventoryWeight21,
-        sabekatQuantity,
-        sabekatWeight,
-        ginehatQuantity,
-        ginehatWeight,
-      ),
-    );
-  }
+    ),
+  );
+}
 
   Future<void> _updateDataToFirestore(
     double total18kWeight,

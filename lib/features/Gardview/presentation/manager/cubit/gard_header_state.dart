@@ -7,7 +7,6 @@ class GardHeaderLoading extends GardHeaderState {}
 class GardHeaderLoaded extends GardHeaderState {
   final double total18kWeight;
   final double total21kWeight;
-  final double totalinventoryWeight21;
   final double totalkKasr21;
   final double totalkKasr18;
   final double totalkKasrAll;
@@ -18,7 +17,6 @@ class GardHeaderLoaded extends GardHeaderState {
   GardHeaderLoaded({
      required this.totalinventoryAll,
     required this.totalkKasrAll,
-    required this.totalinventoryWeight21,
     required this.total18kWeight,
     required this.total21kWeight,
     required this.totalkKasr21,

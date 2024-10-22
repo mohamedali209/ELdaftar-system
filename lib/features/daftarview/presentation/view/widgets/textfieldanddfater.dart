@@ -61,6 +61,7 @@ class CustombuttonAddorSubtract extends StatelessWidget {
       'دبلة',
       'سلسلة',
       'حلق',
+      'محبس',
       'انسيال',
       'اسورة',
       'اسورة بخاتم',

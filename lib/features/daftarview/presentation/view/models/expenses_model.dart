@@ -1,6 +1,6 @@
 class Expense {
   final String description;
-  final double amount;
+  final int amount;
 
   Expense({
     required this.description,

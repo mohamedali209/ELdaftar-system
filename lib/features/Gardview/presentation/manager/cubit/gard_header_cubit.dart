@@ -40,7 +40,6 @@ class GardHeaderCubit extends Cubit<GardHeaderState> {
 
         final total18kWeight = _convertToDouble(data['total18kWeight']);
         final total21kWeight = _convertToDouble(data['total21kWeight']);
-        final totalkWeight21 = _convertToDouble(data['totalInventoryWeight21']);
         final totalkKasr21 = _convertToDouble(data['total21kKasr']);
         final totalkKasr18 = _convertToDouble(data['total18kKasr']);
         final sbayekquatatiy = _convertToDouble(data['sabaek_count']);
@@ -56,7 +55,6 @@ class GardHeaderCubit extends Cubit<GardHeaderState> {
           sbaekayekWeight: sbayekweight,
           totalkKasr21: totalkKasr21,
           totalkKasr18: totalkKasr18,
-          totalinventoryWeight21: totalkWeight21,
           total18kWeight: total18kWeight,
           total21kWeight: total21kWeight,
         ));

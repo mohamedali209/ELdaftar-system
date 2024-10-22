@@ -135,20 +135,37 @@ class Hesabatcontainer extends StatelessWidget {
                                   padding: const EdgeInsets.only(
                                       top: 5, bottom: 20, left: 15, right: 15),
                                   child: Container(
+                                    height:
+                                        300, // Set the height of the container
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(12),
                                       color: Colors.black,
                                     ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
+                                    child: Stack(
                                       children: [
-                                        const SizedBox(
-                                          height: 10,
+                                        // Image positioned at the bottom-right
+                                        Positioned(
+                                          bottom: 0,
+                                          right: 0,
+                                          child: Image.asset(
+                                            'assets/images/hesabbackground.png',
+                                            height:
+                                                100, // Adjust height as needed for the image
+                                            fit: BoxFit.cover,
+                                          ),
                                         ),
-                                        Expanded(
-                                            child: Hesabatgridview(
-                                                items: state.suppliers)),
+                                        // Content inside the black container
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          children: [
+                                            const SizedBox(height: 10),
+                                            Expanded(
+                                              child: Hesabatgridview(
+                                                  items: state.suppliers),
+                                            ),
+                                          ],
+                                        ),
                                       ],
                                     ),
                                   ),

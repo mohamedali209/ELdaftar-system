@@ -54,7 +54,7 @@ class DaftarTodayContent extends StatelessWidget {
                       children: [
                         const SizedBox(
                             height: 40), // Space for the background image
-                        Summarydftarlist(
+                        Summarydftarlist( 
                           onItemAdded: () {
                             context.read<SummaryDftarCubit>().fetchData();
                           },
