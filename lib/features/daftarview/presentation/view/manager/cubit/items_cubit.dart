@@ -252,14 +252,34 @@ class ItemsCubit extends Cubit<ItemsState> {
         } else if (item.details.contains('سبائك')) {
           itemType = 'سبائك';
         } else if (item.details.contains('جنيهات')) {
-          itemType = 'جنيهات'; // Added جنيهات
+          itemType = 'جنيهات';
         } else if (item.details.contains('كسر')) {
-          itemType = 'كسر'; // Added كسر case
+          itemType = 'كسر';
         }
 
         // Proceed if the item type is valid
         if (itemType.isNotEmpty) {
-          if (itemType == 'كسر') {
+          if (itemType == 'سبائك' && is24k) {
+            // Handle the case for سبائك (24k gold)
+            int currentSabaekCount = int.parse(snapshot['sabaek_count']);
+            double currentSabaekWeight =
+                double.parse(snapshot['sabaek_weight']);
+
+            int newSabaekCount = currentSabaekCount - int.parse(item.adad);
+            double newSabaekWeight =
+                currentSabaekWeight - double.parse(item.gram);
+
+            // Update the سبائك fields (count and weight)
+            await _firestore
+                .collection('users')
+                .doc(userId)
+                .collection('weight')
+                .doc('init')
+                .update({
+              'sabaek_count': newSabaekCount.toString(),
+              'sabaek_weight': newSabaekWeight.toString(),
+            });
+          } else if (itemType == 'كسر') {
             // Handle the case for كسر (18k and 21k)
             if (is18k) {
               double total18kKasr = double.parse(snapshot['total18kKasr']);
@@ -288,26 +308,6 @@ class ItemsCubit extends Cubit<ItemsState> {
                 'total21kKasr': total21kKasr.toString(),
               });
             }
-          } else if (is24k && itemType == 'سبائك') {
-            // Handle the case for سبائك (24k gold)
-            int currentSabaekCount = int.parse(snapshot['sabaek_count']);
-            double currentSabaekWeight =
-                double.parse(snapshot['sabaek_weight']);
-
-            int newSabaekCount = currentSabaekCount - int.parse(item.adad);
-            double newSabaekWeight =
-                currentSabaekWeight - double.parse(item.gram);
-
-            // Update the سبائك fields (count and weight)
-            await _firestore
-                .collection('users')
-                .doc(userId)
-                .collection('weight')
-                .doc('init')
-                .update({
-              'sabaek_count': newSabaekCount.toString(),
-              'sabaek_weight': newSabaekWeight.toString(),
-            });
           } else if (itemType == 'جنيهات') {
             // Handle the case for جنيهات
             int currentGnihatCount = int.parse(snapshot['gnihat_count']);
@@ -446,7 +446,9 @@ class ItemsCubit extends Cubit<ItemsState> {
   Future<void> _updateTotalCash(double amount, {required bool add}) async {
     User? user =
         FirebaseAuth.instance.currentUser; // Get the authenticated user
-    if (user == null)return; // If the user is not authenticated, exit the function
+    if (user == null) {
+      return; // If the user is not authenticated, exit the function
+    }
 
     String userId = user.uid; // Get the user's ID
 

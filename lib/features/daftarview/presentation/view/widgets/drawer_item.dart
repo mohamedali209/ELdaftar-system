@@ -5,16 +5,17 @@ import 'package:flutter_svg/svg.dart';
 
 class Draweritem extends StatelessWidget {
   const Draweritem(
-      {super.key, required this.drawerItemModel, required this.isactive, this.onTap});
+      {super.key,
+      required this.drawerItemModel,
+      required this.isactive,
+      this.onTap});
   final DrawerItemModel drawerItemModel;
   final bool isactive;
   final void Function()? onTap;
   @override
   Widget build(BuildContext context) {
     return isactive
-        ? Activeitem(
-          onTap:onTap ,
-          drawerItemModel: drawerItemModel)
+        ? Activeitem(onTap: onTap, drawerItemModel: drawerItemModel)
         : Inactiveitem(drawerItemModel: drawerItemModel);
   }
 }
@@ -30,11 +31,16 @@ class Inactiveitem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: SvgPicture.asset(drawerItemModel.image),
+      leading: SvgPicture.asset(
+        drawerItemModel.image,
+        height: 15,
+        colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+      ),
       title: FittedBox(
           alignment: Alignment.centerLeft,
           fit: BoxFit.scaleDown,
-          child: Text(drawerItemModel.title, style: Appstyles.regular25(context))),
+          child:
+              Text(drawerItemModel.title, style: Appstyles.regular25(context))),
     );
   }
 }
@@ -42,11 +48,12 @@ class Inactiveitem extends StatelessWidget {
 class Activeitem extends StatelessWidget {
   const Activeitem({
     super.key,
-    required this.drawerItemModel, this.onTap,
+    required this.drawerItemModel,
+    this.onTap,
   });
 
   final DrawerItemModel drawerItemModel;
-final void Function()? onTap;
+  final void Function()? onTap;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

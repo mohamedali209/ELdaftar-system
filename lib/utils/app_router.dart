@@ -1,13 +1,16 @@
 import 'package:aldafttar/features/CollectionEldafaterview/view/eldafater_view.dart';
 import 'package:aldafttar/features/Gardview/presentation/view/Gardview.dart';
 import 'package:aldafttar/features/Hesabatview/presentation/view/hesabat_view.dart';
-import 'package:aldafttar/features/Loginview/view/signinview.dart';
 import 'package:aldafttar/features/Loginview/view/sign_up_view.dart';
+import 'package:aldafttar/features/Loginview/view/signinview.dart';
+import 'package:aldafttar/features/addemployee/manager/cubit/addemployee_cubit.dart';
+import 'package:aldafttar/features/addemployee/view/add_employee_view.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/desktop_layout.dart';
 import 'package:aldafttar/features/inventoryscreen/presentation/view/inventory_screen.dart';
 import 'package:aldafttar/features/marmatview/view/marmat_view.dart';
 import 'package:aldafttar/features/splashview/presentation/view/splash_view.dart';
 import 'package:aldafttar/features/tahlelview/presentation/view/tahlel_view.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 abstract class AppRouter {
@@ -22,7 +25,8 @@ abstract class AppRouter {
   static const khesabatview = '/hesabatview';
   static const kmarmatview = '/marmatview';
   static const ktahlelView = '/tahlelView';
-    static const kcollectiondafterView = '/collectiondafterView';
+  static const kcollectiondafterView = '/collectiondafterView';
+  static const kaddemployee = '/addemployee';
 
   static final router = GoRouter(
     routes: [
@@ -62,9 +66,16 @@ abstract class AppRouter {
         path: ktahlelView,
         builder: (context, state) => const Tahlelview(),
       ),
-        GoRoute(
+      GoRoute(
         path: kcollectiondafterView,
         builder: (context, state) => const Eldafaterview(),
+      ),
+      GoRoute(
+        path: kaddemployee,
+        builder: (context, state) => BlocProvider(
+          create: (context) => AddEmployeeCubit(),
+          child: const AddEmployee(),
+        ),
       ),
     ],
   );

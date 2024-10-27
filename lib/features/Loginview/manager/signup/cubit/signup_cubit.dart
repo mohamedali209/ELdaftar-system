@@ -10,49 +10,51 @@ class SignupCubit extends Cubit<SignupState> {
   SignupCubit() : super(SignupState());
 
   // Function to handle signup logic
-  Future<void> signup({
-    required String email,
-    required String password,
-    required String name,
-    required String storeName,
-    required String phone,
-  }) async {
-    emit(SignupState(isLoading: true));
+ Future<void> signup({
+  required String email,
+  required String password,
+  required String name,
+  required String storeName,
+  required String phone,
+}) async {
+  emit(SignupState(isLoading: true));
 
-    try {
-      // Sign up with Firebase Auth
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+  try {
+    // Sign up with Firebase Auth
+    UserCredential userCredential =
+        await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
 
-      final String userId = userCredential.user?.uid ?? '';
+    final String userId = userCredential.user?.uid ?? '';
 
-      // Create the main collection with the store name
-      await _firestore.collection('users').doc(userId).set({
-        'name': name,
-        'storeName': storeName,
-        'phone': phone,
-        'email': email,
-        'createdAt': DateTime.now(),
-      });
+    // Create the main collection with the user's details
+    await _firestore.collection('users').doc(userId).set({
+      'name': name,
+      'storeName': storeName,
+      'phone': phone,
+      'email': email,
+      'createdAt': DateTime.now(),
+      'employees': [], // Initialize the employees array
+    });
 
-      // Create subcollections for the user within the store-named collection
-      await _createSubcollections('users', userId);
+    // Create subcollections for the user within the store-named collection
+    await _createSubcollections('users', userId);
 
-      emit(SignupState(isSuccess: true));
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'email-already-in-use') {
-        emit(SignupState(errorMessage: 'The email address is already in use.'));
-      } else {
-        emit(SignupState(errorMessage: e.toString()));
-      }
-    } catch (e) {
-      // Emit a general error state for any other exceptions
+    emit(SignupState(isSuccess: true));
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'email-already-in-use') {
+      emit(SignupState(errorMessage: 'The email address is already in use.'));
+    } else {
       emit(SignupState(errorMessage: e.toString()));
     }
+  } catch (e) {
+    // Emit a general error state for any other exceptions
+    emit(SignupState(errorMessage: e.toString()));
   }
+}
+
 
   // Helper function to create subcollections for the user
   Future<void> _createSubcollections(String storeName, String userId) async {
