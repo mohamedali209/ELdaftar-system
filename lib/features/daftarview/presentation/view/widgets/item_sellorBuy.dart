@@ -50,7 +50,8 @@ class ItemSellorBuy extends StatelessWidget {
                       const SizedBox(height: 5),
                       TextButton(
                         style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero, // No padding around the text
+                          padding:
+                              EdgeInsets.zero, // No padding around the text
                           minimumSize: Size
                               .zero, // No minimum size, to avoid any extra space
                           tapTargetSize: MaterialTapTargetSize
@@ -79,7 +80,8 @@ class ItemSellorBuy extends StatelessWidget {
                 ),
               ),
               // Conditionally show the edit icon button
-              ModalRoute.of(context)?.settings.name == '/DaftarView'
+              ModalRoute.of(context)?.settings.name == '/DaftarView' ||
+                      ModalRoute.of(context)?.settings.name == '/employeeDaftar'
                   ? IconButton(
                       onPressed: onTap,
                       icon: const Icon(
@@ -92,7 +94,8 @@ class ItemSellorBuy extends StatelessWidget {
             ],
           ),
           SizedBox(
-            width: ModalRoute.of(context)?.settings.name == '/DaftarView'
+            width: ModalRoute.of(context)?.settings.name == '/DaftarView' ||
+                    ModalRoute.of(context)?.settings.name == '/employeeDaftar'
                 ? (MediaQuery.of(context).size.width < 600
                     ? MediaQuery.of(context).size.width *
                         .05 // Width for mobile when at DaftarView
@@ -100,7 +103,7 @@ class ItemSellorBuy extends StatelessWidget {
                         .13) // Width for larger screens at DaftarView
                 : (MediaQuery.of(context).size.width < 600
                     ? MediaQuery.of(context).size.width *
-                        .13// Width for mobile when not at DaftarView
+                        .13 // Width for mobile when not at DaftarView
                     : MediaQuery.of(context).size.width *
                         .17), // Width for larger screens when not at DaftarView
           ),

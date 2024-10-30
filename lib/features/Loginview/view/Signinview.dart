@@ -20,7 +20,6 @@ class SigninScreenState extends State<SigninScreen> {
     // Check if the user is already signed in and navigate if true
     context.read<SigninCubit>().checkIfSignedIn(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        
         GoRouter.of(context).go(AppRouter.kinventoryview);
       });
     });
@@ -29,11 +28,10 @@ class SigninScreenState extends State<SigninScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<SigninCubit, SigninState>(
-      listener: (context, state) {
-      },
+      listener: (context, state) {},
       child: const Scaffold(
         backgroundColor: Colors.black,
-        body: Signinbody(),
+        body: Signinbody(),  
       ),
     );
   }

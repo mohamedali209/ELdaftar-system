@@ -3,15 +3,15 @@ import 'dart:async';
 import 'package:aldafttar/features/marmatview/manager/cubit/marmat_state.dart';
 import 'package:aldafttar/features/marmatview/model/marmat_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';  // Import FirebaseAuth
+import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MarmatCubit extends Cubit<MarmatState> {
   final FirebaseFirestore firestore;
-  final FirebaseAuth _auth = FirebaseAuth.instance;  // FirebaseAuth instance
+  final FirebaseAuth _auth = FirebaseAuth.instance; // FirebaseAuth instance
   StreamSubscription? _marmatSubscription; // Stream subscription variable
-  
+
   MarmatCubit({required this.firestore}) : super(MarmatInitial());
 
   // Stream to fetch and listen to real-time changes in the current user's marmat collection
@@ -27,24 +27,24 @@ class MarmatCubit extends Cubit<MarmatState> {
         // Stream the 'marmat' collection for the logged-in user
         _marmatSubscription = firestore
             .collection('users')
-            .doc(userId)  // Access the user's document
+            .doc(userId) // Access the user's document
             .collection('marmat')
             .snapshots()
             .listen(
           (querySnapshot) {
             final items = querySnapshot.docs.map((doc) {
-              return MarmatModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);
+              return MarmatModel.fromMap(doc.data(), doc.id);
             }).toList();
 
             if (!isClosed) {
-              emit(MarmatLoaded(items: items));  // Emit the loaded items
+              emit(MarmatLoaded(items: items)); // Emit the loaded items
             }
           },
           onError: (error) {
             if (!isClosed) {
               emit(MarmatError(message: error.toString()));
             }
-            print('Error fetching Marmat items: $error');
+            debugPrint('Error fetching Marmat items: $error');
           },
         );
       } else {
@@ -65,11 +65,12 @@ class MarmatCubit extends Cubit<MarmatState> {
         String userId = user.uid;
 
         // Automatically generate a new document ID in the user's 'marmat' collection
-        final docRef = firestore.collection('users')
+        final docRef = firestore
+            .collection('users')
             .doc(userId)
             .collection('marmat')
             .doc();
-            
+
         await docRef.set(marmatModel.toMap());
       } else {
         emit(MarmatError(message: 'User not logged in'));
@@ -172,7 +173,7 @@ class MarmatCubit extends Cubit<MarmatState> {
 
   @override
   Future<void> close() {
-    _marmatSubscription?.cancel();  // Cancel the stream subscription
+    _marmatSubscription?.cancel(); // Cancel the stream subscription
     return super.close();
   }
 }

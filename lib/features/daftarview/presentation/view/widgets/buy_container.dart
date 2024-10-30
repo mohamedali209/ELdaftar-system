@@ -61,7 +61,7 @@ class BuyingWidget extends StatelessWidget {
                         child: SizedBox(height: 15),
                       ),
                       SliverToBoxAdapter(
-                        child: ModalRoute.of(context)?.settings.name == '/DaftarView' ? Textfieldanddfater(
+                        child: ModalRoute.of(context)?.settings.name == '/DaftarView' || ModalRoute.of(context)?.settings.name == '/employeeDaftar' ? Textfieldanddfater(
                           onItemAdded: (Daftarcheckmodel newItem) {
                             // Add the new item
                             onItemAdded(newItem);

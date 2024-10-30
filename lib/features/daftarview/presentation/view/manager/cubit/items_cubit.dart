@@ -175,6 +175,7 @@ class ItemsCubit extends Cubit<ItemsState> {
       // Handle case when user is not logged in
     }
   }
+  
 
   Future<void> _updateFirestore() async {
     final user = FirebaseAuth.instance.currentUser;

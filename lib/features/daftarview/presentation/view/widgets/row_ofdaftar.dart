@@ -1,6 +1,6 @@
 import 'package:aldafttar/features/daftarview/presentation/view/manager/cubit/items_cubit.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/models/daftar_check_model.dart';
-import 'package:aldafttar/features/daftarview/presentation/view/widgets/item_sellorBuy.dart';
+import 'package:aldafttar/features/daftarview/presentation/view/widgets/item_sellorbuy.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/modifying_dialog.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/tfasel_dialog.dart';
 import 'package:flutter/material.dart';

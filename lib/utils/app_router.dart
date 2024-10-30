@@ -1,15 +1,23 @@
 import 'package:aldafttar/features/CollectionEldafaterview/view/eldafater_view.dart';
-import 'package:aldafttar/features/Gardview/presentation/view/Gardview.dart';
+import 'package:aldafttar/features/Gardview/presentation/manager/cubit/updateinventory/cubit/updateinventory_cubit.dart';
+import 'package:aldafttar/features/Gardview/presentation/view/gardview.dart';
 import 'package:aldafttar/features/Hesabatview/presentation/view/hesabat_view.dart';
+import 'package:aldafttar/features/Hesabatview/presentation/view/manager/cubit/supplier_cubit.dart';
+import 'package:aldafttar/features/Loginview/manager/employeelogin/cubit/employee_cubit.dart';
 import 'package:aldafttar/features/Loginview/view/sign_up_view.dart';
 import 'package:aldafttar/features/Loginview/view/signinview.dart';
+import 'package:aldafttar/features/Loginview/view/widgets/employee_login_screen.dart';
 import 'package:aldafttar/features/addemployee/manager/cubit/addemployee_cubit.dart';
 import 'package:aldafttar/features/addemployee/view/add_employee_view.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/desktop_layout.dart';
+import 'package:aldafttar/features/employeesdftar/manager/cubit/employeesitem_cubit.dart';
+import 'package:aldafttar/features/employeesdftar/view/employees_dftar_screen.dart';
 import 'package:aldafttar/features/inventoryscreen/presentation/view/inventory_screen.dart';
+import 'package:aldafttar/features/marmatview/manager/cubit/marmat_cubit.dart';
 import 'package:aldafttar/features/marmatview/view/marmat_view.dart';
 import 'package:aldafttar/features/splashview/presentation/view/splash_view.dart';
 import 'package:aldafttar/features/tahlelview/presentation/view/tahlel_view.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -27,6 +35,9 @@ abstract class AppRouter {
   static const ktahlelView = '/tahlelView';
   static const kcollectiondafterView = '/collectiondafterView';
   static const kaddemployee = '/addemployee';
+  static const kemployeelogin = '/employeeLogin';
+
+  static const kemployeeDaftar = '/employeeDaftar';
 
   static final router = GoRouter(
     routes: [
@@ -52,15 +63,25 @@ abstract class AppRouter {
       ),
       GoRoute(
         path: kgardview,
-        builder: (context, state) => const Gardfawryview(),
+        builder: (context, state) => BlocProvider(
+          create: (context) => UpdateInventoryCubit(),
+          child: const Gardfawryview(),
+        ),
       ),
       GoRoute(
         path: khesabatview,
-        builder: (context, state) => const Hesabatview(),
+        builder: (context, state) => BlocProvider(
+          create: (context) => SupplierCubit(FirebaseFirestore.instance),
+          child: const Hesabatview(),
+        ),
       ),
       GoRoute(
         path: kmarmatview,
-        builder: (context, state) => const MarmatScreen(),
+        builder: (context, state) => BlocProvider(
+          create: (context) =>
+              MarmatCubit(firestore: FirebaseFirestore.instance),
+          child: const MarmatScreen(),
+        ),
       ),
       GoRoute(
         path: ktahlelView,
@@ -75,6 +96,20 @@ abstract class AppRouter {
         builder: (context, state) => BlocProvider(
           create: (context) => AddEmployeeCubit(),
           child: const AddEmployee(),
+        ),
+      ),
+      GoRoute(
+        path: kemployeelogin,
+        builder: (context, state) => BlocProvider(
+          create: (context) => EmployeeCubit(),
+          child: const EmployeeLoginScreen(),
+        ),
+      ),
+      GoRoute(
+        path: kemployeeDaftar,
+        builder: (context, state) => BlocProvider(
+          create: (context) => EmployeesitemCubit(),
+          child: const EmployeesDaftarScreen(),
         ),
       ),
     ],

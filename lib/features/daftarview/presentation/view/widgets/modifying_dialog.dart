@@ -21,10 +21,10 @@ class ModifyOrDeleteDialog extends StatefulWidget {
   });
 
   @override
-  _ModifyOrDeleteDialogState createState() => _ModifyOrDeleteDialogState();
+  ModifyOrDeleteDialogState createState() => ModifyOrDeleteDialogState();
 }
 
-class _ModifyOrDeleteDialogState extends State<ModifyOrDeleteDialog> {
+class ModifyOrDeleteDialogState extends State<ModifyOrDeleteDialog> {
   late String selectedAyar;
 
   @override

@@ -58,7 +58,8 @@ class _SplashBodyState extends State<SplashBody> {
           alignment: Alignment.center,
           height: double.infinity,
           width: double.infinity,
-          color: const Color(0x99151312), // Adding slight transparency to the overlay color
+          color: const Color(
+              0x99151312), // Adding slight transparency to the overlay color
           child: AnimatedTextKit(
             animatedTexts: [
               ColorizeAnimatedText(
