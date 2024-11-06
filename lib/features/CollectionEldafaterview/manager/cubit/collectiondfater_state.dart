@@ -10,8 +10,12 @@ class CollectiondfaterLoaded extends CollectiondfaterState {
   final List<Daftarcheckmodel> sellingItems;
   final List<Daftarcheckmodel> buyingItems;
   final List<Expense> expenses; // Add expenses field
+    final bool isLoading;
+
 
   CollectiondfaterLoaded({
+        this.isLoading = false,
+
     required this.sellingItems,
     required this.buyingItems,
     required this.expenses, // Include expenses in the constructor

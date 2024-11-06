@@ -1,4 +1,5 @@
 import 'package:aldafttar/features/Hesabatview/presentation/view/manager/cubit/supplier_cubit.dart';
+import 'package:aldafttar/features/Hesabatview/presentation/view/manager/transaction/cubit/transaction_cubit.dart';
 import 'package:aldafttar/features/Hesabatview/presentation/view/models/hesab_item_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -120,28 +121,29 @@ class DialogEditHesab extends StatelessWidget {
                         );
                     Navigator.of(context).pop(); // Close dialog
                     context
-                        .read<SupplierCubit>()
+                        .read<TransactionCubit>()
                         .fetchTransactions(hesabmodel.id);
+                  
                   },
-                  child:Container(
-                      width: 130,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xff735600), Colors.amber],
-                          begin: Alignment.centerRight,
-                          end: Alignment.centerLeft,
-                        ),
-                        borderRadius:
-                            BorderRadius.circular(15), // Adjust as needed
+                  child: Container(
+                    width: 130,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xff735600), Colors.amber],
+                        begin: Alignment.centerRight,
+                        end: Alignment.centerLeft,
                       ),
-                      child: const Center(
-                        child: Text(
-                          'اضافة',
-                          style: TextStyle(color: Colors.white),
-                        ),
+                      borderRadius:
+                          BorderRadius.circular(15), // Adjust as needed
+                    ),
+                    child: const Center(
+                      child: Text(
+                        'اضافة',
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
+                  ),
                 ),
               ),
               const SizedBox(width: 16), // Add space between buttons
@@ -163,8 +165,8 @@ class DialogEditHesab extends StatelessWidget {
                           false, // false indicates a subtraction
                         );
                     Navigator.of(context).pop(); // Close dialog
-                    context
-                        .read<SupplierCubit>()
+                     context
+                        .read<TransactionCubit>()
                         .fetchTransactions(hesabmodel.id);
                   },
                   child: const Text('خصم'),
@@ -178,7 +180,9 @@ class DialogEditHesab extends StatelessWidget {
             ),
             onPressed: () {
               Navigator.of(context).pop(); // Close dialog without changes
-              context.read<SupplierCubit>().fetchTransactions(hesabmodel.id);
+                context
+                        .read<TransactionCubit>()
+                        .fetchTransactions(hesabmodel.id);
             },
             child: const Text('إلغاء'),
           ),

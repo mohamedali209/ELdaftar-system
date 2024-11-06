@@ -2,6 +2,7 @@ import 'package:aldafttar/features/daftarview/presentation/view/manager/summaryl
 import 'package:aldafttar/features/daftarview/presentation/view/manager/summarylist/cubit/summary_item_state.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/summary_daftar_item.dart';
 import 'package:aldafttar/utils/custom_loading.dart';
+import 'package:aldafttar/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -20,7 +21,11 @@ class Summarydftarlist extends StatelessWidget {
           if (state is SummaryDftarLoading) {
             return const Center(child: CustomLoadingIndicator());
           } else if (state is SummaryDftarError) {
-            return Center(child: Text('Error: ${state.message}'));
+            return Center(
+                child: Text(
+              state.message,
+              style: Appstyles.regular25(context),
+            ));
           } else if (state is SummaryDftarLoaded) {
             final items = state.items;
 
@@ -39,7 +44,9 @@ class Summarydftarlist extends StatelessWidget {
                     ),
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
-                      children: List.generate(items.length > 2 ? items.length - 2 : items.length, (index) {
+                      children: List.generate(
+                          items.length > 2 ? items.length - 2 : items.length,
+                          (index) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4.0),
                           child: SummaryHeadersDaftaritem(
@@ -55,17 +62,21 @@ class Summarydftarlist extends StatelessWidget {
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.black,
-                        border: Border.all(color: const Color(0xffCC9900), width: 2), // Amber border
+                        border: Border.all(
+                            color: const Color(0xffCC9900),
+                            width: 2), // Amber border
                         borderRadius: BorderRadius.circular(15),
                       ),
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
                         children: List.generate(2, (index) {
                           return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 4.0),
                             child: SummaryHeadersDaftaritem(
                               color: const Color.fromARGB(255, 31, 30, 30),
-                              daftarmodel: items[items.length - 2 + index], // Last two items
+                              daftarmodel: items[
+                                  items.length - 2 + index], // Last two items
                             ),
                           );
                         }),

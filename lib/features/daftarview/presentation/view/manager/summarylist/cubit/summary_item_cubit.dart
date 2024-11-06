@@ -61,7 +61,7 @@ class SummaryDftarCubit extends Cubit<SummaryDftarState> {
           .listen((dailyTransactionsSnapshot) {
         if (!dailyTransactionsSnapshot.exists) {
           if (!isClosed) {
-            emit(SummaryDftarError('Daily transactions document does not exist.'));
+            emit(SummaryDftarError('لا يوجد تعاملات اليوم'));
           }
           return;
         }

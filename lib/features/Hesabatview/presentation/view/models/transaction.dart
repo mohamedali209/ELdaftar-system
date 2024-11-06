@@ -38,4 +38,10 @@ class TransactionModel {
       'isAdd': isAddition, // Include isAddition in the map
     };
   }
+
+  // Override toString method for better debugging
+  @override
+  String toString() {
+    return 'TransactionModel(wazna18: $wazna18, wazna21: $wazna21, wazna24: $wazna24, nakdyia: $nakdyia, date: $date, isAddition: $isAddition)';
+  }
 }

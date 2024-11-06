@@ -6,7 +6,6 @@ import 'package:aldafttar/features/Hesabatview/presentation/view/widgets/summary
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/custom_background_container.dart';
 import 'package:aldafttar/utils/custom_loading.dart';
 import 'package:aldafttar/utils/styles.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -17,10 +16,7 @@ class Hesabatcontainer extends StatelessWidget {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return BlocProvider(
-          create: (context) => SupplierCubit(FirebaseFirestore.instance),
-          child: const SingleChildScrollView(child: AddSupplierDialog()),
-        );
+        return const SingleChildScrollView(child: AddSupplierDialog());
       },
     );
   }

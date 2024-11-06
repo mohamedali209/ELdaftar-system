@@ -75,28 +75,41 @@ class Signinbody extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Column(
                   children: [
-                    TextButton(
-                      style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                      onPressed: () {
-                        // AppRouter.router.push(AppRouter.ksignupview);
-                        AppRouter.router.push(AppRouter.kemployeelogin);
-                      },
-                      child: Text(
-                        'قم ب انشاء حساب',
-                        style: Appstyles.regular12cairo(context).copyWith(
-                          fontSize: 12,
-                          color: Colors.amber,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton(
+                          style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                          onPressed: () {
+                            AppRouter.router.push(AppRouter.ksignupview);
+                          },
+                          child: Text(
+                            ' قم ب انشاء حساب',
+                            style: Appstyles.regular12cairo(context).copyWith(
+                              fontSize: 12,
+                              color: Colors.amber,
+                            ),
+                          ),
                         ),
-                      ),
+                        Text(
+                          ' ليس لديك حساب ؟',
+                          style: Appstyles.regular12cairo(context)
+                              .copyWith(fontSize: 12),
+                        ),
+                      ],
                     ),
-                    Text(
-                      'ليس لديك حساب ؟',
-                      style: Appstyles.regular12cairo(context)
-                          .copyWith(fontSize: 12),
-                    ),
+                    const Text('او'),
+                    TextButton(
+                        onPressed: () {
+                          AppRouter.router.push(AppRouter.kemployeelogin);
+                        },
+                        child: Text('تسجيل الدخول كموظف',
+                            style: Appstyles.regular12cairo(context).copyWith(
+                              fontSize: 14,
+                              color: Colors.amber,
+                            )))
                   ],
                 ),
               ],

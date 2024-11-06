@@ -1,8 +1,7 @@
+import 'package:aldafttar/features/CollectionEldafaterview/manager/cubit/collectiondfater_cubit.dart';
 import 'package:aldafttar/features/CollectionEldafaterview/view/eldafater_view.dart';
-import 'package:aldafttar/features/Gardview/presentation/manager/cubit/updateinventory/cubit/updateinventory_cubit.dart';
 import 'package:aldafttar/features/Gardview/presentation/view/gardview.dart';
 import 'package:aldafttar/features/Hesabatview/presentation/view/hesabat_view.dart';
-import 'package:aldafttar/features/Hesabatview/presentation/view/manager/cubit/supplier_cubit.dart';
 import 'package:aldafttar/features/Loginview/manager/employeelogin/cubit/employee_cubit.dart';
 import 'package:aldafttar/features/Loginview/view/sign_up_view.dart';
 import 'package:aldafttar/features/Loginview/view/signinview.dart';
@@ -10,6 +9,7 @@ import 'package:aldafttar/features/Loginview/view/widgets/employee_login_screen.
 import 'package:aldafttar/features/addemployee/manager/cubit/addemployee_cubit.dart';
 import 'package:aldafttar/features/addemployee/view/add_employee_view.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/desktop_layout.dart';
+import 'package:aldafttar/features/daftarview/presentation/view/manager/cubit/items_cubit.dart';
 import 'package:aldafttar/features/employeesdftar/manager/cubit/employeesitem_cubit.dart';
 import 'package:aldafttar/features/employeesdftar/view/employees_dftar_screen.dart';
 import 'package:aldafttar/features/inventoryscreen/presentation/view/inventory_screen.dart';
@@ -63,17 +63,11 @@ abstract class AppRouter {
       ),
       GoRoute(
         path: kgardview,
-        builder: (context, state) => BlocProvider(
-          create: (context) => UpdateInventoryCubit(),
-          child: const Gardfawryview(),
-        ),
+        builder: (context, state) => const Gardfawryview(),
       ),
       GoRoute(
         path: khesabatview,
-        builder: (context, state) => BlocProvider(
-          create: (context) => SupplierCubit(FirebaseFirestore.instance),
-          child: const Hesabatview(),
-        ),
+        builder: (context, state) => const Hesabatview(),
       ),
       GoRoute(
         path: kmarmatview,
@@ -89,7 +83,18 @@ abstract class AppRouter {
       ),
       GoRoute(
         path: kcollectiondafterView,
-        builder: (context, state) => const Eldafaterview(),
+        builder: (context, state) => MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) =>
+                  CollectiondfaterCubit(FirebaseFirestore.instance),
+            ),
+            BlocProvider(
+              create: (context) => ItemsCubit(),
+            ),
+          ],
+          child: const Eldafaterview(),
+        ),
       ),
       GoRoute(
         path: kaddemployee,
@@ -107,8 +112,15 @@ abstract class AppRouter {
       ),
       GoRoute(
         path: kemployeeDaftar,
-        builder: (context, state) => BlocProvider(
-          create: (context) => EmployeesitemCubit(),
+        builder: (context, state) => MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) => ItemsCubit(),
+            ),
+            BlocProvider(
+              create: (context) => EmployeesitemCubit(),
+            ),
+          ],
           child: const EmployeesDaftarScreen(),
         ),
       ),

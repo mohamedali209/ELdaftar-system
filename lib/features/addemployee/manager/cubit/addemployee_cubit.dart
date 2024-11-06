@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'addemployee_state.dart';
 
 class AddEmployeeCubit extends Cubit<AddEmployeeState> {
@@ -20,7 +21,8 @@ class AddEmployeeCubit extends Cubit<AddEmployeeState> {
 
     try {
       // Create a Firebase Auth user
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -28,12 +30,24 @@ class AddEmployeeCubit extends Cubit<AddEmployeeState> {
       // Get the user's unique ID
       String uid = userCredential.user!.uid;
 
-      // Add employee data to Firestore with the user's UID as shopId
+      // Add employee data to Firestore with the user's UID as the document ID
       await _firestore.collection('employees').doc(uid).set({
         'name': name,
         'email': email,
-        'password': password,
-        'shopId': shopId, // Using the user's UID as shopId
+        'shopId': shopId,
+        'role': role,
+      });
+
+      // Add the employee document to the 'employees' subcollection within 'users/{shopId}'
+      await _firestore
+          .collection('users')
+          .doc(shopId)
+          .collection('employees')
+          .doc(uid)
+          .set({
+        'uid': uid,
+        'name': name,
+        'email': email,
         'role': role,
       });
 
@@ -42,8 +56,46 @@ class AddEmployeeCubit extends Cubit<AddEmployeeState> {
       emit(AddEmployeeError('Failed to add employee: ${e.toString()}'));
     }
   }
-}
 
+  Future<void> fetchEmployees(String shopId) async {
+    emit(AddEmployeeLoading());
+
+    try {
+      // Fetch all employee documents from the 'employees' subcollection
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .doc(shopId)
+          .collection('employees')
+          .get();
+
+      // Map each document in the subcollection to a list of employee maps
+      List<Map<String, dynamic>> employees = querySnapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+
+      emit(AddEmployeeLoaded(employees));
+    } catch (e) {
+      emit(AddEmployeeError('Failed to fetch employees: ${e.toString()}'));
+    }
+  }
+
+  Future<void> deleteEmployee(String shopId, String uid) async {
+    emit(AddEmployeeLoading());
+    try {
+      // First, delete the employee document from the 'employees' collection
+      await _firestore.collection('employees').doc(uid).delete();
+      await _firestore
+          .collection('users')
+          .doc(shopId)
+          .collection('employees')
+          .doc(uid)
+          .delete();
+      emit(AddEmployeeSuccess());
+    } catch (e) {
+      emit(AddEmployeeError('Failed to delete employee: ${e.toString()}'));
+    }
+  }
+}
 
 class ServiceLocator {
   static final ServiceLocator _instance = ServiceLocator._internal();

@@ -1,30 +1,32 @@
-import 'package:aldafttar/features/daftarview/presentation/view/manager/cubit/items_cubit.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/models/daftar_check_model.dart';
+import 'package:aldafttar/features/employeesdftar/manager/cubit/employeesitem_cubit.dart';
 import 'package:flutter/material.dart';
 
-class ModifyOrDeleteDialog extends StatefulWidget {
+class EmployeeModifyOrDeleteDialog extends StatefulWidget {
   final TextEditingController adadController;
   final TextEditingController gramController;
   final TextEditingController priceController;
   final Daftarcheckmodel item;
-  final ItemsCubit itemsCubit;
+  final EmployeesitemCubit employeeModifyItemCubit;
   final bool isBuyingItem; // Add this final field
 
-  const ModifyOrDeleteDialog({
+  const EmployeeModifyOrDeleteDialog({
     super.key,
     required this.adadController,
     required this.gramController,
     required this.priceController,
     required this.item,
-    required this.itemsCubit,
+    required this.employeeModifyItemCubit,
     required this.isBuyingItem, // Pass isBuyingItem
   });
 
   @override
-  ModifyOrDeleteDialogState createState() => ModifyOrDeleteDialogState();
+  EmployeeModifyOrDeleteDialogState createState() =>
+      EmployeeModifyOrDeleteDialogState();
 }
 
-class ModifyOrDeleteDialogState extends State<ModifyOrDeleteDialog> {
+class EmployeeModifyOrDeleteDialogState
+    extends State<EmployeeModifyOrDeleteDialog> {
   late String selectedAyar;
 
   @override
@@ -133,7 +135,7 @@ class ModifyOrDeleteDialogState extends State<ModifyOrDeleteDialog> {
                       ayar: selectedAyar,
                       price: widget.priceController.text,
                     );
-                    widget.itemsCubit.modifyItem(modifiedItem,
+                    widget.employeeModifyItemCubit.modifyItem(modifiedItem,
                         isBuyingItem: widget.isBuyingItem); // Use isBuyingItem
                     Navigator.of(context).pop();
                   },
@@ -165,7 +167,7 @@ class ModifyOrDeleteDialogState extends State<ModifyOrDeleteDialog> {
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                   onPressed: () {
-                    widget.itemsCubit.deleteItem(widget.item);
+                    widget.employeeModifyItemCubit.deleteItem(widget.item);
                     Navigator.of(context).pop();
                   },
                   child: const Text(

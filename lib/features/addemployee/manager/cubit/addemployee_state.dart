@@ -13,3 +13,8 @@ class AddEmployeeError extends AddEmployeeState {
 
   AddEmployeeError(this.message);
 }
+class AddEmployeeLoaded extends AddEmployeeState {
+  final List<Map<String, dynamic>> employees;
+
+  AddEmployeeLoaded(this.employees);
+}

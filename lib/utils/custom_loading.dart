@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 class CustomLoadingIndicator extends StatelessWidget {
   final double size;
-  final Color color;
 
   const CustomLoadingIndicator({
     super.key,
-    this.size = 30.0, // Default size
-    this.color = Colors.amber, // Default color
+    this.size = 100.0, // Default size
   });
 
   @override
@@ -16,9 +15,9 @@ class CustomLoadingIndicator extends StatelessWidget {
       child: SizedBox(
         width: size,
         height: size,
-        child: CircularProgressIndicator(
-          strokeWidth: 6.0, // Adjust the thickness
-          valueColor: AlwaysStoppedAnimation<Color>(color),
+        child: Lottie.asset(
+          'assets/lottie/Animation - 1730555800350.json', // Change this to your animation file path
+          fit: BoxFit.cover,
         ),
       ),
     );

@@ -81,12 +81,15 @@ class ItemsCubit extends Cubit<ItemsState> {
   }
 
   void addSellingItem(Daftarcheckmodel newItem) async {
+    // Start loading
+    emit(state.copyWith(isLoading: true));
+    await Future.delayed(const Duration(milliseconds: 700));
+
     final nextNum = (state.sellingItems.length + 1).toString();
     final newItemWithNum = newItem.copyWith(num: nextNum);
 
-    emit(ItemsState(
+    emit(state.copyWith(
       sellingItems: List.from(state.sellingItems)..add(newItemWithNum),
-      buyingItems: state.buyingItems,
     ));
 
     try {
@@ -97,27 +100,35 @@ class ItemsCubit extends Cubit<ItemsState> {
           add: true);
     } catch (e) {
       debugPrint('Error adding selling item: $e');
+    } finally {
+      // Stop loading
+      emit(state.copyWith(isLoading: false));
     }
   }
 
   void addBuyingItem(Daftarcheckmodel newItem) async {
+    // Start loading
+    emit(state.copyWith(isLoading: true));
+
     final nextNum = (state.buyingItems.length + 1).toString();
     final newItemWithNum = newItem.copyWith(num: nextNum);
 
-    emit(ItemsState(
-      sellingItems: state.sellingItems,
+    emit(state.copyWith(
       buyingItems: List.from(state.buyingItems)..add(newItemWithNum),
     ));
 
     try {
       // Execute all async tasks concurrently for better performance
-      await _updateFirestore();
-      await _addItemGramsToWeight(newItemWithNum); // Update weight collection
-      await _updateTotals();
-      await _updateTotalCash(double.tryParse(newItemWithNum.price) ?? 0,
-          add: false);
+
+      _updateFirestore();
+      _addItemGramsToWeight(newItemWithNum); // Update weight collection
+      _updateTotals();
+      _updateTotalCash(double.tryParse(newItemWithNum.price) ?? 0, add: false);
     } catch (e) {
       debugPrint('Error adding buying item: $e');
+    } finally {
+      // Stop loading
+      emit(state.copyWith(isLoading: false));
     }
   }
 
@@ -175,7 +186,6 @@ class ItemsCubit extends Cubit<ItemsState> {
       // Handle case when user is not logged in
     }
   }
-  
 
   Future<void> _updateFirestore() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -481,6 +491,8 @@ class ItemsCubit extends Cubit<ItemsState> {
 
   void modifyItem(Daftarcheckmodel modifiedItem,
       {bool isBuyingItem = false}) async {
+                 emit(state.copyWith(isLoading: true));
+
     // Fetch current selling and buying items
     Daftarcheckmodel oldSellingItem = state.sellingItems.firstWhere(
       (item) => item.num == modifiedItem.num,
@@ -508,6 +520,8 @@ class ItemsCubit extends Cubit<ItemsState> {
 
     // Update logic based on whether it's a buying or selling item
     if (!isBuyingItem) {
+               emit(state.copyWith(isLoading: true));
+
       // Update Selling Item logic
       if (oldSellingItem.num != '0') {
         await updateSellingItem(oldSellingItem, modifiedItem);
@@ -546,6 +560,9 @@ class ItemsCubit extends Cubit<ItemsState> {
     // Update Firestore and totals
     await _updateFirestore();
     await _updateTotals();
+
+    emit(state.copyWith(isLoading: false));
+
   }
 
   Future<void> updateSellingItem(
@@ -845,6 +862,8 @@ class ItemsCubit extends Cubit<ItemsState> {
   }
 
   void deleteItem(Daftarcheckmodel itemToDelete) async {
+             emit(state.copyWith(isLoading: true));
+
     List<Daftarcheckmodel> updatedSellingItems = List.from(state.sellingItems);
     List<Daftarcheckmodel> updatedBuyingItems = List.from(state.buyingItems);
 
@@ -879,6 +898,8 @@ class ItemsCubit extends Cubit<ItemsState> {
 
     await _updateFirestore();
     await _updateTotals();
+
+    emit(state.copyWith(isLoading: false));
   }
 
 // Helper function to update total_cash based on the item being deleted

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:aldafttar/features/Hesabatview/presentation/view/manager/cubit/supplier_state.dart';
 import 'package:aldafttar/features/Hesabatview/presentation/view/models/gold_converter.dart';
 import 'package:aldafttar/features/Hesabatview/presentation/view/models/hesab_item_model.dart';
-import 'package:aldafttar/features/Hesabatview/presentation/view/models/transaction.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -364,57 +363,6 @@ class SupplierCubit extends Cubit<SupplierState> {
       }
     } catch (e) {
       emit(SupplierLoadFailure('Error updating transaction: ${e.toString()}'));
-    }
-  }
-
-  Future<void> fetchTransactions(String supplierId) async {
-    try {
-      emit(SupplierLoadInProgress());
-
-      // Get the current user
-      User? user = _auth.currentUser;
-
-      // Check if the user is not null
-      if (user != null) {
-        String userId = user.uid;
-
-        // Fetch supplier data from the user's suppliers subcollection in Firestore
-        final supplierDoc = await _firestore
-            .collection('users')
-            .doc(userId)
-            .collection('suppliers')
-            .doc(supplierId)
-            .get();
-
-        if (!supplierDoc.exists) {
-          emit(SupplierLoadFailure('Supplier not found'));
-          return;
-        }
-
-        // Retrieve transactions from the supplier document
-        final supplierData = supplierDoc.data()!;
-        final List<dynamic> transactionsData =
-            supplierData['transactions'] ?? [];
-
-        // Map transactions into a list of models
-        final transactions = transactionsData.map((data) {
-          return TransactionModel(
-            wazna18: data['wazna18'] ?? '0',
-            wazna21: data['wazna21'] ?? '0',
-            wazna24: data['wazna24'] ?? '0',
-            nakdyia: data['nakdyia'] ?? '0',
-            date: data['date'] ?? '',
-            isAddition: data['isAdd'] ?? false,
-          );
-        }).toList();
-
-        // Emit the success state with transactions
-        emit(SupplierTransactionsLoadSuccess(transactions));
-      } else {
-        emit(SupplierLoadFailure('User not authenticated'));
-      }
-    } catch (e) {
-      emit(SupplierLoadFailure('Error fetching transactions: ${e.toString()}'));
     }
   }
 
