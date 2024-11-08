@@ -13,7 +13,6 @@ import 'package:aldafttar/features/daftarview/presentation/view/manager/cubit/it
 import 'package:aldafttar/features/employeesdftar/manager/cubit/employeesitem_cubit.dart';
 import 'package:aldafttar/features/employeesdftar/view/employees_dftar_screen.dart';
 import 'package:aldafttar/features/inventoryscreen/presentation/view/inventory_screen.dart';
-import 'package:aldafttar/features/marmatview/manager/cubit/marmat_cubit.dart';
 import 'package:aldafttar/features/marmatview/view/marmat_view.dart';
 import 'package:aldafttar/features/splashview/presentation/view/splash_view.dart';
 import 'package:aldafttar/features/tahlelview/presentation/view/tahlel_view.dart';
@@ -71,11 +70,7 @@ abstract class AppRouter {
       ),
       GoRoute(
         path: kmarmatview,
-        builder: (context, state) => BlocProvider(
-          create: (context) =>
-              MarmatCubit(firestore: FirebaseFirestore.instance),
-          child: const MarmatScreen(),
-        ),
+        builder: (context, state) => const MarmatScreen(),
       ),
       GoRoute(
         path: ktahlelView,

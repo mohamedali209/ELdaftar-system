@@ -1,8 +1,10 @@
+import 'package:aldafttar/features/Gardview/presentation/manager/cubit/updateinventory/cubit/updateinventory_cubit.dart';
 import 'package:aldafttar/features/Gardview/presentation/view/widgets/add_minus_dialog.dart';
 import 'package:aldafttar/features/Gardview/presentation/view/widgets/add_minus_nakdyia_dialog.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/custom_background_container.dart';
 import 'package:aldafttar/utils/styles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DaftarelgardHeader extends StatelessWidget {
   const DaftarelgardHeader({super.key});
@@ -103,18 +105,20 @@ class DaftarelgardHeader extends StatelessWidget {
   void _showAddOrMinusDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) {
-        return const AddOrMinusDialog();
-      },
+      builder: (dialogContext) => BlocProvider.value(
+        value: BlocProvider.of<UpdateInventoryCubit>(context),
+        child: const AddOrMinusDialog(),
+      ),
     );
   }
 
   void _showAddOrMinusDialogNakdyia(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) {
-        return const UpdateCashDialog();
-      },
+      builder: (dialogContext) => BlocProvider.value(
+        value: BlocProvider.of<UpdateInventoryCubit>(context),
+        child: const UpdateCashDialog(),
+      ),
     );
   }
 }

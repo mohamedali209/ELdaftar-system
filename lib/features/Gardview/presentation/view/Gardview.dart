@@ -1,9 +1,11 @@
+import 'package:aldafttar/features/Gardview/presentation/manager/cubit/updateinventory/cubit/updateinventory_cubit.dart';
 import 'package:aldafttar/features/Gardview/presentation/view/widgets/elgard_expanded_container.dart';
 import 'package:aldafttar/features/Gardview/presentation/view/widgets/gardfawry_scaffold.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/adaptive_layout.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/custom_drawer.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/drawer_item_list.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 final GlobalKey<DraweritemlistState> drawerKey =
     GlobalKey<DraweritemlistState>();
@@ -20,16 +22,19 @@ class _GardfawryviewState extends State<Gardfawryview> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      key: key,
-      drawer: MediaQuery.sizeOf(context).width < 600
-          ? Customdrawer(drawerKey: drawerKey)
-          : null,
-      body: AdaptiveLayout(
-        mobileLayout: (context) => const Gardviewmobilelayout(),
-        tabletLayout: (context) => const Gardfawyscaffold(),
-        desktopLayout: (context) => const Gardfawyscaffold(),
+    return BlocProvider(
+      create: (context) => UpdateInventoryCubit(),
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        key: key,
+        drawer: MediaQuery.sizeOf(context).width < 600
+            ? Customdrawer(drawerKey: drawerKey)
+            : null,
+        body: AdaptiveLayout(
+          mobileLayout: (context) => const Gardviewmobilelayout(),
+          tabletLayout: (context) => const Gardfawyscaffold(),
+          desktopLayout: (context) => const Gardfawyscaffold(),
+        ),
       ),
     );
   }

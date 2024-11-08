@@ -15,9 +15,10 @@ class Hesabatcontainer extends StatelessWidget {
   void _showAddSupplierDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return const SingleChildScrollView(child: AddSupplierDialog());
-      },
+      builder: (dialogContext) => BlocProvider.value(
+        value: BlocProvider.of<SupplierCubit>(context),
+        child: const SingleChildScrollView(child: AddSupplierDialog()),
+      ),
     );
   }
 
@@ -162,7 +163,7 @@ class Hesabatcontainer extends StatelessWidget {
                                             ),
                                           ],
                                         ),
-                                      ],
+                                      ], 
                                     ),
                                   ),
                                 );

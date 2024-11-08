@@ -95,9 +95,12 @@ class Marmatexpandedcontainer extends StatelessWidget {
                                       onPressed: () {
                                         showDialog(
                                           context: context,
-                                          builder: (context) {
-                                            return const AlertdialogMarmat();
-                                          },
+                                          builder: (dialogContext) =>
+                                              BlocProvider.value(
+                                            value: BlocProvider.of<MarmatCubit>(
+                                                context),
+                                            child: const AlertdialogMarmat(),
+                                          ),
                                         );
                                       },
                                       icon: Container(

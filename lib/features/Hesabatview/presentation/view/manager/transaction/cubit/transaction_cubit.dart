@@ -25,7 +25,7 @@ class TransactionCubit extends Cubit<TransactionState> {
             .doc(hesabId)
             .get();
 
-        if (!supplierDoc.exists) {
+        if (!supplierDoc.exists) { 
           emit(TransactionLoadFailure('Supplier not found'));
           return;
         }

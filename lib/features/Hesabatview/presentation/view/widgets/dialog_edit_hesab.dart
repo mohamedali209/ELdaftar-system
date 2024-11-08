@@ -119,11 +119,10 @@ class DialogEditHesab extends StatelessWidget {
                           nakdyiaController.text,
                           true, // true indicates an addition
                         );
-                    Navigator.of(context).pop(); // Close dialog
                     context
                         .read<TransactionCubit>()
                         .fetchTransactions(hesabmodel.id);
-                  
+                    Navigator.of(context).pop(); // Close dialog
                   },
                   child: Container(
                     width: 130,
@@ -164,10 +163,10 @@ class DialogEditHesab extends StatelessWidget {
                           nakdyiaController.text,
                           false, // false indicates a subtraction
                         );
-                    Navigator.of(context).pop(); // Close dialog
-                     context
+                    context
                         .read<TransactionCubit>()
                         .fetchTransactions(hesabmodel.id);
+                    Navigator.of(context).pop(); // Close dialog
                   },
                   child: const Text('خصم'),
                 ),
@@ -180,9 +179,7 @@ class DialogEditHesab extends StatelessWidget {
             ),
             onPressed: () {
               Navigator.of(context).pop(); // Close dialog without changes
-                context
-                        .read<TransactionCubit>()
-                        .fetchTransactions(hesabmodel.id);
+              context.read<TransactionCubit>().fetchTransactions(hesabmodel.id);
             },
             child: const Text('إلغاء'),
           ),

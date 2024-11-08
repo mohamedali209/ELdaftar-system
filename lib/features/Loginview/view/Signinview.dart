@@ -1,5 +1,4 @@
 import 'package:aldafttar/features/Loginview/manager/signin/cubit/signin_cubit.dart';
-import 'package:aldafttar/features/Loginview/manager/signin/cubit/signin_state.dart';
 import 'package:aldafttar/features/Loginview/view/widgets/sign_in_body.dart';
 import 'package:aldafttar/utils/app_router.dart';
 import 'package:flutter/material.dart';
@@ -27,11 +26,11 @@ class SigninScreenState extends State<SigninScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<SigninCubit, SigninState>(
-      listener: (context, state) {},
+    return BlocProvider(
+      create: (context) => SigninCubit(),
       child: const Scaffold(
         backgroundColor: Colors.black,
-        body: Signinbody(),  
+        body: Signinbody(),
       ),
     );
   }

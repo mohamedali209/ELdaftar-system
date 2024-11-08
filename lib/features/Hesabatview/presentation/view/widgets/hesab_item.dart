@@ -26,14 +26,18 @@ class Hesabitem extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return DialogEditHesab(
+      builder: (dialogContext) => MultiBlocProvider(
+        providers: [
+          BlocProvider.value(value: BlocProvider.of<TransactionCubit>(context)),
+          BlocProvider.value(value: BlocProvider.of<SupplierCubit>(context)),
+        ],
+        child: DialogEditHesab(
             ayar18Controller: ayar18Controller,
             ayar21Controller: ayar21Controller,
             ayar24Controller: ayar24Controller,
             nakdyiaController: nakdyiaController,
-            hesabmodel: hesabmodel);
-      },
+            hesabmodel: hesabmodel),
+      ),
     );
   }
 
@@ -112,8 +116,12 @@ class Hesabitem extends StatelessWidget {
   void _showEditDialog(BuildContext context) async {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
+      builder: (dialogContext) => MultiBlocProvider(
+        providers: [
+          BlocProvider.value(value: BlocProvider.of<TransactionCubit>(context)),
+          BlocProvider.value(value: BlocProvider.of<SupplierCubit>(context)),
+        ],
+        child: StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             context.read<TransactionCubit>().fetchTransactions(hesabmodel.id);
 
@@ -143,7 +151,6 @@ class Hesabitem extends StatelessWidget {
               ),
               content: Stack(
                 children: [
-                  // Container with gradient background and padding
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
@@ -161,7 +168,6 @@ class Hesabitem extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Row with titles (headers)
                         const Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -173,15 +179,12 @@ class Hesabitem extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 10),
-
-                        // SizedBox to hold the ListView with dynamic data
                         SizedBox(
                           height: MediaQuery.of(context).size.height * .4,
                           width: MediaQuery.of(context).size.width * .9,
                           child:
                               BlocBuilder<TransactionCubit, TransactionState>(
                             builder: (context, state) {
-
                               if (state is TransactionLoadInProgress) {
                                 return const Center(
                                     child: CustomLoadingIndicator());
@@ -189,7 +192,7 @@ class Hesabitem extends StatelessWidget {
                                 return Center(child: Text(state.errorMessage));
                               } else if (state is TransactionLoadSuccess) {
                                 final transactions = state.transactions;
-                           
+
                                 return ListView.builder(
                                   shrinkWrap: true,
                                   itemCount: transactions.length,
@@ -260,27 +263,21 @@ class Hesabitem extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                         onPressed: () {
-                          context
-                              .read<SupplierCubit>()
-                              .fetchSuppliers(); // Reload suppliers
-                          Navigator.of(context)
-                              .pop(); // Close dialog without changes
+                          context.read<SupplierCubit>().fetchSuppliers();
+                          Navigator.of(context).pop();
                         },
                         child: const Text('إلغاء'),
                       ),
                     ),
-                    const SizedBox(width: 16), // Add space between buttons
+                    const SizedBox(width: 16),
                     Expanded(
                       child: TextButton(
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                         onPressed: () {
-                          showTransactionDialog(
-                              context); // Open the transaction dialog
-                          context
-                              .read<SupplierCubit>()
-                              .fetchSuppliers(); // Reload suppliers
+                          showTransactionDialog(context);
+                          context.read<SupplierCubit>().fetchSuppliers();
                         },
                         child: Container(
                           width: 130,
@@ -291,8 +288,7 @@ class Hesabitem extends StatelessWidget {
                               begin: Alignment.centerRight,
                               end: Alignment.centerLeft,
                             ),
-                            borderRadius:
-                                BorderRadius.circular(15), // Adjust as needed
+                            borderRadius: BorderRadius.circular(15),
                           ),
                           child: const Center(
                             child: Text(
@@ -308,8 +304,8 @@ class Hesabitem extends StatelessWidget {
               ],
             );
           },
-        );
-      },
+        ),
+      ),
     );
   }
 }
