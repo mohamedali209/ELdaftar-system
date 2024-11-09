@@ -17,20 +17,8 @@ class Summaryhesabatlist extends StatelessWidget {
         if (state is SupplierLoadSuccess) {
           final List<DaftarheaderModel> items = [
             DaftarheaderModel(
-              title: 'وزنة 18',
-              subtitle: state.totalWazna18.toStringAsFixed(2),
-            ),
-            DaftarheaderModel(
               title: 'وزنة 21',
               subtitle: state.totalWazna21.toStringAsFixed(2),
-            ),
-            DaftarheaderModel(
-              title: 'وزنة 24',
-              subtitle: state.totalWazna24.toStringAsFixed(2),
-            ),
-            DaftarheaderModel(
-              title: '21 اجمالي الوزنة',
-              subtitle: state.totalWeight.toStringAsFixed(2),
             ),
             DaftarheaderModel(
               title: 'اجمالي النقدية',

@@ -4,22 +4,23 @@ import 'package:aldafttar/features/Hesabatview/presentation/view/models/hesab_it
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class DialogEditHesab extends StatelessWidget {
+class DialogEditHesab extends StatefulWidget {
   const DialogEditHesab({
     super.key,
-    required this.ayar18Controller,
     required this.ayar21Controller,
-    required this.ayar24Controller,
     required this.nakdyiaController,
     required this.hesabmodel,
   });
 
-  final TextEditingController ayar18Controller;
   final TextEditingController ayar21Controller;
-  final TextEditingController ayar24Controller;
   final TextEditingController nakdyiaController;
   final Hesabmodel hesabmodel;
 
+  @override
+  State<DialogEditHesab> createState() => _DialogEditHesabState();
+}
+
+class _DialogEditHesabState extends State<DialogEditHesab> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -72,25 +73,14 @@ class DialogEditHesab extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
-                      controller: ayar18Controller,
-                      decoration: const InputDecoration(labelText: 'عيار 18'),
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 10), // Space between fields
-                    TextField(
-                      controller: ayar21Controller,
+                      controller: widget.ayar21Controller,
                       decoration: const InputDecoration(labelText: 'عيار 21'),
                       keyboardType: TextInputType.number,
                     ),
+
                     const SizedBox(height: 10), // Space between fields
                     TextField(
-                      controller: ayar24Controller,
-                      decoration: const InputDecoration(labelText: 'عيار 24'),
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 10), // Space between fields
-                    TextField(
-                      controller: nakdyiaController,
+                      controller: widget.nakdyiaController,
                       decoration: const InputDecoration(labelText: 'نقدية'),
                       keyboardType: TextInputType.number,
                     ),
@@ -111,18 +101,25 @@ class DialogEditHesab extends StatelessWidget {
                   ),
                   onPressed: () {
                     // Add the entered values to the current values
-                    context.read<SupplierCubit>().addTransaction(
-                          hesabmodel.id,
-                          ayar18Controller.text,
-                          ayar21Controller.text,
-                          ayar24Controller.text,
-                          nakdyiaController.text,
-                          true, // true indicates an addition
-                        );
+                    final transactionCubit = context.read<TransactionCubit>();
+                    final navigator = Navigator.of(context);
+
                     context
-                        .read<TransactionCubit>()
-                        .fetchTransactions(hesabmodel.id);
-                    Navigator.of(context).pop(); // Close dialog
+                        .read<SupplierCubit>()
+                        .addTransaction(
+                          widget.hesabmodel.id,
+                          widget.ayar21Controller.text,
+                          widget.nakdyiaController.text,
+                          true, // true indicates an addition
+                        )
+                        .then((_) {
+                      // Refetch the transactions after adding
+                      transactionCubit.fetchTransactions(widget.hesabmodel.id);
+
+                      if (mounted) {
+                        navigator.pop(); // Close dialog
+                      }
+                    });
                   },
                   child: Container(
                     width: 130,
@@ -156,16 +153,14 @@ class DialogEditHesab extends StatelessWidget {
                   onPressed: () {
                     // Subtract the entered values from the current values
                     context.read<SupplierCubit>().addTransaction(
-                          hesabmodel.id,
-                          ayar18Controller.text,
-                          ayar21Controller.text,
-                          ayar24Controller.text,
-                          nakdyiaController.text,
+                          widget.hesabmodel.id,
+                          widget.ayar21Controller.text,
+                          widget.nakdyiaController.text,
                           false, // false indicates a subtraction
                         );
                     context
                         .read<TransactionCubit>()
-                        .fetchTransactions(hesabmodel.id);
+                        .fetchTransactions(widget.hesabmodel.id);
                     Navigator.of(context).pop(); // Close dialog
                   },
                   child: const Text('خصم'),
@@ -179,7 +174,9 @@ class DialogEditHesab extends StatelessWidget {
             ),
             onPressed: () {
               Navigator.of(context).pop(); // Close dialog without changes
-              context.read<TransactionCubit>().fetchTransactions(hesabmodel.id);
+              context
+                  .read<TransactionCubit>()
+                  .fetchTransactions(widget.hesabmodel.id);
             },
             child: const Text('إلغاء'),
           ),

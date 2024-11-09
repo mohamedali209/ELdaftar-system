@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:aldafttar/features/Hesabatview/presentation/view/manager/cubit/supplier_state.dart';
-import 'package:aldafttar/features/Hesabatview/presentation/view/models/gold_converter.dart';
 import 'package:aldafttar/features/Hesabatview/presentation/view/models/hesab_item_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -44,21 +43,10 @@ class SupplierCubit extends Cubit<SupplierState> {
             }).toList();
 
             // Calculate totals
-            final totalWazna18 =
-                suppliers.fold<double>(0, (currentSum, supplier) {
-              final value = double.tryParse(supplier.wazna18) ?? 0;
-              return currentSum + value;
-            });
 
             final totalWazna21 =
                 suppliers.fold<double>(0, (currentSum, supplier) {
               final value = double.tryParse(supplier.wazna21) ?? 0;
-              return currentSum + value;
-            });
-
-            final totalWazna24 =
-                suppliers.fold<double>(0, (currentSum, supplier) {
-              final value = double.tryParse(supplier.wazna24) ?? 0;
               return currentSum + value;
             });
 
@@ -68,13 +56,8 @@ class SupplierCubit extends Cubit<SupplierState> {
             });
 
             // Calculate total weight and account count
-            final totalWeight = (totalWazna18 * 6 / 7) +
-                (totalWazna24 * 24 / 21) +
-                totalWazna21;
+
             final accountCount = suppliers.length;
-            final total21 = (totalWazna18 * 6 / 7) +
-                (totalWazna24 * 24 / 21) +
-                totalWazna21;
 
             // Update the totals document in Firestore (optional, can be customized)
             _firestore
@@ -83,22 +66,14 @@ class SupplierCubit extends Cubit<SupplierState> {
                 .collection('totals')
                 .doc('totals')
                 .set({
-              'totalWazna18': totalWazna18,
               'totalWazna21': totalWazna21,
-              'totalWazna24': totalWazna24,
-              'totalWeight': totalWeight,
-              'total21': total21,
               'totalNakdyia': totalNakdyia,
             });
 
             emit(SupplierLoadSuccess(
-              total21,
               totalNakdyia,
               suppliers,
-              totalWazna18,
-              totalWazna24,
               totalWazna21,
-              totalWeight,
               accountCount,
             ));
           },
@@ -179,12 +154,10 @@ class SupplierCubit extends Cubit<SupplierState> {
   }
 
   // Method for adding/subtracting a transaction
-  Future<void> addTransaction(String supplierId, String ayar18, String ayar21,
-      String ayar24, String nakdyia, bool isAdd) async {
+  Future<void> addTransaction(
+      String supplierId, String ayar21, String nakdyia, bool isAdd) async {
     final DateTime now = DateTime.now();
     final String formattedDate = "${now.year}-${now.month}-${now.day}";
-
-    final GoldConverter goldConverter = GoldConverter();
 
     try {
       emit(SupplierLoadInProgress());
@@ -210,106 +183,32 @@ class SupplierCubit extends Cubit<SupplierState> {
         }
 
         final supplierData = supplierDoc.data()!;
-        double currentWazna18 =
-            double.tryParse(supplierData['wazna18'] ?? '0') ?? 0;
         double currentWazna21 =
             double.tryParse(supplierData['wazna21'] ?? '0') ?? 0;
-        double currentWazna24 =
-            double.tryParse(supplierData['wazna24'] ?? '0') ?? 0;
         int currentNakdyia = int.tryParse(supplierData['nakdyia'] ?? '0') ?? 0;
 
         // Convert input to double for calculations
-        double newWazna18 = double.tryParse(ayar18) ?? 0;
         double newWazna21 = double.tryParse(ayar21) ?? 0;
-        double newWazna24 = double.tryParse(ayar24) ?? 0;
         final newNakdyia = int.tryParse(nakdyia) ?? 0;
 
         if (!isAdd) {
-          // Subtraction Logic: Handle gold subtraction
+          // Subtraction Logic: Handle nakdyia and ayar21 subtraction
           if (newNakdyia > currentNakdyia) {
             emit(SupplierLoadFailure('Not enough nakdyia to subtract'));
             return;
           } else {
             currentNakdyia -= newNakdyia; // Subtract nakdyia
           }
-          if (newWazna18 > currentWazna18) {
-            double remainingWazna18 = newWazna18 - currentWazna18;
-            currentWazna18 = 0;
 
-            double wazna21Equivalent =
-                goldConverter.convert18kTo21k(remainingWazna18);
-            if (wazna21Equivalent > currentWazna21) {
-              double remainingWazna21 = wazna21Equivalent - currentWazna21;
-              currentWazna21 = 0;
-
-              double wazna24Equivalent =
-                  goldConverter.convert21kTo24k(remainingWazna21);
-              if (wazna24Equivalent > currentWazna24) {
-                emit(SupplierLoadFailure(
-                    'Not enough gold across all karats to subtract'));
-                return;
-              } else {
-                currentWazna24 -= wazna24Equivalent;
-              }
-            } else {
-              currentWazna21 -= wazna21Equivalent;
-            }
-          } else {
-            currentWazna18 -= newWazna18;
-          }
-
-          // Subtract from wazna21
           if (newWazna21 > currentWazna21) {
-            double remainingWazna21 = newWazna21 - currentWazna21;
-            currentWazna21 = 0;
-
-            double wazna24Equivalent =
-                goldConverter.convert21kTo24k(remainingWazna21);
-            if (wazna24Equivalent > currentWazna24) {
-              double wazna18Equivalent =
-                  goldConverter.convert24kTo18k(wazna24Equivalent);
-              if (wazna18Equivalent > currentWazna18) {
-                emit(SupplierLoadFailure(
-                    'Not enough gold across all karats to subtract'));
-                return;
-              } else {
-                currentWazna18 -= wazna18Equivalent;
-              }
-            } else {
-              currentWazna24 -= wazna24Equivalent;
-            }
+            emit(SupplierLoadFailure('Not enough gold to subtract'));
+            return;
           } else {
-            currentWazna21 -= newWazna21;
-          }
-
-          // Subtract from wazna24
-          if (newWazna24 > currentWazna24) {
-            double remainingWazna24 = newWazna24 - currentWazna24;
-            currentWazna24 = 0;
-
-            double wazna21Equivalent =
-                goldConverter.convert24kTo21k(remainingWazna24);
-            if (wazna21Equivalent > currentWazna21) {
-              double wazna18Equivalent =
-                  goldConverter.convert21kTo18k(wazna21Equivalent);
-              if (wazna18Equivalent > currentWazna18) {
-                emit(SupplierLoadFailure(
-                    'Not enough gold across all karats to subtract'));
-                return;
-              } else {
-                currentWazna18 -= wazna18Equivalent;
-              }
-            } else {
-              currentWazna21 -= wazna21Equivalent;
-            }
-          } else {
-            currentWazna24 -= newWazna24;
+            currentWazna21 -= newWazna21; // Subtract ayar21
           }
         } else {
           // Addition Logic: Add new values to the current values
-          currentWazna18 += newWazna18;
           currentWazna21 += newWazna21;
-          currentWazna24 += newWazna24;
           currentNakdyia += newNakdyia;
         }
 
@@ -320,9 +219,7 @@ class SupplierCubit extends Cubit<SupplierState> {
             .collection('suppliers')
             .doc(supplierId)
             .update({
-          'wazna18': currentWazna18.toString(),
-          'wazna21': currentWazna21.toString(),
-          'wazna24': currentWazna24.toString(),
+          'wazna21': currentWazna21.toStringAsFixed(2),
           'nakdyia': currentNakdyia.toString(),
           'isAdd': isAdd,
         });
@@ -339,9 +236,7 @@ class SupplierCubit extends Cubit<SupplierState> {
 
         // Add the new transaction to the list
         transactionList.add({
-          'wazna18': newWazna18.toString(),
-          'wazna21': newWazna21.toString(),
-          'wazna24': newWazna24.toString(),
+          'wazna21': newWazna21.toStringAsFixed(2),
           'nakdyia': newNakdyia.toString(),
           'isAdd': isAdd, // Addition or subtraction
           'date': formattedDate, // Transaction date

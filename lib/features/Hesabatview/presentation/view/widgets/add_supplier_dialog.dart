@@ -12,9 +12,7 @@ class AddSupplierDialog extends StatefulWidget {
 
 class AddSupplierDialogState extends State<AddSupplierDialog> {
   String supplierName = '';
-  String wazna18 = '';
   String wazna21 = '';
-  String wazna24 = '';
   String nakdyia = '';
 
   // Helper method for building text fields
@@ -86,13 +84,7 @@ class AddSupplierDialogState extends State<AddSupplierDialog> {
                   _buildTextField('الاسم', (value) => supplierName = value,
                       TextInputType.text),
                   const SizedBox(height: 5),
-                  _buildTextField('وزنة 18', (value) => wazna18 = value,
-                      TextInputType.number),
-                  const SizedBox(height: 5),
                   _buildTextField('وزنة 21', (value) => wazna21 = value,
-                      TextInputType.number),
-                  const SizedBox(height: 5),
-                  _buildTextField('وزنة 24', (value) => wazna24 = value,
                       TextInputType.number),
                   const SizedBox(height: 5),
                   _buildTextField('نقدية', (value) => nakdyia = value,
@@ -143,20 +135,15 @@ class AddSupplierDialogState extends State<AddSupplierDialog> {
                   // Ensure supplierName is filled
                   if (supplierName.isNotEmpty) {
                     // Validate numeric input
-                    double? wazna180 =
-                        double.tryParse(wazna18.isNotEmpty ? wazna18 : '0');
+
                     double? wazna210 =
                         double.tryParse(wazna21.isNotEmpty ? wazna21 : '0');
-                    double? wazna240 =
-                        double.tryParse(wazna24.isNotEmpty ? wazna24 : '0');
+
                     double? nakdyia0 =
                         double.tryParse(nakdyia.isNotEmpty ? nakdyia : '0');
 
                     // Check if parsing failed (i.e., not valid numbers)
-                    if (wazna180 == null ||
-                        wazna210 == null ||
-                        wazna240 == null ||
-                        nakdyia0 == null) {
+                    if (wazna210 == null || nakdyia0 == null) {
                       // Show an error message if any input is invalid
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -170,9 +157,7 @@ class AddSupplierDialogState extends State<AddSupplierDialog> {
                       transactions: [],
                       id: '', // Ensure this matches how you initialize the ID
                       suppliername: supplierName,
-                      wazna18: wazna180.toString(),
                       wazna21: wazna210.toString(),
-                      wazna24: wazna240.toString(),
                       nakdyia: nakdyia0.toString(),
                     );
 

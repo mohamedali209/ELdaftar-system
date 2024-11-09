@@ -9,19 +9,13 @@ class SupplierLoadInProgress extends SupplierState {}
 
 class SupplierLoadSuccess extends SupplierState {
   final List<Hesabmodel> suppliers;
-  final double totalWazna18;
   final double totalWazna21;
-  final double totalWazna24;
-  final double totalWeight;
-  final double total21;
   final int nakdyia;
   final int accountCount;
 
   SupplierLoadSuccess(
-    this.total21,
-    this.nakdyia, this.suppliers, this.totalWazna18,
-      this.totalWazna24,
-      this.totalWazna21, this.totalWeight, this.accountCount);
+    this.nakdyia, this.suppliers,
+      this.totalWazna21,  this.accountCount);
 }
 
 class SupplierLoadFailure extends SupplierState {

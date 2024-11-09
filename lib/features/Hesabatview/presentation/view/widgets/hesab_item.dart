@@ -19,9 +19,7 @@ class Hesabitem extends StatelessWidget {
   final Hesabmodel hesabmodel;
 
   void showTransactionDialog(BuildContext context) {
-    final TextEditingController ayar18Controller = TextEditingController();
     final TextEditingController ayar21Controller = TextEditingController();
-    final TextEditingController ayar24Controller = TextEditingController();
     final TextEditingController nakdyiaController = TextEditingController();
 
     showDialog(
@@ -32,9 +30,7 @@ class Hesabitem extends StatelessWidget {
           BlocProvider.value(value: BlocProvider.of<SupplierCubit>(context)),
         ],
         child: DialogEditHesab(
-            ayar18Controller: ayar18Controller,
             ayar21Controller: ayar21Controller,
-            ayar24Controller: ayar24Controller,
             nakdyiaController: nakdyiaController,
             hesabmodel: hesabmodel),
       ),
@@ -80,30 +76,23 @@ class Hesabitem extends StatelessWidget {
               style: Appstyles.regular25(context).copyWith(fontSize: 30),
             ),
           ),
-          const Divider(),
+          const SizedBox(
+            height: 15,
+          ),
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Supplierwaznaornkdyia(
-                  waznaornakdyia: '18 وزنة',
-                  num: hesabmodel.wazna18,
-                ),
-                Supplierwaznaornkdyia(
                   waznaornakdyia: '21 وزنة',
                   num: hesabmodel.wazna21,
                 ),
-                Supplierwaznaornkdyia(
-                  waznaornakdyia: '24 وزنة',
-                  num: hesabmodel.wazna24,
+                const SizedBox(
+                  height: 20,
                 ),
                 Supplierwaznaornkdyia(
                   waznaornakdyia: 'نقدية',
                   num: hesabmodel.nakdyia,
-                ),
-                Supplierwaznaornkdyia(
-                  waznaornakdyia: 'اجمالي الوزنة 21',
-                  num: hesabmodel.total21.toString(),
                 ),
               ],
             ),
@@ -171,9 +160,7 @@ class Hesabitem extends StatelessWidget {
                         const Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            DaftarcontainerItem(title: 'جرام 18'),
                             DaftarcontainerItem(title: 'جرام 21'),
-                            DaftarcontainerItem(title: 'جرام 24'),
                             DaftarcontainerItem(title: 'نقدية'),
                             DaftarcontainerItem(title: 'التاريخ'),
                           ],
@@ -214,22 +201,11 @@ class Hesabitem extends StatelessWidget {
                                           DaftarcontainerItem(
                                             color: color,
                                             title:
-                                                transaction.wazna18.toString(),
-                                          ),
-                                          DaftarcontainerItem(
-                                            color: color,
-                                            title:
                                                 transaction.wazna21.toString(),
                                           ),
                                           DaftarcontainerItem(
                                             color: color,
-                                            title:
-                                                transaction.wazna24.toString(),
-                                          ),
-                                          DaftarcontainerItem(
-                                            color: color,
-                                            title:
-                                                transaction.nakdyia.toString(),
+                                            title: transaction.nakdyia,
                                           ),
                                           DaftarcontainerItem(
                                             color: color,
