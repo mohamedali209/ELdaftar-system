@@ -99,27 +99,33 @@ class _DialogEditHesabState extends State<DialogEditHesab> {
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
-                  onPressed: () {
-                    // Add the entered values to the current values
+                  onPressed: () async {
                     final transactionCubit = context.read<TransactionCubit>();
                     final navigator = Navigator.of(context);
 
-                    context
-                        .read<SupplierCubit>()
-                        .addTransaction(
-                          widget.hesabmodel.id,
-                          widget.ayar21Controller.text,
-                          widget.nakdyiaController.text,
-                          true, // true indicates an addition
-                        )
-                        .then((_) {
-                      // Refetch the transactions after adding
-                      transactionCubit.fetchTransactions(widget.hesabmodel.id);
+                    try {
+                      // Wait until addTransaction finishes
+                      await context.read<SupplierCubit>().addTransaction(
+                            widget.hesabmodel.id,
+                            widget.ayar21Controller.text,
+                            widget.nakdyiaController.text,
+                            true, // true indicates an addition
+                          );
+
+                      // Optional: Add a small delay to ensure the database update completes
+                      await Future.delayed(const Duration(milliseconds: 200));
+
+                      // Refetch the transactions after the addTransaction completes
+                      await transactionCubit
+                          .fetchTransactions(widget.hesabmodel.id);
 
                       if (mounted) {
                         navigator.pop(); // Close dialog
                       }
-                    });
+                    } catch (error) {
+                      // Handle any errors in the process
+                      print("Error adding transaction: $error");
+                    }
                   },
                   child: Container(
                     width: 130,
@@ -150,18 +156,35 @@ class _DialogEditHesabState extends State<DialogEditHesab> {
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
-                  onPressed: () {
-                    // Subtract the entered values from the current values
-                    context.read<SupplierCubit>().addTransaction(
-                          widget.hesabmodel.id,
-                          widget.ayar21Controller.text,
-                          widget.nakdyiaController.text,
-                          false, // false indicates a subtraction
-                        );
-                    context
-                        .read<TransactionCubit>()
-                        .fetchTransactions(widget.hesabmodel.id);
-                    Navigator.of(context).pop(); // Close dialog
+                  onPressed: () async {
+                    // Store references to the cubits and navigator
+                    final transactionCubit = context.read<TransactionCubit>();
+                    final navigator = Navigator.of(context);
+
+                    try {
+                      // Wait until addTransaction completes
+                      await context.read<SupplierCubit>().addTransaction(
+                            widget.hesabmodel.id,
+                            widget.ayar21Controller.text,
+                            widget.nakdyiaController.text,
+                            false, // false indicates a subtraction
+                          );
+
+                      // Optional: Add a small delay to ensure the database update completes
+                      await Future.delayed(const Duration(milliseconds: 200));
+
+                      // Refetch the transactions after the addTransaction completes
+                      await transactionCubit
+                          .fetchTransactions(widget.hesabmodel.id);
+
+                      // Close the dialog if still mounted
+                      if (mounted) {
+                        navigator.pop();
+                      }
+                    } catch (error) {
+                      // Handle any errors in the process
+                      print("Error during transaction subtraction: $error");
+                    }
                   },
                   child: const Text('خصم'),
                 ),
