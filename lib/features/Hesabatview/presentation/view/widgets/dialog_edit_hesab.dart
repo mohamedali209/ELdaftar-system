@@ -124,7 +124,7 @@ class _DialogEditHesabState extends State<DialogEditHesab> {
                       }
                     } catch (error) {
                       // Handle any errors in the process
-                      print("Error adding transaction: $error");
+                      debugPrint("Error adding transaction: $error");
                     }
                   },
                   child: Container(
@@ -183,7 +183,7 @@ class _DialogEditHesabState extends State<DialogEditHesab> {
                       }
                     } catch (error) {
                       // Handle any errors in the process
-                      print("Error during transaction subtraction: $error");
+                      debugPrint("Error during transaction subtraction: $error");
                     }
                   },
                   child: const Text('خصم'),

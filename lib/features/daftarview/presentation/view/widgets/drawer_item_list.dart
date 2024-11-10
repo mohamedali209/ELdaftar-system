@@ -67,7 +67,7 @@ class DraweritemlistState extends State<Draweritemlist> {
           GoRouter.of(context).go(AppRouter.kcollectiondafterView);
         },
         title: 'الدفاتر',
-        image: 'assets/images/tahlelat.svg',
+        image: 'assets/images/reshot-icon-stacked-books-PS57ZD98BR.svg',
       ),
     ];
   }

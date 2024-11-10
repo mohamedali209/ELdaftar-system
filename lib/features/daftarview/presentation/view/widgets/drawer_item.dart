@@ -61,6 +61,7 @@ class Activeitem extends StatelessWidget {
       child: ListTile(
         leading: SvgPicture.asset(
           drawerItemModel.image,
+          height: 20,
           colorFilter: const ColorFilter.mode(
             Colors.amber,
             BlendMode.srcIn,

@@ -5,11 +5,13 @@ import 'package:aldafttar/utils/app_router.dart';
 import 'package:aldafttar/utils/sizeconfig.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() async {
-  // BindingBase.debugZoneErrorsAreFatal = true;
+  BindingBase.debugZoneErrorsAreFatal = true;
+
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
