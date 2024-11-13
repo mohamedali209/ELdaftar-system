@@ -1,6 +1,9 @@
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/custom_background_container.dart';
+import 'package:aldafttar/features/tahlelview/presentation/view/widgets/buy_items_chart.dart';
+import 'package:aldafttar/features/tahlelview/presentation/view/widgets/buy_orsell_row.dart';
 import 'package:aldafttar/features/tahlelview/presentation/view/widgets/buyorsell_header_period.dart';
 import 'package:aldafttar/features/tahlelview/presentation/view/widgets/custom_line_chart.dart';
+import 'package:aldafttar/utils/styles.dart';
 import 'package:flutter/material.dart';
 
 class Tahlelexpandedcontainer extends StatefulWidget {
@@ -116,10 +119,60 @@ class TahlelexpandedcontainerState extends State<Tahlelexpandedcontainer> {
                 ),
               ),
             ),
+            const SizedBox(height: 20),
+            Custombackgroundcontainer(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    PeriodHeader(
+                      title: 'نسبة مبيعات المنتجات من حيث المبلغ',
+                      style: Appstyles.daftartodayheader(context),
+                      selectedPeriod: selectedPeriod,
+                      onPeriodChanged: onPeriodChanged,
+                    ),
+                    const Buyitemschart(),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Custombackgroundcontainer(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    PeriodHeader(
+                      title: 'نسبة مبيعات المنتجات من حيث الوزن',
+                      style: Appstyles.daftartodayheader(context),
+                      selectedPeriod: selectedPeriod,
+                      onPeriodChanged: onPeriodChanged,
+                    ),
+                    const Buyitemschart(),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Custombackgroundcontainer(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    PeriodHeader(
+                      title: 'نسبة البيع و الشراء',
+                      style: Appstyles.daftartodayheader(context),
+                      selectedPeriod: selectedPeriod,
+                      onPeriodChanged: onPeriodChanged,
+                    ),
+                    const Buyorselltahlel()
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
- 

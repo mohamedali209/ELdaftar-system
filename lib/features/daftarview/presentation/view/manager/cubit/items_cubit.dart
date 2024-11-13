@@ -80,8 +80,25 @@ class ItemsCubit extends Cubit<ItemsState> {
     return super.close();
   }
 
+  String getWeeklyPeriod() {
+    final now = DateTime.now();
+    final startOfYear = DateTime(now.year, 1, 1);
+    final daysDifference = now.difference(startOfYear).inDays;
+    final weekOfYear = ((daysDifference + startOfYear.weekday) / 7).ceil();
+    return 'week_${weekOfYear}_${now.year}';
+  }
+
+  String getMonthlyPeriod() {
+    final now = DateTime.now();
+    return 'month_${now.month}_${now.year}';
+  }
+
+  String getYearlyPeriod() {
+    final now = DateTime.now();
+    return 'year_${now.year}';
+  }
+
   void addSellingItem(Daftarcheckmodel newItem) async {
-    // Start loading
     emit(state.copyWith(isLoading: true));
     await Future.delayed(const Duration(milliseconds: 700));
 
@@ -98,10 +115,17 @@ class ItemsCubit extends Cubit<ItemsState> {
       await _updateTotals();
       await _updateTotalCash(double.tryParse(newItemWithNum.price) ?? 0,
           add: true);
+
+      final salesAmount = double.tryParse(newItemWithNum.price) ?? 0;
+
+      await updateSalesSummary(salesAmount); // Call it only once
+
+      // final quantity = double.tryParse(newItemWithNum.adad) ?? 0.0;
+      // final weight = double.tryParse(newItemWithNum.gram) ?? 0.0;
+      // await updateTopSellingItems(newItemWithNum.details, quantity, weight);
     } catch (e) {
       debugPrint('Error adding selling item: $e');
     } finally {
-      // Stop loading
       emit(state.copyWith(isLoading: false));
     }
   }
@@ -118,12 +142,17 @@ class ItemsCubit extends Cubit<ItemsState> {
     ));
 
     try {
-      // Execute all async tasks concurrently for better performance
+      // Execute all async tasks
+      await _updateFirestore();
+      await _addItemGramsToWeight(newItemWithNum); // Update weight collection
+      await _updateTotals();
 
-      _updateFirestore();
-      _addItemGramsToWeight(newItemWithNum); // Update weight collection
-      _updateTotals();
-      _updateTotalCash(double.tryParse(newItemWithNum.price) ?? 0, add: false);
+      final purchaseAmount = double.tryParse(newItemWithNum.price) ?? 0;
+      await _updateTotalCash(purchaseAmount, add: false);
+
+
+      // Update purchase summaries for each period
+      await updatePurchaseSummary(purchaseAmount);
     } catch (e) {
       debugPrint('Error adding buying item: $e');
     } finally {
@@ -131,6 +160,362 @@ class ItemsCubit extends Cubit<ItemsState> {
       emit(state.copyWith(isLoading: false));
     }
   }
+
+ Future<void> updateSalesSummary(double salesAmount) async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    final userId = user.uid;
+    final insightsRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('insights')
+        .doc('insights_document_id');
+
+    final docSnapshot = await insightsRef.get();
+    DateTime now = DateTime.now();
+
+    // Initialize sales_summary if it doesn't exist
+    if (!docSnapshot.exists || 
+        docSnapshot.data() == null || 
+        !docSnapshot.data()!.containsKey('sales_summary')) {
+      await insightsRef.set({
+        'sales_summary': {'weekly': [], 'monthly': [], 'yearly': []}
+      }, SetOptions(merge: true));
+    }
+
+    // Retrieve or initialize weekly, monthly, and yearly data arrays
+    List<dynamic> weeklyData = (docSnapshot.data()?['sales_summary']?['weekly'] as List<dynamic>?) ?? [];
+    List<dynamic> monthlyData = (docSnapshot.data()?['sales_summary']?['monthly'] as List<dynamic>?) ?? [];
+    List<dynamic> yearlyData = (docSnapshot.data()?['sales_summary']?['yearly'] as List<dynamic>?) ?? [];
+
+    // Update each period with the sales amount
+    weeklyData = _updateWeeklySummary(weeklyData, now, salesAmount);
+    monthlyData = _updateMonthlySummary(monthlyData, now, salesAmount);
+    yearlyData = _updateYearlySummary(yearlyData, now, salesAmount);
+
+    // Save all periods back to Firestore in one update call
+    await insightsRef.update({
+      'sales_summary.weekly': weeklyData,
+      'sales_summary.monthly': monthlyData,
+      'sales_summary.yearly': yearlyData,
+    });
+  }
+}
+
+
+// Helper functions to manage the summaries
+  List<dynamic> _updateWeeklySummary(
+    List<dynamic> weeklyData, DateTime now, double salesAmount) {
+  
+  // Calculate the day index for the current day in the weekly format (0 for Monday to 6 for Sunday)
+  int dayOfWeek = (now.weekday - 1) % 7; // Monday is 0, Sunday is 6
+  String period = 'day-$dayOfWeek';
+
+  // Remove entries older than 7 days
+  weeklyData.removeWhere(
+      (entry) => now.difference(DateTime.parse(entry['date'])).inDays >= 7);
+
+  // Check if there's already an entry for the current dayOfWeek
+  int existingIndex = weeklyData.indexWhere((entry) => entry['period'] == period);
+
+  // If entry exists, update the sales amount for the current day
+  if (existingIndex >= 0) {
+    weeklyData[existingIndex]['sales'] += salesAmount;
+  } else {
+    // If no entry exists for today, add a new one
+    weeklyData.add({
+      'period': period,
+      'sales': salesAmount,
+      'date': now.toIso8601String()
+    });
+  }
+
+  return weeklyData;
+}
+
+  List<dynamic> _updateMonthlySummary(
+      List<dynamic> monthlyData, DateTime now, double salesAmount) {
+    int weekOfMonth =
+        ((now.day - 1) ~/ 7) + 1; // Calculate which week of the month it is
+    String period = '${now.month}-$weekOfMonth';
+
+    // Remove entries older than 4 weeks (1 month)
+    monthlyData
+        .removeWhere((entry) => _isOlderThanOneMonth(entry['date'], now));
+    // Update or add sales for the current week
+    int existingIndex =
+        monthlyData.indexWhere((entry) => entry['period'] == period);
+    if (existingIndex >= 0) {
+      monthlyData[existingIndex]['sales'] += salesAmount;
+    } else {
+      monthlyData.add({
+        'period': period,
+        'sales': salesAmount,
+        'date': now.toIso8601String()
+      });
+    }
+    return monthlyData;
+  }
+
+  List<dynamic> _updateYearlySummary(
+      List<dynamic> yearlyData, DateTime now, double salesAmount) {
+    String monthYear = '${now.month}-${now.year}';
+
+    // Remove entries older than 12 months
+    yearlyData.removeWhere((entry) => _isOlderThanOneYear(entry['date'], now));
+    // Update or add sales for the current month
+    int existingIndex =
+        yearlyData.indexWhere((entry) => entry['month'] == monthYear);
+    if (existingIndex >= 0) {
+      yearlyData[existingIndex]['sales'] += salesAmount;
+    } else {
+      yearlyData.add({
+        'month': monthYear,
+        'sales': salesAmount,
+        'date': now.toIso8601String()
+      });
+    }
+    return yearlyData;
+  }
+
+// Helper methods for period checking
+  bool _isOlderThanOneMonth(String date, DateTime now) {
+    DateTime dateParsed = DateTime.parse(date);
+    return now.difference(dateParsed).inDays >= 30;
+  }
+
+  bool _isOlderThanOneYear(String date, DateTime now) {
+    DateTime dateParsed = DateTime.parse(date);
+    return now.difference(dateParsed).inDays >= 365;
+  }
+
+ Future<void> updatePurchaseSummary(double purchaseAmount) async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    final userId = user.uid;
+    final insightsRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('insights')
+        .doc('insights_document_id');
+
+    final docSnapshot = await insightsRef.get();
+    DateTime now = DateTime.now();
+
+    // Check if the document and purchase_summary field exist, initialize if necessary
+    if (!docSnapshot.exists || 
+        docSnapshot.data() == null || 
+        !docSnapshot.data()!.containsKey('purchase_summary')) {
+      await insightsRef.set({
+        'purchase_summary': {
+          'weekly': [],
+          'monthly': [],
+          'yearly': []
+        }
+      }, SetOptions(merge: true));
+    }
+
+    // Retrieve or initialize `weekly`, `monthly`, `yearly` data arrays
+    List<dynamic> weeklyData = (docSnapshot.data()?['purchase_summary']?['weekly'] as List<dynamic>?) ?? [];
+    List<dynamic> monthlyData = (docSnapshot.data()?['purchase_summary']?['monthly'] as List<dynamic>?) ?? [];
+    List<dynamic> yearlyData = (docSnapshot.data()?['purchase_summary']?['yearly'] as List<dynamic>?) ?? [];
+
+    // Update each period with the purchase amount
+    weeklyData = _updateWeeklySummarypurchase(weeklyData, now, purchaseAmount);
+    monthlyData = _updateMonthlySummarypurchase(monthlyData, now, purchaseAmount);
+    yearlyData = _updateYearlySummarypurchase(yearlyData, now, purchaseAmount);
+
+    // Save all periods back to Firestore in one update call
+    await insightsRef.update({
+      'purchase_summary.weekly': weeklyData,
+      'purchase_summary.monthly': monthlyData,
+      'purchase_summary.yearly': yearlyData,
+    });
+  }
+}
+
+
+
+// Helper functions to manage the purchase summaries for each period
+ List<dynamic> _updateWeeklySummarypurchase(
+    List<dynamic> weeklyData, DateTime now, double purchaseAmount) {
+  
+  // Calculate the day index for the current day in the weekly format (0 for Monday to 6 for Sunday)
+int dayOfWeek = (now.weekday - 1) % 7; // Monday is 0, Sunday is 6
+  String period = 'day-$dayOfWeek';
+
+  // Remove entries older than 7 days
+  weeklyData.removeWhere(
+      (entry) => now.difference(DateTime.parse(entry['date'])).inDays >= 7);
+
+  // Check if there's already an entry for today's dayOfWeek
+  int existingIndex = weeklyData.indexWhere((entry) => entry['period'] == period);
+
+  // If entry exists, update the purchase amount for the current day
+  if (existingIndex >= 0) {
+    weeklyData[existingIndex]['purchase'] += purchaseAmount;
+  } else {
+    // If no entry exists for today, add a new one
+    weeklyData.add({
+      'period': period,
+      'purchase': purchaseAmount,
+      'date': now.toIso8601String()
+    });
+  }
+
+  return weeklyData;
+}
+
+  List<dynamic> _updateMonthlySummarypurchase(
+      List<dynamic> monthlyData, DateTime now, double purchaseAmount) {
+    int weekOfMonth =
+        ((now.day - 1) ~/ 7) + 1; // Calculate which week of the month it is
+    String period = '${now.month}-$weekOfMonth';
+
+    // Remove entries older than 4 weeks (1 month)
+    monthlyData
+        .removeWhere((entry) => _isOlderThanOneMonth(entry['date'], now));
+    // Update or add purchase for the current week
+    int existingIndex =
+        monthlyData.indexWhere((entry) => entry['period'] == period);
+    if (existingIndex >= 0) {
+      monthlyData[existingIndex]['purchase'] += purchaseAmount;
+    } else {
+      monthlyData.add({
+        'period': period,
+        'purchase': purchaseAmount,
+        'date': now.toIso8601String()
+      });
+    }
+    return monthlyData;
+  }
+
+  List<dynamic> _updateYearlySummarypurchase(
+      List<dynamic> yearlyData, DateTime now, double purchaseAmount) {
+    String monthYear = '${now.month}-${now.year}';
+
+    // Remove entries older than 12 months
+    yearlyData.removeWhere((entry) => _isOlderThanOneYear(entry['date'], now));
+    // Update or add purchase for the current month
+    int existingIndex =
+        yearlyData.indexWhere((entry) => entry['month'] == monthYear);
+    if (existingIndex >= 0) {
+      yearlyData[existingIndex]['purchase'] += purchaseAmount;
+    } else {
+      yearlyData.add({
+        'month': monthYear,
+        'purchase': purchaseAmount,
+        'date': now.toIso8601String()
+      });
+    }
+    return yearlyData;
+  }
+
+// Helper methods for period checking
+
+  // Future<void> updateTopSellingItems(
+  //   String itemType,
+  //   double quantity,
+  //   double weight,
+  // ) async {
+  //   final user = FirebaseAuth.instance.currentUser;
+  //   if (user != null) {
+  //     final userId = user.uid;
+  //     final insightsRef = FirebaseFirestore.instance
+  //         .collection('users')
+  //         .doc(userId)
+  //         .collection('insights')
+  //         .doc('insights_document_id');
+
+  //     final docSnapshot = await insightsRef.get();
+
+  //     if (docSnapshot.exists) {
+  //       final insightsData = docSnapshot.data();
+
+  //       // Debugging: print the fetched data
+  //       print('Fetched Insights Data: $insightsData');
+
+  //       // Safely access top_selling_items and initialize if null
+  //       var topSellingItems = insightsData?['top_selling_items'] ??
+  //           {
+  //             'by_quantity': [],
+  //             'by_weight': [],
+  //           };
+  //       List<dynamic> byQuantity = topSellingItems['by_quantity'];
+  //       List<dynamic> byWeight = topSellingItems['by_weight'];
+
+  //       // Calculate total quantity and total weight from existing data
+  //       double totalQuantity = 0;
+  //       double totalWeight = 0;
+
+  //       // Calculate the total quantity from existing data
+  //       for (var item in byQuantity) {
+  //         totalQuantity += item['quantity'] ?? 0.0;
+  //       }
+
+  //       // Calculate the total weight from existing data
+  //       for (var item in byWeight) {
+  //         totalWeight += item['weight'] ?? 0.0;
+  //       }
+
+  //       // Print total quantity and weight to debug
+  //       print('Total Quantity: $totalQuantity');
+  //       print('Total Weight: $totalWeight');
+
+  //       // Calculate the percentage of quantity for the current item
+  //       double quantityPercentage =
+  //           totalQuantity > 0 ? (quantity / totalQuantity) * 100 : 0;
+
+  //       // Calculate the percentage of weight for the current item
+  //       double weightPercentage =
+  //           totalWeight > 0 ? (weight / totalWeight) * 100 : 0;
+
+  //       // Print the calculated percentages for debugging
+  //       print('Calculated Quantity Percentage: $quantityPercentage');
+  //       print('Calculated Weight Percentage: $weightPercentage');
+
+  //       // Now we need to update the document with the new item and the calculated percentage
+  //       await insightsRef.set({
+  //         'top_selling_items.by_quantity': FieldValue.arrayUnion([
+  //           {
+  //             'itemType': itemType,
+  //             'quantity': quantity,
+  //             'percentage': quantityPercentage
+  //           }
+  //         ]),
+  //         'top_selling_items.by_weight': FieldValue.arrayUnion([
+  //           {
+  //             'itemType': itemType,
+  //             'weight': weight,
+  //             'percentage': weightPercentage
+  //           }
+  //         ]),
+  //       }, SetOptions(merge: true));
+  //     } else {
+  //       // If the document doesn't exist, create it with 100% for the first item
+  //       await insightsRef.set({
+  //         'top_selling_items': {
+  //           'by_quantity': [
+  //             {
+  //               'itemType': itemType,
+  //               'quantity': quantity,
+  //               'percentage':
+  //                   100.0 // First item will always have 100% in its category
+  //             }
+  //           ],
+  //           'by_weight': [
+  //             {
+  //               'itemType': itemType,
+  //               'weight': weight,
+  //               'percentage':
+  //                   100.0 // First item will always have 100% in its category
+  //             }
+  //           ]
+  //         }
+  //       });
+  //     }
+  //   }
+  // }
 
   Future<void> _addItemGramsToWeight(Daftarcheckmodel newItem) async {
     // Get the current user
@@ -491,7 +876,7 @@ class ItemsCubit extends Cubit<ItemsState> {
 
   void modifyItem(Daftarcheckmodel modifiedItem,
       {bool isBuyingItem = false}) async {
-                 emit(state.copyWith(isLoading: true));
+    emit(state.copyWith(isLoading: true));
 
     // Fetch current selling and buying items
     Daftarcheckmodel oldSellingItem = state.sellingItems.firstWhere(
@@ -520,7 +905,7 @@ class ItemsCubit extends Cubit<ItemsState> {
 
     // Update logic based on whether it's a buying or selling item
     if (!isBuyingItem) {
-               emit(state.copyWith(isLoading: true));
+      emit(state.copyWith(isLoading: true));
 
       // Update Selling Item logic
       if (oldSellingItem.num != '0') {
@@ -562,7 +947,6 @@ class ItemsCubit extends Cubit<ItemsState> {
     await _updateTotals();
 
     emit(state.copyWith(isLoading: false));
-
   }
 
   Future<void> updateSellingItem(
@@ -862,7 +1246,7 @@ class ItemsCubit extends Cubit<ItemsState> {
   }
 
   void deleteItem(Daftarcheckmodel itemToDelete) async {
-             emit(state.copyWith(isLoading: true));
+    emit(state.copyWith(isLoading: true));
 
     List<Daftarcheckmodel> updatedSellingItems = List.from(state.sellingItems);
     List<Daftarcheckmodel> updatedBuyingItems = List.from(state.buyingItems);

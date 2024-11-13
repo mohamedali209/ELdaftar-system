@@ -5,12 +5,14 @@ class PeriodHeader extends StatelessWidget {
   final String title;
   final String selectedPeriod; // Pass selected period here
   final Function(String) onPeriodChanged;
+  final TextStyle? style;
 
   const PeriodHeader(
       {super.key,
       required this.title,
       required this.selectedPeriod,
-      required this.onPeriodChanged});
+      required this.onPeriodChanged,
+      this.style});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +21,7 @@ class PeriodHeader extends StatelessWidget {
       children: [
         Text(
           title,
-          style: Appstyles.daftartodayheader(context).copyWith(fontSize: 25),
+          style: style??Appstyles.daftartodayheader(context).copyWith(fontSize: 23),
         ),
         DropdownButton<String>(
           padding: const EdgeInsets.all(0),
