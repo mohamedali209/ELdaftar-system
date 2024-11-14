@@ -2,10 +2,18 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class BuyorSellItemsCircleChart extends StatefulWidget {
-  const BuyorSellItemsCircleChart({super.key});
+  final double sales;
+  final double purchases;
+
+  const BuyorSellItemsCircleChart({
+    super.key,
+    required this.sales,
+    required this.purchases,
+  });
 
   @override
-  State<BuyorSellItemsCircleChart> createState() => _BuyorSellItemsCircleChartState();
+  State<BuyorSellItemsCircleChart> createState() =>
+      _BuyorSellItemsCircleChartState();
 }
 
 class _BuyorSellItemsCircleChartState extends State<BuyorSellItemsCircleChart> {
@@ -17,6 +25,12 @@ class _BuyorSellItemsCircleChartState extends State<BuyorSellItemsCircleChart> {
   }
 
   PieChartData getChartData() {
+    double total = widget.sales + widget.purchases;
+
+    // Calculate percentages
+    double salesPercentage = (widget.sales / total) * 100;
+    double purchasePercentage = (widget.purchases / total) * 100;
+
     return PieChartData(
       pieTouchData: PieTouchData(
         enabled: true,
@@ -30,16 +44,20 @@ class _BuyorSellItemsCircleChartState extends State<BuyorSellItemsCircleChart> {
       sectionsSpace: 0,
       sections: [
         PieChartSectionData(
-          showTitle: false,
-          value: 60, // Adjust percentage as needed
-          radius: activeIndex == 0 ? 60 : 50,
+          showTitle: true,
+          value: (widget.sales / total) * 100,
+          radius: double.parse(salesPercentage.toStringAsFixed(2)),
           color: Colors.green,
+          title:
+              '${salesPercentage.toStringAsFixed(2)}%', // Optional: display percentage in the chart
         ),
         PieChartSectionData(
-          showTitle: false,
-          value: 40, // Adjust percentage as needed
+          showTitle: true,
+          value: double.parse(purchasePercentage.toStringAsFixed(2)),
           radius: activeIndex == 1 ? 60 : 50,
           color: Colors.blue,
+          title:
+              '${purchasePercentage.toStringAsFixed(2)}%', // Optional: display percentage in the chart
         ),
       ],
     );

@@ -22,59 +22,34 @@ class CustomLineChart extends StatelessWidget {
             titlesData: FlTitlesData(
               leftTitles: const AxisTitles(
                 sideTitles: SideTitles(
-                    showTitles: true, interval: 50, reservedSize: 40),
+                    showTitles: false, interval: 50, reservedSize: 40),
               ),
               topTitles: const AxisTitles(
                 sideTitles: SideTitles(showTitles: false),
+              ),
+              rightTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: true, reservedSize: 40,),
               ),
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
                   interval: 1,
                   getTitlesWidget: (value, _) {
-                    const months = [
-                      '1',
-                      '2',
-                      '3',
-                      '4',
-                      '5',
-                      '6',
-                      '7',
-                      '8',
-                      '9',
-                      '10',
-                      '11',
-                      '12',
-                      '13',
-                      '14',
-                      '15',
-                      '16',
-                      '17',
-                      '18',
-                      '19',
-                      '20',
-                      '21',
-                      '22',
-                      '23',
-                      '24',
-                      '25',
-                      '26',
-                      '27',
-                      '28',
-                      '29',
-                      '30',
-                      '31',
-                    ];
-                    return Text(
-                      months[value.toInt()],
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
-                    );
+                    // Handle case when there is less data than months
+                    if (dataPoints.isNotEmpty && value < dataPoints.length) {
+                      return Text(
+                        (value.toInt() + 1).toString(),
+                        style: const TextStyle(color: Colors.white, fontSize: 12),
+                      );
+                    } else {
+                      return Container();
+                    }
                   },
                 ),
               ),
             ),
             gridData: const FlGridData(
-              show: true,
+              show: false,
               drawVerticalLine: true,
               horizontalInterval: 50,
             ),
