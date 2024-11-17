@@ -1,38 +1,10 @@
 import 'package:flutter/material.dart';
 
 class ItemsList extends StatelessWidget {
-  final List<String> items = [
-    'خاتم',
-    'دبلة',
-    'سلسلة',
-    'حلق',
-    'محبس',
-    'انسيال',
-    'اسورة',
-    'تعليقة',
-    'كوليه',
-    'غوايش',
-    'سبائك',
-    'جنيهات'
-  ];
+  final List<String> items;
+  final List<Color> colors;
 
-  final List<Color> colors = [
-    const Color(0xFF5BC47B),
-    const Color(0xFFDF4EE3),
-    const Color(0xFFEB8D3F),
-    Colors.red,
-    Colors.blue,
-    Colors.purple,
-    Colors.orange,
-    Colors.cyan,
-    Colors.green,
-    Colors.yellow,
-    Colors.pink,
-    Colors.brown,
-    Colors.teal
-  ];
-
-  ItemsList({super.key});
+  const ItemsList({super.key, required this.items, required this.colors});
 
   @override
   Widget build(BuildContext context) {

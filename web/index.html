@@ -35,7 +35,7 @@
     const serviceWorkerVersion = "{{flutter_service_worker_version}}";
   </script>
   <!-- This script adds the flutter initialization JS code -->
-  <script src="flutter.js" defer=""></script>
+  <script src="flutter_bootstrap.js" async></script>
   
   
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
@@ -144,8 +144,10 @@
 <body>
   <script>
     window.addEventListener('load', function(ev) {
+      {{flutter_js}}
+      {{flutter_build_config}}
       // Download main.dart.js
-      _flutter.loader.loadEntrypoint({
+      _flutter.loader.load({
         serviceWorker: {
           serviceWorkerVersion: serviceWorkerVersion,
         },

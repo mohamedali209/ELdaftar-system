@@ -2,6 +2,7 @@ import 'package:aldafttar/features/tahlelview/presentation/view/manager/fetchins
 import 'package:aldafttar/features/tahlelview/presentation/view/manager/fetchinsights/cubit/fetch_insights_state.dart';
 import 'package:aldafttar/features/tahlelview/presentation/view/widgets/buy_or_sell_chart.dart';
 import 'package:aldafttar/features/tahlelview/presentation/view/widgets/color_item.dart';
+import 'package:aldafttar/utils/custom_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -15,7 +16,7 @@ class Buyorselltahlel extends StatelessWidget {
     return BlocBuilder<FetchInsightsCubit, FetchInsightsState>(
       builder: (context, state) {
         if (state is FetchInsightsLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CustomLoadingIndicator());
         } else if (state is FetchInsightsSuccess) {
           // Here you pass the fetched sales and purchases data
           return Container(

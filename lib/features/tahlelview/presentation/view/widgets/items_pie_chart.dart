@@ -2,7 +2,14 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class ItemsCircleChart extends StatefulWidget {
-  const ItemsCircleChart({super.key});
+  final Map<String, double> salesPercentageData;
+  final List<Color> colors;
+
+  const ItemsCircleChart({
+    super.key,
+    required this.salesPercentageData,
+    required this.colors, // Accept colors as a parameter
+  });
 
   @override
   State<ItemsCircleChart> createState() => _ItemsCircleChartState();
@@ -11,46 +18,21 @@ class ItemsCircleChart extends StatefulWidget {
 class _ItemsCircleChartState extends State<ItemsCircleChart> {
   int activeIndex = -1;
 
-  final List<String> items = [
-    'خاتم',
-    'دبلة',
-    'سلسلة',
-    'حلق',
-    'محبس',
-    'انسيال',
-    'اسورة',
-    'تعليقة',
-    'كوليه',
-    'غوايش',
-    'سبائك',
-    'جنيهات'
-  ];
-
-  final List<Color> colors = [
-    const Color(0xFF5BC47B),
-    const Color(0xFFDF4EE3),
-    const Color(0xFFEB8D3F),
-    Colors.red,
-    Colors.blue,
-    Colors.purple,
-    Colors.orange,
-    Colors.cyan,
-    Colors.green,
-    Colors.yellow,
-    Colors.pink,
-    Colors.brown,
-    Colors.teal
-  ];
-
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
       aspectRatio: 1,
-      child: PieChart(getChartData()),
+      child: PieChart(
+        getChartData(),
+        swapAnimationDuration: const Duration(milliseconds: 1000), // Duration of animation
+      ),
     );
   }
 
   PieChartData getChartData() {
+    final entries = widget.salesPercentageData.entries.toList();
+    double total = entries.fold(0.0, (sum, entry) => sum + entry.value); // Calculate total value
+    
     return PieChartData(
       pieTouchData: PieTouchData(
         enabled: true,
@@ -62,15 +44,26 @@ class _ItemsCircleChartState extends State<ItemsCircleChart> {
         },
       ),
       sectionsSpace: 0,
-      sections: List.generate(items.length, (index) {
+      sections: List.generate(entries.length, (index) {
+        final entry = entries[index];
+        double percentage = (entry.value / total) * 100;
+        bool isTouched = index == activeIndex;
+
         return PieChartSectionData(
-          showTitle: true,
-          value: (index + 1) * 10, // Example values
-          radius: activeIndex == index ? 60 : 50,
-          color: colors[index],
+          showTitle: isTouched? true : false,
+          titlePositionPercentageOffset: isTouched ? 1.5 : 0.1, // Move title outside when touched
+          title: '${entry.key} (${percentage.toStringAsFixed(1)}%)',
+          value: entry.value,
+          color: widget.colors[index % widget.colors.length],
+          radius: isTouched ? 60 : 50, // Increase radius when touched
+          // Animation settings
+          titleStyle: const TextStyle(
+            fontSize: 12, 
+            fontWeight: FontWeight.bold, 
+            color: Colors.white,
+          ),
         );
       }),
     );
   }
 }
-
