@@ -45,6 +45,7 @@ class ListGardCubit extends Cubit<ListGardState> {
         List<String> categories = [
           'خواتم',
           'دبل',
+          'توينز',
           'محابس',
           'سلاسل',
           'حلقان',

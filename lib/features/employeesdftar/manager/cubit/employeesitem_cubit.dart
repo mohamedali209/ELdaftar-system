@@ -113,7 +113,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
 
       final salesAmount = double.tryParse(newItemWithNum.price) ?? 0;
       await updateSalesSummary(salesAmount);
-         final itemWeight = double.tryParse(newItemWithNum.gram) ?? 0.0;
+      final itemWeight = double.tryParse(newItemWithNum.gram) ?? 0.0;
       final itemType =
           newItemWithNum.details; // Assuming 'type' holds the item type
       await updateSalesSummaryPercentage(itemType, itemWeight);
@@ -142,24 +142,25 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
       await _updateTotals();
       await _updateTotalCash(double.tryParse(newItemWithNum.price) ?? 0,
           add: false);
-                final purchaseAmount = double.tryParse(newItemWithNum.price) ?? 0;
+      final purchaseAmount = double.tryParse(newItemWithNum.price) ?? 0;
       await updatePurchaseSummary(purchaseAmount);
     } catch (e) {
       debugPrint('Error adding buying item: $e');
-    }finally {
+    } finally {
       emit(state.copyWith(isLoading: false));
     }
   }
-   Future<void> updateSalesSummary(double salesAmount) async {
+
+  Future<void> updateSalesSummary(double salesAmount) async {
     final user = FirebaseAuth.instance.currentUser;
-    
+
     if (user != null) {
       final userId = user.uid;
-        DocumentSnapshot employeeDoc =
-            await _firestore.collection('employees').doc(userId).get();
+      DocumentSnapshot employeeDoc =
+          await _firestore.collection('employees').doc(userId).get();
 
-          final data = employeeDoc.data() as Map<String, dynamic>?;
-          final shopId = data?['shopId'];
+      final data = employeeDoc.data() as Map<String, dynamic>?;
+      final shopId = data?['shopId'];
       final insightsRef = FirebaseFirestore.instance
           .collection('users')
           .doc(shopId)
@@ -203,134 +204,161 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
     }
   }
 
-
-
-Future<void> updateSalesSummaryPercentage(String itemType, double itemWeight) async {
-  final user = FirebaseAuth.instance.currentUser;
-  if (user != null) {
-    final userId = user.uid;
+  Future<void> updateSalesSummaryPercentage(
+      String itemType, double itemWeight) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final userId = user.uid;
       DocumentSnapshot employeeDoc =
-            await _firestore.collection('employees').doc(userId).get();
+          await _firestore.collection('employees').doc(userId).get();
 
-          final data = employeeDoc.data() as Map<String, dynamic>?;
-          final shopId = data?['shopId'];
-    final insightsRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(shopId)
-        .collection('insights')
-        .doc('insights_document_id');
+      final data = employeeDoc.data() as Map<String, dynamic>?;
+      final shopId = data?['shopId'];
+      final insightsRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(shopId)
+          .collection('insights')
+          .doc('insights_document_id');
 
-    final docSnapshot = await insightsRef.get();
+      final docSnapshot = await insightsRef.get();
 
-    // Define the default structure for initial items
-    final Map<String, Map<String, dynamic>> initialItems = {
-      'خاتم': {'weight': 0.0, 'percentage': "0.00"},
-      'دبلة': {'weight': 0.0, 'percentage': "0.00"},
-      'سلسلة': {'weight': 0.0, 'percentage': "0.00"},
-      'حلق': {'weight': 0.0, 'percentage': "0.00"},
-      'محبس': {'weight': 0.0, 'percentage': "0.00"},
-      'انسيال': {'weight': 0.0, 'percentage': "0.00"},
-      'اسورة': {'weight': 0.0, 'percentage': "0.00"},
-      'تعليقة': {'weight': 0.0, 'percentage': "0.00"},
-      'كوليه': {'weight': 0.0, 'percentage': "0.00"},
-      'غوايش': {'weight': 0.0, 'percentage': "0.00"},
-      'سبائك': {'weight': 0.0, 'percentage': "0.00"},
-      'جنيهات': {'weight': 0.0, 'percentage': "0.00"},
-      'كسر': {'weight': 0.0, 'percentage': "0.00"},
-    };
+      // Define the default structure for initial items
+      final Map<String, Map<String, dynamic>> initialItems = {
+        'خاتم': {'weight': 0.0, 'percentage': "0.00"},
+        'دبلة': {'weight': 0.0, 'percentage': "0.00"},
+        'سلسلة': {'weight': 0.0, 'percentage': "0.00"},
+        'توينز': {'weight': 0.0, 'percentage': "0.00"},
+        'حلق': {'weight': 0.0, 'percentage': "0.00"},
+        'محبس': {'weight': 0.0, 'percentage': "0.00"},
+        'انسيال': {'weight': 0.0, 'percentage': "0.00"},
+        'اسورة': {'weight': 0.0, 'percentage': "0.00"},
+        'تعليقة': {'weight': 0.0, 'percentage': "0.00"},
+        'كوليه': {'weight': 0.0, 'percentage': "0.00"},
+        'غوايش': {'weight': 0.0, 'percentage': "0.00"},
+        'سبائك': {'weight': 0.0, 'percentage': "0.00"},
+        'جنيهات': {'weight': 0.0, 'percentage': "0.00"},
+        'كسر': {'weight': 0.0, 'percentage': "0.00"},
+      };
 
-    // Get the current date
-    final DateTime now = DateTime.now();
+      // Get the current date
+      final DateTime now = DateTime.now();
 
-    // Retrieve or initialize last updated dates
-    DateTime lastWeeklyUpdate = (docSnapshot.data()?['lastWeeklyUpdate'] as Timestamp?)?.toDate() ?? now;
-    DateTime lastMonthlyUpdate = (docSnapshot.data()?['lastMonthlyUpdate'] as Timestamp?)?.toDate() ?? now;
-    DateTime lastYearlyUpdate = (docSnapshot.data()?['lastYearlyUpdate'] as Timestamp?)?.toDate() ?? now;
+      // Retrieve or initialize last updated dates
+      DateTime lastWeeklyUpdate =
+          (docSnapshot.data()?['lastWeeklyUpdate'] as Timestamp?)?.toDate() ??
+              now;
+      DateTime lastMonthlyUpdate =
+          (docSnapshot.data()?['lastMonthlyUpdate'] as Timestamp?)?.toDate() ??
+              now;
+      DateTime lastYearlyUpdate =
+          (docSnapshot.data()?['lastYearlyUpdate'] as Timestamp?)?.toDate() ??
+              now;
 
-    // Check if we need to reset the weekly data (every Monday)
-    if (now.weekday == DateTime.monday && now.difference(lastWeeklyUpdate).inDays >= 7) {
+      // Check if we need to reset the weekly data (every Monday)
+      if (now.weekday == DateTime.monday &&
+          now.difference(lastWeeklyUpdate).inDays >= 7) {
+        await insightsRef.update({
+          'sales_percentage.weekly': initialItems,
+          'sales_percentage.totalWeeklyGrams': 0.0,
+          'lastWeeklyUpdate': now,
+        });
+      }
+
+      // Check if we need to reset the monthly data (every 4 weeks)
+      if (now.difference(lastMonthlyUpdate).inDays >= 28) {
+        await insightsRef.update({
+          'sales_percentage.monthly': initialItems,
+          'sales_percentage.totalMonthlyGrams': 0.0,
+          'lastMonthlyUpdate': now,
+        });
+      }
+
+      // Check if we need to reset the yearly data (every January 1st)
+      if (now.month == 1 && lastYearlyUpdate.year < now.year) {
+        await insightsRef.update({
+          'sales_percentage.yearly': initialItems,
+          'sales_percentage.totalYearlyGrams': 0.0,
+          'lastYearlyUpdate': now,
+        });
+      }
+
+      // Fetch updated data with null checks
+      final updatedDocSnapshot = await insightsRef.get();
+      Map<String, dynamic> weeklyData = Map<String, dynamic>.from(
+          updatedDocSnapshot.data()?['sales_percentage']?['weekly'] ??
+              initialItems);
+      Map<String, dynamic> monthlyData = Map<String, dynamic>.from(
+          updatedDocSnapshot.data()?['sales_percentage']?['monthly'] ??
+              initialItems);
+      Map<String, dynamic> yearlyData = Map<String, dynamic>.from(
+          updatedDocSnapshot.data()?['sales_percentage']?['yearly'] ??
+              initialItems);
+
+      // Update weights
+      double totalWeeklyGrams = (updatedDocSnapshot.data()?['sales_percentage']
+                  ?['totalWeeklyGrams'] as num?)
+              ?.toDouble() ??
+          0.0;
+      double totalMonthlyGrams = (updatedDocSnapshot.data()?['sales_percentage']
+                  ?['totalMonthlyGrams'] as num?)
+              ?.toDouble() ??
+          0.0;
+      double totalYearlyGrams = (updatedDocSnapshot.data()?['sales_percentage']
+                  ?['totalYearlyGrams'] as num?)
+              ?.toDouble() ??
+          0.0;
+
+      double currentWeeklyWeight =
+          (weeklyData[itemType]?['weight'] ?? 0.0) as double;
+      double currentMonthlyWeight =
+          (monthlyData[itemType]?['weight'] ?? 0.0) as double;
+      double currentYearlyWeight =
+          (yearlyData[itemType]?['weight'] ?? 0.0) as double;
+
+      weeklyData[itemType]['weight'] = currentWeeklyWeight + itemWeight;
+      monthlyData[itemType]['weight'] = currentMonthlyWeight + itemWeight;
+      yearlyData[itemType]['weight'] = currentYearlyWeight + itemWeight;
+
+      totalWeeklyGrams += itemWeight;
+      totalMonthlyGrams += itemWeight;
+      totalYearlyGrams += itemWeight;
+
+      // Calculate percentage for each item type
+      final weeklyPercentageData =
+          _calculatePercentageForItems(weeklyData, totalWeeklyGrams);
+      final monthlyPercentageData =
+          _calculatePercentageForItems(monthlyData, totalMonthlyGrams);
+      final yearlyPercentageData =
+          _calculatePercentageForItems(yearlyData, totalYearlyGrams);
+
+      // Save all data back to Firestore
       await insightsRef.update({
-        'sales_percentage.weekly': initialItems,
-        'sales_percentage.totalWeeklyGrams': 0.0,
-        'lastWeeklyUpdate': now,
+        'sales_percentage.weekly': weeklyPercentageData,
+        'sales_percentage.monthly': monthlyPercentageData,
+        'sales_percentage.yearly': yearlyPercentageData,
+        'sales_percentage.totalWeeklyGrams': totalWeeklyGrams,
+        'sales_percentage.totalMonthlyGrams': totalMonthlyGrams,
+        'sales_percentage.totalYearlyGrams': totalYearlyGrams,
       });
     }
-
-    // Check if we need to reset the monthly data (every 4 weeks)
-    if (now.difference(lastMonthlyUpdate).inDays >= 28) {
-      await insightsRef.update({
-        'sales_percentage.monthly': initialItems,
-        'sales_percentage.totalMonthlyGrams': 0.0,
-        'lastMonthlyUpdate': now,
-      });
-    }
-
-    // Check if we need to reset the yearly data (every January 1st)
-    if (now.month == 1 && lastYearlyUpdate.year < now.year) {
-      await insightsRef.update({
-        'sales_percentage.yearly': initialItems,
-        'sales_percentage.totalYearlyGrams': 0.0,
-        'lastYearlyUpdate': now,
-      });
-    }
-
-    // Fetch updated data with null checks
-    final updatedDocSnapshot = await insightsRef.get();
-    Map<String, dynamic> weeklyData = Map<String, dynamic>.from(updatedDocSnapshot.data()?['sales_percentage']?['weekly'] ?? initialItems);
-    Map<String, dynamic> monthlyData = Map<String, dynamic>.from(updatedDocSnapshot.data()?['sales_percentage']?['monthly'] ?? initialItems);
-    Map<String, dynamic> yearlyData = Map<String, dynamic>.from(updatedDocSnapshot.data()?['sales_percentage']?['yearly'] ?? initialItems);
-
-    // Update weights
-    double totalWeeklyGrams = (updatedDocSnapshot.data()?['sales_percentage']?['totalWeeklyGrams'] as num?)?.toDouble() ?? 0.0;
-    double totalMonthlyGrams = (updatedDocSnapshot.data()?['sales_percentage']?['totalMonthlyGrams'] as num?)?.toDouble() ?? 0.0;
-    double totalYearlyGrams = (updatedDocSnapshot.data()?['sales_percentage']?['totalYearlyGrams'] as num?)?.toDouble() ?? 0.0;
-
-    double currentWeeklyWeight = (weeklyData[itemType]?['weight'] ?? 0.0) as double;
-    double currentMonthlyWeight = (monthlyData[itemType]?['weight'] ?? 0.0) as double;
-    double currentYearlyWeight = (yearlyData[itemType]?['weight'] ?? 0.0) as double;
-
-    weeklyData[itemType]['weight'] = currentWeeklyWeight + itemWeight;
-    monthlyData[itemType]['weight'] = currentMonthlyWeight + itemWeight;
-    yearlyData[itemType]['weight'] = currentYearlyWeight + itemWeight;
-
-    totalWeeklyGrams += itemWeight;
-    totalMonthlyGrams += itemWeight;
-    totalYearlyGrams += itemWeight;
-
-    // Calculate percentage for each item type
-    final weeklyPercentageData = _calculatePercentageForItems(weeklyData, totalWeeklyGrams);
-    final monthlyPercentageData = _calculatePercentageForItems(monthlyData, totalMonthlyGrams);
-    final yearlyPercentageData = _calculatePercentageForItems(yearlyData, totalYearlyGrams);
-
-    // Save all data back to Firestore
-    await insightsRef.update({
-      'sales_percentage.weekly': weeklyPercentageData,
-      'sales_percentage.monthly': monthlyPercentageData,
-      'sales_percentage.yearly': yearlyPercentageData,
-      'sales_percentage.totalWeeklyGrams': totalWeeklyGrams,
-      'sales_percentage.totalMonthlyGrams': totalMonthlyGrams,
-      'sales_percentage.totalYearlyGrams': totalYearlyGrams,
-    });
   }
-}
 
 // Helper function to calculate percentage
-Map<String, dynamic> _calculatePercentageForItems(Map<String, dynamic> itemWeights, double totalGrams) {
-  Map<String, dynamic> percentages = {};
-  itemWeights.forEach((item, weightMap) {
-    double weight = (weightMap['weight'] ?? 0.0) as double;
-    double percentage = (totalGrams > 0) ? (weight / totalGrams) * 100 : 0.0;
-    percentages[item] = {
-      'weight': weight,
-      'percentage': percentage.toStringAsFixed(2),
-    };
-  });
-  return percentages;
-}
-
+  Map<String, dynamic> _calculatePercentageForItems(
+      Map<String, dynamic> itemWeights, double totalGrams) {
+    Map<String, dynamic> percentages = {};
+    itemWeights.forEach((item, weightMap) {
+      double weight = (weightMap['weight'] ?? 0.0) as double;
+      double percentage = (totalGrams > 0) ? (weight / totalGrams) * 100 : 0.0;
+      percentages[item] = {
+        'weight': weight,
+        'percentage': percentage.toStringAsFixed(2),
+      };
+    });
+    return percentages;
+  }
 
 // Helper function to calculate the percentage for each item type based on the total grams sold
- 
 
 // Helper functions to manage the summaries
   List<dynamic> _updateWeeklySummary(
@@ -422,11 +450,11 @@ Map<String, dynamic> _calculatePercentageForItems(Map<String, dynamic> itemWeigh
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       final userId = user.uid;
-        DocumentSnapshot employeeDoc =
-            await _firestore.collection('employees').doc(userId).get();
+      DocumentSnapshot employeeDoc =
+          await _firestore.collection('employees').doc(userId).get();
 
-          final data = employeeDoc.data() as Map<String, dynamic>?;
-          final shopId = data?['shopId'];
+      final data = employeeDoc.data() as Map<String, dynamic>?;
+      final shopId = data?['shopId'];
       final insightsRef = FirebaseFirestore.instance
           .collection('users')
           .doc(shopId)
@@ -547,7 +575,6 @@ Map<String, dynamic> _calculatePercentageForItems(Map<String, dynamic> itemWeigh
     }
     return yearlyData;
   }
-
 
   Future<void> _addItemGramsToWeight(Daftarcheckmodel newItem) async {
     // Get the current user
@@ -701,6 +728,8 @@ Map<String, dynamic> _calculatePercentageForItems(Map<String, dynamic> itemWeigh
               itemType = 'محابس';
             } else if (item.details.contains('دبلة')) {
               itemType = 'دبل';
+            } else if (item.details.contains('توينز')) {
+              itemType = 'توينز';
             } else if (item.details.contains('سلسلة')) {
               itemType = 'سلاسل';
             } else if (item.details.contains('غوايش')) {
@@ -1201,6 +1230,7 @@ Map<String, dynamic> _calculatePercentageForItems(Map<String, dynamic> itemWeigh
     if (details.contains('خاتم')) return 'خواتم';
     if (details.contains('اسورة')) return 'اساور';
     if (details.contains('محابس')) return 'محابس';
+    if (details.contains('توينز')) return 'توينز';
     if (details.contains('دبلة')) return 'دبل';
     if (details.contains('سلسلة')) return 'سلاسل';
     if (details.contains('غوايش')) return 'غوايش';
@@ -1369,7 +1399,7 @@ Map<String, dynamic> _calculatePercentageForItems(Map<String, dynamic> itemWeigh
   void deleteItem(Daftarcheckmodel itemToDelete) async {
     List<Daftarcheckmodel> updatedSellingItems = List.from(state.sellingItems);
     List<Daftarcheckmodel> updatedBuyingItems = List.from(state.buyingItems);
- emit(state.copyWith(isLoading: true));
+    emit(state.copyWith(isLoading: true));
     if (state.sellingItems.contains(itemToDelete)) {
       updatedSellingItems = state.sellingItems
           .where((item) => item.num != itemToDelete.num)

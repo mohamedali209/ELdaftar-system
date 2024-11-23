@@ -82,6 +82,7 @@ class AddOrMinusDialogState extends State<AddOrMinusDialog> {
                       DropdownMenuItem(value: 'خواتم', child: Text('خواتم')),
                       DropdownMenuItem(value: 'دبل', child: Text('دبل')),
                       DropdownMenuItem(value: 'محابس', child: Text('محابس')),
+                      DropdownMenuItem(value: 'توينز', child: Text('توينز')),
                       DropdownMenuItem(
                           value: 'انسيالات', child: Text('انسيالات')),
                       DropdownMenuItem(value: 'غوايش', child: Text('غوايش')),

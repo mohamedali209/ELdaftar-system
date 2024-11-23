@@ -1,4 +1,5 @@
 import 'package:aldafttar/features/Loginview/manager/employeelogin/cubit/employee_cubit.dart';
+import 'package:aldafttar/features/Loginview/manager/employeelogin/cubit/employee_state.dart';
 import 'package:aldafttar/features/Loginview/view/widgets/loginbutton.dart';
 import 'package:aldafttar/utils/app_router.dart';
 import 'package:aldafttar/utils/custom_loading.dart';
@@ -12,10 +13,10 @@ class EmployeeLoginScreen extends StatefulWidget {
   const EmployeeLoginScreen({super.key});
 
   @override
-  _EmployeeLoginScreenState createState() => _EmployeeLoginScreenState();
+  EmployeeLoginScreenState createState() => EmployeeLoginScreenState();
 }
 
-class _EmployeeLoginScreenState extends State<EmployeeLoginScreen> {
+class EmployeeLoginScreenState extends State<EmployeeLoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -29,25 +30,26 @@ class _EmployeeLoginScreenState extends State<EmployeeLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<EmployeeCubit, String?>(
-      listener: (context, state) {
-        if (state == null) {
-          // Show loading spinner
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (_) => const Center(child: CustomLoadingIndicator()),
-          );
-        } else if (state == "مدير" || state == "موظف") {
-          Navigator.of(context).pop(); // Close the loading dialog
-          GoRouter.of(context).go(AppRouter.kemployeeDaftar);
-        } else {
-          Navigator.of(context).pop(); // Close loading dialog
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state)),
-          );
-        }
-      },
+    return BlocListener<EmployeeCubit, EmployeeState>(
+  listener: (context, state) {
+    if (state is EmployeeLoading) {
+      // Show loading spinner
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const Center(child: CustomLoadingIndicator()),
+      );
+    } else {
+      Navigator.of(context).pop(); // Close any open dialogs
+      if (state is EmployeeSuccess) {
+        GoRouter.of(context).go(AppRouter.kemployeeDaftar); // Navigate on success
+      } else if (state is EmployeeFailure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(state.errorMessage)),
+        );
+      }
+    }
+  },
       child: Scaffold(
         backgroundColor: Colors.black,
         body: Stack(

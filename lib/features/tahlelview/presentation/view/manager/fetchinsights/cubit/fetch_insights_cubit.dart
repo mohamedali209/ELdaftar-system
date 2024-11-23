@@ -1,6 +1,7 @@
 import 'package:aldafttar/features/tahlelview/presentation/view/manager/fetchinsights/cubit/fetch_insights_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class FetchInsightsCubit extends Cubit<FetchInsightsState> {
@@ -33,7 +34,6 @@ class FetchInsightsCubit extends Cubit<FetchInsightsState> {
         // Fetch sales percentage from the sales_percentage map
   // Fetch and parse sales percentage data
 final salesPercentage = data['sales_percentage'] ?? {};
-print("Sales percentage from Firestore: $salesPercentage"); // Log this
 
 Map<String, double> salesPercentageData = {};
 
@@ -50,7 +50,7 @@ switch (period) {
     periodMap = salesPercentage['weekly'] ?? {};
     break;
   default:
-    print("Invalid period: $period");
+    debugPrint("Invalid period: $period");
     break;
 }
 
@@ -64,7 +64,6 @@ periodMap.forEach((key, value) {
   }
 });
 
-print("Parsed sales percentage data: $salesPercentageData"); // Log this
 
 // Emit success state with all relevant data
 emit(FetchInsightsSuccess(salesData, purchaseData, salesPercentageData));

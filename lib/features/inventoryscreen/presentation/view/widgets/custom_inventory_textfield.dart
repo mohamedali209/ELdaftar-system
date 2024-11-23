@@ -2,12 +2,13 @@ import 'package:aldafttar/utils/styles.dart';
 import 'package:flutter/material.dart';
 
 class CustomTextFieldInventory extends StatelessWidget {
-final  FocusNode? focusNode;
+  final FocusNode? focusNode;
   final TextEditingController controller;
   final String labelText;
   final String? Function(String?)? validator;
   final TextInputType? keyboardType;
   final void Function(String)? onChanged;
+ final void Function(String?)? onSaved;
   const CustomTextFieldInventory({
     super.key,
     required this.controller,
@@ -15,18 +16,15 @@ final  FocusNode? focusNode;
     this.validator,
     this.keyboardType,
     this.onChanged,
-    this.focusNode,
+    this.focusNode, this.onSaved,
   });
 
   @override
   Widget build(BuildContext context) {
-    return 
-    
-    
-    TextFormField(
+    return TextFormField(
       focusNode: focusNode,
       style: const TextStyle(color: Colors.white),
-      onChanged: onChanged,
+      onSaved: onSaved,
       controller: controller,
       keyboardType: keyboardType,
       decoration: InputDecoration(

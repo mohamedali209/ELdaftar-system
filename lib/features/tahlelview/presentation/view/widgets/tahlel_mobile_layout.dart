@@ -30,7 +30,7 @@ class Tahlelmobilelayout extends StatelessWidget {
           ),
         ),
         // Rest of your mobile layout
-         Expanded(
+        const Expanded(
           child: Tahlelexpandedcontainer(), // Your main content goes here
         ),
       ],

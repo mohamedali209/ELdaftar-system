@@ -2,10 +2,10 @@ class SigninState {
   final bool isLoading;
   final bool isSuccess;
   final String? errorMessage;
-  final Map<String, dynamic>? storeData; // Add storeData field
-  final String? shopId; // Add shopId to state
+  final Map<String, dynamic>? storeData;
+  final String? shopId;
 
-  SigninState({
+  const SigninState({
     this.isLoading = false,
     this.isSuccess = false,
     this.errorMessage,

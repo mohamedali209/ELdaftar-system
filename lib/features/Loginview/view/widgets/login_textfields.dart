@@ -26,6 +26,7 @@ class SignTextfields extends StatelessWidget {
             height: 15,
           ),
           CustomTextField2(
+            obscureText: true,
             hintText: 'كلمة المرور',
             controller: passwordController,
           ),

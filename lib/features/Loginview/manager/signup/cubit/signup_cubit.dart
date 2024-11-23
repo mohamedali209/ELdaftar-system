@@ -73,6 +73,7 @@ class SignupCubit extends Cubit<SignupState> {
       'خواتم',
       'دبل',
       'محابس',
+      'توينز',
       'انسيالات',
       'غوايش',
       'حلقان',

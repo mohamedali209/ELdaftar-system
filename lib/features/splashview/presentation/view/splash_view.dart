@@ -2,7 +2,6 @@ import 'package:aldafttar/utils/app_router.dart';
 import 'package:aldafttar/utils/styles.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -78,7 +77,7 @@ class _SplashBodyState extends State<SplashBody> {
   void push() {
     Future.delayed(
       const Duration(seconds: 3),
-      () => GoRouter.of(context).go(AppRouter.kloginview),
+      () => AppRouter.router.go(AppRouter.kloginview),
     );
   }
 }

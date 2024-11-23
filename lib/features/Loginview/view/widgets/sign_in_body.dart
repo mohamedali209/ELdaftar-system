@@ -20,22 +20,22 @@ class Signinbody extends StatelessWidget {
     return BlocListener<SigninCubit, SigninState>(
       listener: (context, state) {
         if (state.isLoading) {
-          // Show loading spinner
+          // Show loading indicator
           showDialog(
             context: context,
             barrierDismissible: false,
             builder: (_) => const Center(child: CustomLoadingIndicator()),
           );
-        } else if (state.isSuccess) {
-          Navigator.of(context).pop(); // Close the loading dialog
-          GoRouter.of(context).go(AppRouter.kDaftarview);
-        } else if (state.errorMessage != null) {
-          // Close loading dialog if open
-          Navigator.of(context).pop();
-          // Show error message using ScaffoldMessenger
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.errorMessage!)),
-          );
+        } else {
+          Navigator.of(context).pop(); // Close any open dialogs
+          if (state.isSuccess) {
+            GoRouter.of(context).go(AppRouter.kDaftarview);
+          } else if (state.errorMessage != null) {
+            // Show error message
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.errorMessage!)),
+            );
+          }
         }
       },
       child: SingleChildScrollView(
@@ -71,7 +71,7 @@ class Signinbody extends StatelessWidget {
                       email: emailController.text,
                       password: passwordController.text,
                     );
-                    AppRouter.router.push(AppRouter.kinventoryview);
+                    AppRouter.router.push(AppRouter.kDaftarview);
                   },
                 ),
                 const SizedBox(height: 20),
@@ -102,14 +102,17 @@ class Signinbody extends StatelessWidget {
                     ),
                     const Text('او'),
                     TextButton(
-                        onPressed: () {
-                          AppRouter.router.push(AppRouter.kemployeelogin);
-                        },
-                        child: Text('تسجيل الدخول كموظف',
-                            style: Appstyles.regular12cairo(context).copyWith(
-                              fontSize: 14,
-                              color: Colors.amber,
-                            )))
+                      onPressed: () {
+                        AppRouter.router.push(AppRouter.kemployeelogin);
+                      },
+                      child: Text(
+                        'تسجيل الدخول كموظف',
+                        style: Appstyles.regular12cairo(context).copyWith(
+                          fontSize: 14,
+                          color: Colors.amber,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ],
