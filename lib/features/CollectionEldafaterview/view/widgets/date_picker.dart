@@ -15,6 +15,9 @@ class DatePickerState extends State<DatePicker> {
   DateTime? selectedDate;
 
   Future<void> _selectDate(BuildContext context) async {
+    // Capture the Cubit instance before the async operation
+    final collectionCubit = context.read<CollectiondfaterCubit>();
+
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: selectedDate ?? DateTime.now(),
@@ -33,8 +36,7 @@ class DatePickerState extends State<DatePicker> {
             ),
             // Customize the text style (for days, years, etc.)
             textTheme: const TextTheme(
-              bodyLarge:
-                  TextStyle(color: Colors.black), // Text inside the picker
+              bodyLarge: TextStyle(color: Colors.black),
               bodyMedium: TextStyle(color: Colors.black),
             ),
           ),
@@ -47,13 +49,15 @@ class DatePickerState extends State<DatePicker> {
       setState(() {
         selectedDate = pickedDate;
       });
-         final String year = DateFormat('yyyy').format(pickedDate);
+      final String year = DateFormat('yyyy').format(pickedDate);
       final String month = DateFormat('MM').format(pickedDate);
       final String day = DateFormat('dd').format(pickedDate);
 
-      context.read<CollectiondfaterCubit>().fetchTransactionsForDate(year, month, day);
+      // Use the captured Cubit instance
+      collectionCubit.fetchTransactionsForDate(year, month, day);
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

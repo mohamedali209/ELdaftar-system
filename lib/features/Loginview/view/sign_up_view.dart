@@ -1,10 +1,10 @@
 import 'package:aldafttar/features/Loginview/manager/signup/cubit/signup_cubit.dart';
 import 'package:aldafttar/features/Loginview/manager/signup/cubit/signup_state.dart';
 import 'package:aldafttar/features/Loginview/view/widgets/signup_textfields.dart';
+import 'package:aldafttar/utils/custom_loading.dart';
 import 'package:aldafttar/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 
 class SignupScreen extends StatelessWidget {
   const SignupScreen({super.key});
@@ -29,28 +29,38 @@ class SignupScreen extends StatelessWidget {
               ),
             ),
             // Main content at the center
-            Center(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+            BlocBuilder<SignupCubit, SignupState>(
+              builder: (context, state) {
+                return Stack(
                   children: [
-                    Text(
-                      'الدفتر',
-                      style: Appstyles.bold50(context).copyWith(fontSize: 70),
+                    Center(
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              'الدفتر',
+                              style: Appstyles.bold50(context)
+                                  .copyWith(fontSize: 70),
+                            ),
+                            const SizedBox(height: 20),
+                            Text(
+                              'انشاء حساب',
+                              style: Appstyles.regular25(context)
+                                  .copyWith(color: Colors.amber),
+                            ),
+                            const SizedBox(height: 15),
+                            SignupForm(),
+                          ],
+                        ),
+                      ),
                     ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'انشاء حساب',
-                      style: Appstyles.regular25(context)
-                          .copyWith(color: Colors.amber),
-                    ),
-                    const SizedBox(height: 15),
-                    SignupForm(),
+                    if (state.isLoading) const CustomLoadingIndicator()
                   ],
-                ),
-              ),
+                );
+              },
             ),
           ],
         ),

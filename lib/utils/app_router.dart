@@ -13,16 +13,14 @@ import 'package:aldafttar/features/daftarview/presentation/view/manager/cubit/it
 import 'package:aldafttar/features/employeesdftar/manager/cubit/employeesitem_cubit.dart';
 import 'package:aldafttar/features/employeesdftar/view/employees_dftar_screen.dart';
 import 'package:aldafttar/features/marmatview/view/marmat_view.dart';
-import 'package:aldafttar/features/splashview/presentation/view/splash_view.dart';
 import 'package:aldafttar/features/tahlelview/presentation/view/tahlel_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 abstract class AppRouter {
-  static const ksplashview = '/';
   static const ksignupview = '/signupview';
-  static const kloginview = '/loginview';
+  static const kloginview = '/';
 
   static const kinventoryview = '/InventoryView';
   static const kDaftarview = '/DaftarView';
@@ -39,10 +37,6 @@ abstract class AppRouter {
 
   static final router = GoRouter(
     routes: [
-      GoRoute(
-        path: ksplashview,
-        builder: (context, state) => const SplashScreen(),
-      ),
       GoRoute(
         path: kloginview,
         builder: (context, state) => const SigninScreen(),
