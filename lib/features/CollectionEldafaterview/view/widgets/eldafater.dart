@@ -1,8 +1,8 @@
 import 'package:aldafttar/features/CollectionEldafaterview/manager/cubit/collectiondfater_cubit.dart';
+import 'package:aldafttar/features/CollectionEldafaterview/view/widgets/buying_widget_collection.dart';
 import 'package:aldafttar/features/CollectionEldafaterview/view/widgets/collection_titles.dart';
 import 'package:aldafttar/features/CollectionEldafaterview/view/widgets/date_picker.dart';
 import 'package:aldafttar/features/CollectionEldafaterview/view/widgets/selling_widget_collection.dart';
-import 'package:aldafttar/features/daftarview/presentation/view/widgets/buy_container.dart';
 import 'package:aldafttar/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -53,7 +53,7 @@ class Eldafater extends StatelessWidget {
                           ),
                           // Buying Section
                           const TitleBuyingCollection(),
-                          BuyingWidget(
+                          CollectionBuyingWidget(
                             items: state.buyingItems,
                             onItemAdded: (newItem) {},
                           ),
