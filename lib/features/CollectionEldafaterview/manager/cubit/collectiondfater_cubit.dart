@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:aldafttar/features/daftarview/presentation/view/models/daftar_check_model.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/models/expenses_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,67 +11,82 @@ part 'collectiondfater_state.dart';
 class CollectiondfaterCubit extends Cubit<CollectiondfaterState> {
   final FirebaseFirestore _firestore;
   CollectiondfaterCubit(this._firestore) : super(CollectiondfaterInitial());
+    StreamSubscription<DocumentSnapshot>? _transactionSubscription;
+
 void selectDateAndFetchTransactions(String year, String month, String day) async {
   emit(CollectiondfaterLoading()); // Emit loading state
    fetchTransactionsForDate(year, month, day); // Fetch the data
 }
 
   void fetchTransactionsForDate(String year, String month, String day) async {
-  try {
     final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final userId = user.uid;
+    if (user == null) {
+      emit(CollectiondfaterError('User is not logged in.'));
+      return;
+    }
 
-      // Fetch data from Firestore for the specific date
-      final DocumentSnapshot snapshot = await _firestore
+    final userId = user.uid;
+
+    try {
+      emit(CollectiondfaterLoading());
+
+      // Listen to changes in the Firestore document
+      _transactionSubscription = _firestore
           .collection('users')
           .doc(userId)
           .collection('dailyTransactions')
           .doc(year)
           .collection(month)
           .doc(day)
-          .get();
+          .snapshots()
+          .listen((snapshot) {
+        if (snapshot.exists && snapshot.data() != null) {
+          final data = snapshot.data() as Map<String, dynamic>;
 
-      List<Daftarcheckmodel> sellingItems = [];
-      List<Daftarcheckmodel> buyingItems = [];
-      List<Expense> expenses = []; // Initialize the expenses list
+          final sellingItems = (data['sellingItems'] as List?)
+                  ?.map((item) => Daftarcheckmodel.fromFirestore(item))
+                  .toList() ??
+              [];
 
-      if (snapshot.exists && snapshot.data() != null) {
-        final data = snapshot.data() as Map<String, dynamic>;
+          final buyingItems = (data['buyingItems'] as List?)
+                  ?.map((item) => Daftarcheckmodel.fromFirestore(item))
+                  .toList() ??
+              [];
 
-        // Fetch selling items
-        if (data['sellingItems'] != null) {
-          sellingItems = (data['sellingItems'] as List)
-              .map((item) => Daftarcheckmodel.fromFirestore(item))
-              .toList();
+          final expenses = (data['expenses'] as List?)
+                  ?.map((expense) => Expense.fromMap(expense))
+                  .toList() ??
+              [];
+
+          emit(CollectiondfaterLoaded(
+            sellingItems: sellingItems,
+            buyingItems: buyingItems,
+            expenses: expenses,
+          ));
+        } else {
+          emit(CollectiondfaterLoaded(
+            sellingItems: [],
+            buyingItems: [],
+            expenses: [],
+          ));
         }
-
-        // Fetch buying items
-        if (data['buyingItems'] != null) {
-          buyingItems = (data['buyingItems'] as List)
-              .map((item) => Daftarcheckmodel.fromFirestore(item))
-              .toList();
-        }
-
-        // Fetch expenses
-        if (data['expenses'] != null) {
-          expenses = (data['expenses'] as List)
-              .map((expense) => Expense.fromMap(expense))
-              .toList();
-        }
-      }
-
-      emit(CollectiondfaterLoaded(
-        sellingItems: sellingItems,
-        buyingItems: buyingItems,
-        expenses: expenses, // Pass expenses to the state
-      ));
-    } else {
-      emit(CollectiondfaterError('User is not logged in.'));
+      }, onError: (error) {
+        emit(CollectiondfaterError('Error streaming data: $error'));
+      });
+    } catch (e) {
+      emit(CollectiondfaterError('Error initializing stream: $e'));
     }
-  } catch (e) {
-    emit(CollectiondfaterError('Error fetching data: $e'));
   }
-}
 
+  /// Cancels the Firestore stream
+  void cancelTransactionStream() {
+    _transactionSubscription?.cancel();
+    _transactionSubscription = null;
+  }
+
+  @override
+  Future<void> close() {
+    cancelTransactionStream();
+    return super.close();
+  }
 }

@@ -1,4 +1,5 @@
 import 'package:aldafttar/features/CollectionEldafaterview/manager/cubit/collectiondfater_cubit.dart';
+import 'package:aldafttar/features/CollectionEldafaterview/manager/modify/cubit/collection_modify_cubit.dart';
 import 'package:aldafttar/features/CollectionEldafaterview/view/widgets/eldafater.dart';
 import 'package:aldafttar/features/CollectionEldafaterview/view/widgets/eldafater_body.dart';
 
@@ -26,8 +27,16 @@ final GlobalKey<DraweritemlistState> drawerKey =
 class _EldafaterviewState extends State<Eldafaterview> {
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => CollectiondfaterCubit(FirebaseFirestore.instance),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) =>
+              CollectiondfaterCubit(FirebaseFirestore.instance),
+        ),
+        BlocProvider(
+          create: (context) => CollectionModifyCubit(),
+        ),
+      ],
       child: Scaffold(
         backgroundColor: Colors.black,
         key: key,

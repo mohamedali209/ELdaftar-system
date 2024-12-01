@@ -81,7 +81,8 @@ class ItemSellorBuy extends StatelessWidget {
               ),
               // Conditionally show the edit icon button
               ModalRoute.of(context)?.settings.name == '/DaftarView' ||
-                      ModalRoute.of(context)?.settings.name == '/employeeDaftar'
+                      ModalRoute.of(context)?.settings.name == '/employeeDaftar'||
+                      ModalRoute.of(context)?.settings.name == '/collectiondafterView'
                   ? IconButton(
                       onPressed: onTap,
                       icon: const Icon(
@@ -95,7 +96,8 @@ class ItemSellorBuy extends StatelessWidget {
           ),
           SizedBox(
             width: ModalRoute.of(context)?.settings.name == '/DaftarView' ||
-                    ModalRoute.of(context)?.settings.name == '/employeeDaftar'
+                    ModalRoute.of(context)?.settings.name == '/employeeDaftar'||
+                      ModalRoute.of(context)?.settings.name == '/collectiondafterView'
                 ? (MediaQuery.of(context).size.width < 600
                     ? MediaQuery.of(context).size.width *
                         .05 // Width for mobile when at DaftarView

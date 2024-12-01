@@ -1,22 +1,17 @@
-// Example assuming the state class is called ItemsState
-import 'package:aldafttar/features/daftarview/presentation/view/manager/cubit/items_cubit.dart';
-import 'package:aldafttar/features/daftarview/presentation/view/manager/cubit/items_state.dart';
+import 'package:aldafttar/features/CollectionEldafaterview/manager/cubit/collectiondfater_cubit.dart';
+import 'package:aldafttar/features/CollectionEldafaterview/view/widgets/collection_column_list.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/models/daftar_check_model.dart';
-import 'package:aldafttar/features/daftarview/presentation/view/widgets/columns_daftar_list.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/custom_background_container.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/sellorbuy_items.dart';
-import 'package:aldafttar/features/daftarview/presentation/view/widgets/textfieldanddfater.dart';
-import 'package:aldafttar/features/employeesdftar/manager/cubit/employeesitem_cubit.dart';
-import 'package:aldafttar/features/employeesdftar/manager/cubit/employeesitem_state.dart';
 import 'package:aldafttar/utils/custom_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class SellingWidget extends StatelessWidget {
+class CollectionSellingWidget extends StatelessWidget {
   final Function(Daftarcheckmodel) onItemAdded;
   final List<Daftarcheckmodel> items;
 
-  const SellingWidget({
+  const CollectionSellingWidget({
     required this.onItemAdded,
     required this.items,
     super.key,
@@ -25,23 +20,11 @@ class SellingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Determine the current route name
-    final String? routeName = ModalRoute.of(context)?.settings.name;
-    final isEmployeeDaftar = routeName == '/employeeDaftar';
 
-    return BlocBuilder<ItemsCubit, ItemsState>(
-      builder: (context, state) {
-        // If using EmployeesitemCubit instead, you may need another BlocBuilder
-        if (isEmployeeDaftar) {
-          return BlocBuilder<EmployeesitemCubit, EmployeesitemState>(
-            builder: (context, employeeState) {
-              return _buildContent(context, employeeState);
-            },
-          );
-        } else {
-          return _buildContent(context, state);
-        }
-      },
-    );
+    return BlocBuilder<CollectiondfaterCubit, CollectiondfaterState>(
+        builder: (context, state) {
+      return _buildContent(context, state);
+    });
   }
 
   Widget _buildContent(BuildContext context, dynamic state) {
@@ -86,19 +69,6 @@ class SellingWidget extends StatelessWidget {
                       const SliverToBoxAdapter(
                         child: SizedBox(height: 15),
                       ),
-                      SliverToBoxAdapter(
-                        child: (ModalRoute.of(context)?.settings.name ==
-                                    '/DaftarView' ||
-                                ModalRoute.of(context)?.settings.name ==
-                                    '/employeeDaftar')
-                            ? Textfieldanddfater(
-                                onItemAdded: (Daftarcheckmodel newItem) {
-                                  // Add the new item
-                                  onItemAdded(newItem);
-                                },
-                              )
-                            : Container(),
-                      ),
                       const SliverToBoxAdapter(
                         child:
                             Divider(color: Color.fromARGB(255, 114, 110, 110)),
@@ -106,7 +76,7 @@ class SellingWidget extends StatelessWidget {
                       const SliverToBoxAdapter(
                         child: Sellorbuyitems(),
                       ),
-                      ColumnDaftarlist(
+                      CollectionColumnDaftarlist(
                         isBuyingItems: false,
                         items: items,
                       ),

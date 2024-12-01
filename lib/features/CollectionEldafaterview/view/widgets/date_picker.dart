@@ -1,4 +1,5 @@
 import 'package:aldafttar/features/CollectionEldafaterview/manager/cubit/collectiondfater_cubit.dart';
+import 'package:aldafttar/features/CollectionEldafaterview/manager/modify/cubit/collection_modify_cubit.dart';
 import 'package:aldafttar/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,6 +18,7 @@ class DatePickerState extends State<DatePicker> {
   Future<void> _selectDate(BuildContext context) async {
     // Capture the Cubit instance before the async operation
     final collectionCubit = context.read<CollectiondfaterCubit>();
+    final collectionModifyCubit = context.read<CollectionModifyCubit>();
 
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -52,12 +54,12 @@ class DatePickerState extends State<DatePicker> {
       final String year = DateFormat('yyyy').format(pickedDate);
       final String month = DateFormat('MM').format(pickedDate);
       final String day = DateFormat('dd').format(pickedDate);
+   collectionModifyCubit.setSelectedDate(pickedDate);
 
-      // Use the captured Cubit instance
-      collectionCubit.fetchTransactionsForDate(year, month, day);
+  collectionCubit.fetchTransactionsForDate(year, month, day);
+  collectionModifyCubit.selectDateAndmodifyitem(year, month, day);
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
