@@ -56,8 +56,8 @@ class EmployeesDftarBody extends StatelessWidget {
                     child: Row(
                       children: [
                         TextButton(
-                          onPressed: () {
-                            FirebaseAuth.instance.signOut();
+                          onPressed: () async{
+                           await FirebaseAuth.instance.signOut();
                             AppRouter.router.go(AppRouter.kloginview);
                           },
                           child: Text(

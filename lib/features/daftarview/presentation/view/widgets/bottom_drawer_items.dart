@@ -26,11 +26,11 @@ class Bottomdraweritems extends StatelessWidget {
           ),
         ),
         GestureDetector(
-          onTap: ()  {
-            FirebaseAuth.instance.signOut();
+          onTap: ()  async{
+           await FirebaseAuth.instance.signOut();
 
             // Navigate to the login screen or any other screen after logout
-            GoRouter.of(context).go(AppRouter.kloginview);
+            AppRouter.router.go(AppRouter.kloginview);
           },
           child: const Inactiveitem(
             drawerItemModel: DrawerItemModel(

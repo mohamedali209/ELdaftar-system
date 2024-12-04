@@ -17,14 +17,12 @@ import 'package:aldafttar/features/tahlelview/presentation/view/tahlel_view.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 abstract class AppRouter {
   static const ksignupview = '/signupview';
   static const kloginview = '/';
-
-  static const kinventoryview = '/InventoryView';
   static const kDaftarview = '/DaftarView';
-
   static const kgardview = '/gardView';
   static const khesabatview = '/hesabatview';
   static const kmarmatview = '/marmatview';
@@ -32,10 +30,36 @@ abstract class AppRouter {
   static const kcollectiondafterView = '/collectiondafterView';
   static const kaddemployee = '/addemployee';
   static const kemployeelogin = '/employeeLogin';
-
   static const kemployeeDaftar = '/employeeDaftar';
 
   static final router = GoRouter(
+    initialLocation: kloginview,
+    redirect: (context, state) async {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // Check if the user is an employee and redirect them to EmployeesDaftarScreen
+        final querySnapshot = await FirebaseFirestore.instance
+            .collection('employees')
+            .where('email', isEqualTo: user.email)
+            .get();
+        if (querySnapshot.docs.isNotEmpty) {
+          // If the user is an employee, redirect to EmployeesDaftarScreen
+          return kemployeeDaftar;
+        }
+      }
+
+      // Redirect to DaftarView if logged in and trying to access login view
+      if (user != null && state.uri.toString() == kloginview) {
+        return kDaftarview;
+      } 
+      
+      // Redirect to LoginView if not logged in and trying to access DaftarView
+      if (user == null && state.uri.toString() == kDaftarview) {
+        return kloginview;
+      }
+
+      return null; // No redirect needed
+    },
     routes: [
       GoRoute(
         path: kloginview,
@@ -45,10 +69,6 @@ abstract class AppRouter {
         path: ksignupview,
         builder: (context, state) => const SignupScreen(),
       ),
-      // GoRoute(
-      //   path: kinventoryview,
-      //   builder: (context, state) => const InventoryScreen(),
-      // ),
       GoRoute(
         path: kDaftarview,
         builder: (context, state) => const Daftarview(),

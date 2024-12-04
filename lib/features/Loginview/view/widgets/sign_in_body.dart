@@ -65,9 +65,9 @@ class Signinbody extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 Loginbutton(
-                  onPressed: () {
+                  onPressed: ()async {
                     // Trigger sign-in when the button is pressed
-                    BlocProvider.of<SigninCubit>(context).signin(
+                  await  BlocProvider.of<SigninCubit>(context).signin(
                       email: emailController.text,
                       password: passwordController.text,
                     );

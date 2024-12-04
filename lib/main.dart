@@ -37,7 +37,7 @@ class Aldaftar extends StatelessWidget {
         BlocProvider(
           create: (context) => DrawerCubit(),
         ),
-          BlocProvider(
+        BlocProvider(
           create: (context) => FetchInsightsCubit(),
         ),
       ],
