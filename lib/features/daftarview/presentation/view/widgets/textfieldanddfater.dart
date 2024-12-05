@@ -70,7 +70,6 @@ class CustombuttonAddorSubtract extends StatelessWidget {
       'غوايش',
       'سبائك',
       'جنيهات',
-      'كسر'
     ];
 
     final List<String> ayarOptions = [

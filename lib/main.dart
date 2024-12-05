@@ -1,6 +1,5 @@
 import 'package:aldafttar/features/Loginview/manager/signin/cubit/signin_cubit.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/manager/drawercubit/cubit/drawer_cubit.dart';
-import 'package:aldafttar/features/tahlelview/presentation/view/manager/fetchinsights/cubit/fetch_insights_cubit.dart';
 import 'package:aldafttar/firebase_options.dart';
 import 'package:aldafttar/utils/app_router.dart';
 import 'package:aldafttar/utils/sizeconfig.dart';
@@ -36,9 +35,6 @@ class Aldaftar extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => DrawerCubit(),
-        ),
-        BlocProvider(
-          create: (context) => FetchInsightsCubit(),
         ),
       ],
       child: MaterialApp.router(

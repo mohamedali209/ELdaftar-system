@@ -1,10 +1,10 @@
+import 'package:aldafttar/features/addemployee/manager/cubit/addemployee_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'addemployee_state.dart';
 
-class AddEmployeeCubit extends Cubit<AddEmployeeState> {
+class AddEmployeeCubit extends Cubit<AddEmployeecubitState> {
   final FirebaseFirestore _firestore = ServiceLocator().firestore;
   final FirebaseAuth _auth = ServiceLocator().auth;
 

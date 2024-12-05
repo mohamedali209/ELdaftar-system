@@ -1,19 +1,18 @@
+abstract class AddEmployeecubitState {}
 
+class AddEmployeeInitial extends AddEmployeecubitState {}
 
-abstract class AddEmployeeState {}
+class AddEmployeeLoading extends AddEmployeecubitState {}
 
-class AddEmployeeInitial extends AddEmployeeState {}
+class AddEmployeeSuccess extends AddEmployeecubitState {}
 
-class AddEmployeeLoading extends AddEmployeeState {}
-
-class AddEmployeeSuccess extends AddEmployeeState {}
-
-class AddEmployeeError extends AddEmployeeState {
+class AddEmployeeError extends AddEmployeecubitState {
   final String message;
 
   AddEmployeeError(this.message);
 }
-class AddEmployeeLoaded extends AddEmployeeState {
+
+class AddEmployeeLoaded extends AddEmployeecubitState {
   final List<Map<String, dynamic>> employees;
 
   AddEmployeeLoaded(this.employees);

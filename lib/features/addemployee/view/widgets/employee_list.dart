@@ -13,7 +13,7 @@ class EmployeeList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AddEmployeeCubit, AddEmployeeState>(
+    return BlocBuilder<AddEmployeeCubit, AddEmployeecubitState>(
       builder: (context, state) {
         if (state is AddEmployeeLoading) {
           return const SizedBox(); // Loading indicator

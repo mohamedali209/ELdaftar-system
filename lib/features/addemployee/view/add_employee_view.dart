@@ -13,10 +13,10 @@ class AddEmployee extends StatefulWidget {
   const AddEmployee({super.key});
 
   @override
-  _AddEmployeeState createState() => _AddEmployeeState();
+  AddEmployeeState createState() => AddEmployeeState();
 }
 
-class _AddEmployeeState extends State<AddEmployee> {
+class AddEmployeeState extends State<AddEmployee> {
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -68,7 +68,7 @@ class _AddEmployeeState extends State<AddEmployee> {
                 hintText: 'كلمة المرور',
               ),
               const SizedBox(height: 25),
-              BlocConsumer<AddEmployeeCubit, AddEmployeeState>(
+              BlocConsumer<AddEmployeeCubit, AddEmployeecubitState>(
                 listener: (context, state) {
                   if (state is AddEmployeeSuccess) {
                     ScaffoldMessenger.of(context).showSnackBar(
