@@ -74,7 +74,7 @@ class AddEmployeeState extends State<AddEmployee> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         
-                        content: Text('تم الضافةاو الحذف بنجاح قم بتسجيل حسابك مجددا'),
+                        content: Text('تم الاضافة او الحذف بنجاح قم بتسجيل حسابك مجددا'),
                       ),
                     );
 
