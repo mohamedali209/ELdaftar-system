@@ -38,7 +38,7 @@ final salesPercentage = data['sales_percentage'] ?? {};
 Map<String, double> salesPercentageData = {};
 
 // Determine the correct period (yearly, monthly, weekly)
-Map<String, dynamic> periodMap = {};
+Map<dynamic, dynamic> periodMap = {};
 switch (period) {
   case 'سنوي':
     periodMap = salesPercentage['yearly'] ?? {};
@@ -93,7 +93,7 @@ emit(FetchInsightsSuccess(salesData, purchaseData, salesPercentageData));
   }
 
   List<double> _getPurchaseDataForPeriod(
-      Map<String, dynamic> purchaseSummary, String period) {
+      Map<dynamic, dynamic> purchaseSummary, String period) {
     // Check if the period exists in the purchase summary
     if (!purchaseSummary.containsKey(period) ||
         purchaseSummary[period] == null) {
@@ -108,7 +108,7 @@ emit(FetchInsightsSuccess(salesData, purchaseData, salesPercentageData));
     if (period == 'weekly') {
       // Process weekly data (7 days)
       for (var entry in periodData) {
-        if (entry != null && entry is Map<String, dynamic>) {
+        if (entry != null && entry is Map<dynamic, dynamic>) {
           String? dayString = entry['period'];
           if (dayString != null) {
             int dayIndex = _getDayIndexFromString(dayString);
@@ -124,7 +124,7 @@ emit(FetchInsightsSuccess(salesData, purchaseData, salesPercentageData));
       completePurchaseData = List.filled(4, 0.0);
       int currentWeek = _getCurrentWeekOfMonth();
       for (var entry in periodData) {
-        if (entry != null && entry is Map<String, dynamic>) {
+        if (entry != null && entry is Map<dynamic, dynamic>) {
           String? weekString =
               entry['period']; // Assuming 'week' is used for weekly data
           if (weekString != null) {
@@ -139,7 +139,7 @@ emit(FetchInsightsSuccess(salesData, purchaseData, salesPercentageData));
     } else if (period == 'yearly') {
       // Process yearly data (12 months)
       for (var entry in periodData) {
-        if (entry != null && entry is Map<String, dynamic>) {
+        if (entry != null && entry is Map<dynamic, dynamic>) {
           String? monthString = entry['month'];
           if (monthString != null) {
             int monthIndex = _getMonthFromString(monthString);
@@ -170,7 +170,7 @@ emit(FetchInsightsSuccess(salesData, purchaseData, salesPercentageData));
     if (period == 'weekly') {
       // Process weekly data (7 days)
       for (var entry in periodData) {
-        if (entry != null && entry is Map<String, dynamic>) {
+        if (entry != null && entry is Map<dynamic, dynamic>) {
           String? dayString = entry['period'];
           if (dayString != null) {
             int dayIndex = _getDayIndexFromString(dayString);
@@ -186,7 +186,7 @@ emit(FetchInsightsSuccess(salesData, purchaseData, salesPercentageData));
       completeSalesData = List.filled(4, 0.0);
       int currentWeek = _getCurrentWeekOfMonth();
       for (var entry in periodData) {
-        if (entry != null && entry is Map<String, dynamic>) {
+        if (entry != null && entry is Map<dynamic, dynamic>) {
           String? weekString =
               entry['period']; // Assuming 'week' is used for weekly data
           if (weekString != null) {
@@ -201,7 +201,7 @@ emit(FetchInsightsSuccess(salesData, purchaseData, salesPercentageData));
     } else if (period == 'yearly') {
       // Process yearly data (12 months)
       for (var entry in periodData) {
-        if (entry != null && entry is Map<String, dynamic>) {
+        if (entry != null && entry is Map<dynamic, dynamic>) {
           String? monthString = entry['month'];
           if (monthString != null) {
             int monthIndex = _getMonthFromString(monthString);

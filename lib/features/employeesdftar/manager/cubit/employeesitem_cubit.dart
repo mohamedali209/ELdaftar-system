@@ -966,11 +966,15 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
     }
 
     String userId = user.uid; // Get the user's ID
+     DocumentSnapshot employeeDoc =
+          await _firestore.collection('employees').doc(userId).get();
+            final data = employeeDoc.data() as Map<String, dynamic>;
+        final shopId = data['shopId']; // Get the shopId
 
     // Fetch the current cash value for this user from 'users/{userId}/weight' document
     DocumentSnapshot snapshot = await _firestore
         .collection('users')
-        .doc(userId)
+        .doc(shopId)
         .collection('weight')
         .doc('init')
         .get();
@@ -983,36 +987,14 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
       // Update the 'total_cash' for this user in Firestore
       await _firestore
           .collection('users')
-          .doc(userId)
+          .doc(shopId)
           .collection('weight')
           .doc('init')
           .update({
         'total_cash': newTotalCash.toString(),
       });
 
-      // Fetch the shopId from the employees collection
-      DocumentSnapshot employeeDoc =
-          await _firestore.collection('employees').doc(userId).get();
-
-      if (employeeDoc.exists && employeeDoc.data() != null) {
-        final data = employeeDoc.data() as Map<String, dynamic>;
-        final shopId = data['shopId']; // Get the shopId
-
-        // Update the cash for the shop in the users collection
-        await _firestore
-            .collection('users')
-            .doc(
-                shopId) // Use the shopId here to access the specific shop's user document
-            .collection('weight')
-            .doc('init') // Assuming a similar document structure for the shop
-            .update({
-          'total_cash': FieldValue.increment(
-              add ? amount : -amount), // Increment or decrement cash
-        });
-      } else {
-        // Handle case where employee document doesn't exist or is null
-        debugPrint('Employee document does not exist or is null');
-      }
+    
     }
   }
 
