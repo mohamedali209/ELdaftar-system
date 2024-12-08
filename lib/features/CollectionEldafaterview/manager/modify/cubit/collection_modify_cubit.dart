@@ -207,18 +207,18 @@ void modifyItem(
 
     // Buying Item Update Logic (including price)
     if (oldBuyingItem.ayar != modifiedItem.ayar ||
-        oldBuyingItem.price != modifiedItem.price) {
+        oldBuyingItem.price != modifiedItem.price||oldBuyingItem.gram!=modifiedItem.gram) {
       await _subtractItemGramsFromWeight(oldBuyingItem);
       await _addNewItemGramsToNewAyar(modifiedItem);
     } else {
-      int adadDifference =
-          int.parse(oldBuyingItem.adad) - int.parse(modifiedItem.adad);
-      double gramDifference =
-          double.parse(oldBuyingItem.gram) - double.parse(modifiedItem.gram);
+      // int adadDifference =
+      //     int.parse(oldBuyingItem.adad) - int.parse(modifiedItem.adad);
+      // double gramDifference =
+      //     double.parse(oldBuyingItem.gram) - double.parse(modifiedItem.gram);
 
-      if (adadDifference != 0 || gramDifference != 0) {
-        await updateInventory(modifiedItem, adadDifference, gramDifference);
-      }
+      // if (adadDifference != 0 || gramDifference != 0) {
+      //   await updateInventory(modifiedItem, adadDifference, gramDifference);
+      // }
     }
   }
 

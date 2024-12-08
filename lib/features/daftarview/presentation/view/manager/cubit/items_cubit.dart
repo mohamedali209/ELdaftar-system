@@ -685,11 +685,9 @@ class ItemsCubit extends Cubit<ItemsState> {
           itemType = 'محابس';
         } else if (item.details.contains('دبلة')) {
           itemType = 'دبل';
-        } 
-        else if (item.details.contains('توينز')) {
+        } else if (item.details.contains('توينز')) {
           itemType = 'توينز';
-        }
-        else if (item.details.contains('سلسلة')) {
+        } else if (item.details.contains('سلسلة')) {
           itemType = 'سلاسل';
         } else if (item.details.contains('غوايش')) {
           itemType = 'غوايش';
@@ -1052,19 +1050,19 @@ class ItemsCubit extends Cubit<ItemsState> {
 
     // Buying Item Update Logic (including price)
     if (oldBuyingItem.ayar != modifiedItem.ayar ||
-        oldBuyingItem.price != modifiedItem.price) {
+        oldBuyingItem.price != modifiedItem.price||oldBuyingItem.gram!=modifiedItem.gram) {
       await _subtractItemGramsFromWeight(oldBuyingItem);
       await _addNewItemGramsToNewAyar(modifiedItem);
-    } else {
-      int adadDifference =
-          int.parse(oldBuyingItem.adad) - int.parse(modifiedItem.adad);
-      double gramDifference =
-          double.parse(oldBuyingItem.gram) - double.parse(modifiedItem.gram);
+    } // } else {
+    //   int adadDifference =
+    //       int.parse(oldBuyingItem.adad) - int.parse(modifiedItem.adad);
+    //   double gramDifference =
+    //       double.parse(oldBuyingItem.gram) - double.parse(modifiedItem.gram);
 
-      if (adadDifference != 0 || gramDifference != 0) {
-        await updateInventory(modifiedItem, adadDifference, gramDifference);
-      }
-    }
+    //   if (adadDifference != 0 || gramDifference != 0) {
+    //     await updateInventory(modifiedItem, adadDifference, gramDifference);
+    //   }
+    // }
   }
 
   Future<void> updateTotalCash(double priceDifference) async {
