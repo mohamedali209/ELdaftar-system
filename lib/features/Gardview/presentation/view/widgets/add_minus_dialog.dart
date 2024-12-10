@@ -98,6 +98,11 @@ class AddOrMinusDialogState extends State<AddOrMinusDialog> {
                     ],
                     onChanged: (value) {
                       jewelryType = value;
+                      if (jewelryType == 'سبائك') {
+                        purity = '24k';
+                      } else if (jewelryType == 'جنيهات') {
+                        purity = '21k';
+                      }
                     },
                   ),
                   const SizedBox(height: 10),
