@@ -20,15 +20,19 @@ class ForgetpassScreen extends StatelessWidget {
       return;
     }
 
+    // Save context operations to local variables
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         const SnackBar(
-          content: Text('تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني'),
+          content: Text(
+              'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني'),
           backgroundColor: Colors.green,
         ),
       );
-      AppRouter.router.go(AppRouter.kloginview); // Navigate back to login
+      AppRouter.router.pop();
     } catch (e) {
       String errorMessage;
       if (e is FirebaseAuthException) {
@@ -45,7 +49,7 @@ class ForgetpassScreen extends StatelessWidget {
       } else {
         errorMessage = 'حدث خطأ غير متوقع';
       }
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         SnackBar(content: Text(errorMessage)),
       );
     }
@@ -85,7 +89,6 @@ class ForgetpassScreen extends StatelessWidget {
                       child: Column(
                         children: [
                           CustomTextField2(
-                            
                             controller: emailController,
                             hintText: 'البريد الالكتروني',
                           ),
@@ -110,7 +113,7 @@ class ForgetpassScreen extends StatelessWidget {
             child: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.amber),
               onPressed: () {
-                AppRouter.router.pop();
+                Navigator.of(context).pop();
               },
             ),
           ),
