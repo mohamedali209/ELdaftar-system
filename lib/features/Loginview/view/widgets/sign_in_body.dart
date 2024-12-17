@@ -1,5 +1,6 @@
 import 'package:aldafttar/features/Loginview/manager/signin/cubit/signin_cubit.dart';
 import 'package:aldafttar/features/Loginview/manager/signin/cubit/signin_state.dart';
+import 'package:aldafttar/features/Loginview/view/widgets/forget_pass.dart';
 import 'package:aldafttar/features/Loginview/view/widgets/login_textfields.dart';
 import 'package:aldafttar/features/Loginview/view/widgets/loginbutton.dart';
 import 'package:aldafttar/utils/app_router.dart';
@@ -63,11 +64,36 @@ class Signinbody extends StatelessWidget {
                   emailController: emailController,
                   passwordController: passwordController,
                 ),
-                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ForgetpassScreen(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'نسيت كلمة المرور',
+                        style: Appstyles.regular12cairo(context).copyWith(
+                          fontSize: 12,
+                          color: Colors.amber,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: MediaQuery.of(context).size.width * .1),
+                  ],
+                ),
+                const SizedBox(height: 3),
                 Loginbutton(
-                  onPressed: ()async {
+                  text: 'تسجيل الدخول',
+                  onPressed: () async {
                     // Trigger sign-in when the button is pressed
-                  await  BlocProvider.of<SigninCubit>(context).signin(
+                    await BlocProvider.of<SigninCubit>(context).signin(
                       email: emailController.text,
                       password: passwordController.text,
                     );

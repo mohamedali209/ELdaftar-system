@@ -14,12 +14,7 @@ class SigninScreenState extends State<SigninScreen> {
   @override
   void initState() {
     super.initState();
-    // Check if the user is already signed in and navigate if true
-    // context.read<SigninCubit>().checkIfSignedIn(() {
-    //   WidgetsBinding.instance.addPostFrameCallback((_) {
-    //     GoRouter.of(context).go(AppRouter.kDaftarview);
-    //   });
-    // });
+  
   }
 
   @override

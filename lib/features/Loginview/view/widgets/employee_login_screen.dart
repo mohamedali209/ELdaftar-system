@@ -96,6 +96,7 @@ class EmployeeLoginScreenState extends State<EmployeeLoginScreen> {
                       ),
                       const SizedBox(height: 20),
                       Loginbutton(
+                        text: 'تسجيل الدخول',
                         onPressed: () {
                           context.read<EmployeeCubit>().loginEmployee(
                                 emailController.text.trim(),

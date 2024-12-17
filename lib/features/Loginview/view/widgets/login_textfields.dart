@@ -31,7 +31,7 @@ class SignTextfields extends StatelessWidget {
             controller: passwordController,
           ),
           const SizedBox(
-            height: 20,
+            height: 10,
           )
         ],
       ),

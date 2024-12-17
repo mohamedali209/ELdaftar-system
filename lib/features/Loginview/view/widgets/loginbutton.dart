@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 class Loginbutton extends StatelessWidget {
   const Loginbutton({
     super.key,
-    this.onPressed,
+    this.onPressed, required this.text,
   });
   final void Function()? onPressed;
+  final String text ;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -32,8 +33,7 @@ class Loginbutton extends StatelessWidget {
         ),
         onPressed: onPressed,
         child: Text(
-          'تسجيل الدخول',
-          style: Appstyles.regular12cairo(context)
+          text,          style: Appstyles.regular12cairo(context)
               .copyWith(fontSize: 15, color: Colors.white),
         ),
       ),
