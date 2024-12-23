@@ -102,6 +102,7 @@ class ModifyOrDeleteDialogState extends State<ModifyOrDeleteDialog> {
                 },
               ),
               TextField(
+                keyboardType: TextInputType.number,
                 controller: widget.priceController,
                 decoration: const InputDecoration(labelText: "السعر"),
               ),

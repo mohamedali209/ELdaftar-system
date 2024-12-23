@@ -104,6 +104,7 @@ class EmployeeModifyOrDeleteDialogState
                 },
               ),
               TextField(
+                keyboardType: TextInputType.number,
                 controller: widget.priceController,
                 decoration: const InputDecoration(labelText: "السعر"),
               ),
