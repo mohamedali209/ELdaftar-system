@@ -78,10 +78,12 @@ class EmployeeModifyOrDeleteDialogState
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
+                keyboardType: TextInputType.number,
                 controller: widget.adadController,
                 decoration: const InputDecoration(labelText: "عدد"),
               ),
               TextField(
+                keyboardType: TextInputType.number,
                 controller: widget.gramController,
                 decoration: const InputDecoration(labelText: "وزن"),
               ),

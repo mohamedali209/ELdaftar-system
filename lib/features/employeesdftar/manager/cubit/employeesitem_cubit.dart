@@ -1379,43 +1379,60 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
   }
 
   void deleteItem(Daftarcheckmodel itemToDelete) async {
-    List<Daftarcheckmodel> updatedSellingItems = List.from(state.sellingItems);
-    List<Daftarcheckmodel> updatedBuyingItems = List.from(state.buyingItems);
-    emit(state.copyWith(isLoading: true));
-    if (state.sellingItems.contains(itemToDelete)) {
-      updatedSellingItems = state.sellingItems
-          .where((item) => item.num != itemToDelete.num)
-          .toList();
+  emit(state.copyWith(isLoading: true));
 
-      // Subtract the item's price from total_cash when deleting a selling item
-      await _updateCash(itemToDelete, isSellingItem: true);
+  // Create updated lists for selling and buying items
+  List<Daftarcheckmodel> updatedSellingItems = List.from(state.sellingItems);
+  List<Daftarcheckmodel> updatedBuyingItems = List.from(state.buyingItems);
 
-      // Update inventory when deleting a selling item
-      await updateInventory(itemToDelete, int.parse(itemToDelete.adad),
-          double.parse(itemToDelete.gram));
-    } else if (state.buyingItems.contains(itemToDelete)) {
-      updatedBuyingItems = state.buyingItems
-          .where((item) => item.num != itemToDelete.num)
-          .toList();
+  if (state.sellingItems.contains(itemToDelete)) {
+    // Remove the item from selling items
+    updatedSellingItems = updatedSellingItems
+        .where((item) => item.num != itemToDelete.num)
+        .toList();
 
-      // Add the item's price to total_cash when deleting a buying item
-      await _updateCash(itemToDelete, isSellingItem: false);
+    // Update total cash and inventory for selling items
+    await _updateCash(itemToDelete, isSellingItem: true);
+    await updateInventory(
+      itemToDelete,
+      int.parse(itemToDelete.adad),
+      double.parse(itemToDelete.gram),
+    );
+  } else if (state.buyingItems.contains(itemToDelete)) {
+    // Remove the item from buying items
+    updatedBuyingItems = updatedBuyingItems
+        .where((item) => item.num != itemToDelete.num)
+        .toList();
 
-      // Subtract the grams from total18kasr or total21kasr when deleting a buying item
+    // Update total cash for buying items
+    await _updateCash(itemToDelete, isSellingItem: false);
+
+    // Check if the item type is "سبائك" and subtract from inventory
+    if (itemToDelete.details.contains('سبائك')) {
+      await updateInventory(
+        itemToDelete,
+        -int.parse(itemToDelete.adad),
+        -double.parse(itemToDelete.gram),
+      );
+    } else {
+      // Handle other buying items
       await _subtractItemGramsFromWeight(itemToDelete);
     }
-
-    // Emit the new state with updated lists
-    emit(EmployeesitemState(
-      sellingItems: updatedSellingItems,
-      buyingItems: updatedBuyingItems,
-    ));
-
-    await _updateFirestore();
-    await _updateTotals();
-
-    emit(state.copyWith(isLoading: false));
   }
+
+  // Emit updated state with modified lists
+  emit(EmployeesitemState(
+    sellingItems: updatedSellingItems,
+    buyingItems: updatedBuyingItems,
+  ));
+
+  // Perform additional updates to Firestore and totals
+  await _updateFirestore();
+  await _updateTotals();
+
+  emit(state.copyWith(isLoading: false));
+}
+
 
   Future<void> _updateCash(Daftarcheckmodel item,
       {required bool isSellingItem}) async {

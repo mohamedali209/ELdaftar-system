@@ -488,20 +488,28 @@ void modifyItem(
       // Update inventory when deleting a selling item
       await updateInventory(itemToDelete, int.parse(itemToDelete.adad),
           double.parse(itemToDelete.gram));
-    } else if (state.buyingItems.any((item) => item.num == itemToDelete.num)) {
-      updatedBuyingItems = state.buyingItems
-          .where((item) => item.num != itemToDelete.num)
-          .toList();
+    } else if (state.buyingItems.contains(itemToDelete)) {
+    updatedBuyingItems = state.buyingItems
+        .where((item) => item.num != itemToDelete.num)
+        .toList();
 
-      // Add the item's price to total_cash when deleting a buying item
-      await _updateCash(itemToDelete, isSellingItem: false);
+    // Add the item's price to total_cash when deleting a buying item
+    await _updateCash(itemToDelete, isSellingItem: false);
 
-      // Subtract the grams from total18kasr or total21kasr when deleting a buying item
-      await _subtractItemGramsFromWeight(itemToDelete);
+    // Subtract grams from total weights when deleting a buying item
+    if (itemToDelete.details.contains('سبائك')) {
+      // Ensure subtraction for سبائك
+      await updateInventory(
+        itemToDelete,
+        -int.parse(itemToDelete.adad),
+        -double.parse(itemToDelete.gram),
+      );
     } else {
-      debugPrint('Item not found in current state.');
-      return;
+      // Subtract the grams from total weights for other buying items
+      await _subtractItemGramsFromWeight(itemToDelete);
     }
+  }
+
 
     // Emit the updated state
     emit(CollectionModifyState(
