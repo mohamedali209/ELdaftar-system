@@ -114,6 +114,11 @@ class AddOrMinusDialogState extends State<AddOrMinusDialog> {
                       DropdownMenuItem(value: '24k', child: Text('24k')),
                     ],
                     onChanged: (value) {
+                      if (jewelryType == 'سبائك') {
+                        purity = '24k';
+                      } else if (jewelryType == 'جنيهات') {
+                        purity = '21k';
+                      }
                       purity = value;
                     },
                   ),
@@ -207,7 +212,11 @@ class AddOrMinusDialogState extends State<AddOrMinusDialog> {
                   showErrorDialog(context, 'الرجاء إدخال كمية صحيحة');
                   return;
                 }
-
+                if (jewelryType == 'سبائك') {
+                  purity = '24k';
+                } else if (jewelryType == 'جنيهات') {
+                  purity = '21k';
+                }
                 // Proceed to update the inventory
                 BlocProvider.of<UpdateInventoryCubit>(context).updateInventory(
                   type: jewelryType!,

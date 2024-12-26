@@ -3,7 +3,6 @@ import 'package:aldafttar/features/daftarview/presentation/view/manager/drawercu
 import 'package:aldafttar/firebase_options.dart';
 import 'package:aldafttar/utils/app_router.dart';
 import 'package:aldafttar/utils/sizeconfig.dart';
-import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -16,10 +15,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(
-    DevicePreview(
-      enabled: true,
-      builder: (context) => const Aldaftar(),
-    ),
+    const Aldaftar(),
   );
 }
 

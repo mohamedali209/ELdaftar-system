@@ -50,6 +50,7 @@ class Signinbody extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                
                 Text(
                   'الدفتر',
                   style: Appstyles.bold50(context).copyWith(fontSize: 70),

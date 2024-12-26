@@ -606,8 +606,8 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
               double.parse(weightSnapshot['total21kKasr'] ?? '0.0');
           double currentTotal24kKasr =
               double.parse(weightSnapshot['sabaek_weight'] ?? '0.0');
-          double currentTotal24kKasrQuantity =
-              double.parse(weightSnapshot['sabaek_count'] ?? '0.0');
+          int currentTotal24kKasrQuantity =
+              int.parse(weightSnapshot['sabaek_count'] ?? '0.0');
 
           // Add only the grams of the new item to the respective field based on ayar (18k, 21k, or 24k)
           if (newItem.ayar == '18k') {
@@ -966,10 +966,10 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
     }
 
     String userId = user.uid; // Get the user's ID
-     DocumentSnapshot employeeDoc =
-          await _firestore.collection('employees').doc(userId).get();
-            final data = employeeDoc.data() as Map<String, dynamic>;
-        final shopId = data['shopId']; // Get the shopId
+    DocumentSnapshot employeeDoc =
+        await _firestore.collection('employees').doc(userId).get();
+    final data = employeeDoc.data() as Map<String, dynamic>;
+    final shopId = data['shopId']; // Get the shopId
 
     // Fetch the current cash value for this user from 'users/{userId}/weight' document
     DocumentSnapshot snapshot = await _firestore
@@ -993,8 +993,6 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
           .update({
         'total_cash': newTotalCash.toString(),
       });
-
-    
     }
   }
 
@@ -1139,6 +1137,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
             'sabaek_count': newSabaekCount.toString(),
             'sabaek_weight': newSabaekWeight.toString(),
           });
+          return;
         } else if (itemType == 'جنيهات') {
           int currentGnihatCount = int.parse(snapshot['gnihat_count'] ?? '0');
           double currentGnihatWeight =
@@ -1146,7 +1145,17 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
 
           int newGnihatCount = currentGnihatCount + adadDifference;
           double newGnihatWeight = currentGnihatWeight + gramDifference;
-
+   double total21kWeight =
+                double.parse(snapshot['total21kWeight'] ?? '0.0');
+            total21kWeight += gramDifference;
+            await _firestore
+                .collection('users')
+                .doc(shopId)
+                .collection('weight')
+                .doc('init')
+                .update({
+              'total21kWeight': total21kWeight.toString(),
+            });
           await _firestore
               .collection('users')
               .doc(shopId)
@@ -1243,20 +1252,63 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
           priceDifference.abs()); // Add the absolute difference to total_cash
     }
 
-    // Buying Item Update Logic (including price)
+    // Check if the item is سبائك
+    if (oldBuyingItem.details.contains('سبائك')) {
+      try {
+        User? user = FirebaseAuth.instance.currentUser;
+        if (user == null) return; // Ensure the user is authenticated
+
+        String userId = user.uid;
+        DocumentSnapshot employeeDoc =
+            await _firestore.collection('employees').doc(userId).get();
+        final data = employeeDoc.data() as Map<String, dynamic>?;
+        final shopId = data?['shopId'];
+        DocumentSnapshot snapshot = await _firestore
+            .collection('users')
+            .doc(shopId)
+            .collection('weight')
+            .doc('init')
+            .get();
+
+        if (snapshot.exists) {
+          // Retrieve current sabaek values
+          int currentSabaekCount =
+              int.tryParse(snapshot['sabaek_count'] ?? '0') ?? 0;
+          double currentSabaekWeight =
+              double.tryParse(snapshot['sabaek_weight'] ?? '0.0') ?? 0.0;
+
+          // Calculate new values based on the modified item
+          int oldAdad = int.parse(oldBuyingItem.adad);
+          double oldGram = double.parse(oldBuyingItem.gram);
+          int newAdad = int.parse(modifiedItem.adad);
+          double newGram = double.parse(modifiedItem.gram);
+
+          int newSabaekCount = currentSabaekCount - oldAdad + newAdad;
+          double newSabaekWeight = currentSabaekWeight - oldGram + newGram;
+
+          // Update Firestore with the new values
+          await _firestore
+              .collection('users')
+              .doc(shopId)
+              .collection('weight')
+              .doc('init')
+              .update({
+            'sabaek_count': newSabaekCount.toString(),
+            'sabaek_weight': newSabaekWeight.toString(),
+          });
+        }
+      } catch (e) {
+        debugPrint('Error updating سبائك: $e');
+      }
+      return; // Exit as سبائك has been handled
+    }
+
+    // General Buying Item Update Logic (excluding سبائك)
     if (oldBuyingItem.ayar != modifiedItem.ayar ||
-        oldBuyingItem.price != modifiedItem.price||oldBuyingItem.gram!=modifiedItem.gram) {
+        oldBuyingItem.price != modifiedItem.price ||
+        oldBuyingItem.gram != modifiedItem.gram) {
       await _subtractItemGramsFromWeight(oldBuyingItem);
       await _addNewItemGramsToNewAyar(modifiedItem);
-    } else {
-      // int adadDifference =
-      //     int.parse(oldBuyingItem.adad) - int.parse(modifiedItem.adad);
-      // double gramDifference =
-      //     double.parse(oldBuyingItem.gram) - double.parse(modifiedItem.gram);
-
-      // if (adadDifference != 0 || gramDifference != 0) {
-      //   await updateInventory(modifiedItem, adadDifference, gramDifference);
-      // }
     }
   }
 
@@ -1379,60 +1431,59 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
   }
 
   void deleteItem(Daftarcheckmodel itemToDelete) async {
-  emit(state.copyWith(isLoading: true));
+    emit(state.copyWith(isLoading: true));
 
-  // Create updated lists for selling and buying items
-  List<Daftarcheckmodel> updatedSellingItems = List.from(state.sellingItems);
-  List<Daftarcheckmodel> updatedBuyingItems = List.from(state.buyingItems);
+    // Create updated lists for selling and buying items
+    List<Daftarcheckmodel> updatedSellingItems = List.from(state.sellingItems);
+    List<Daftarcheckmodel> updatedBuyingItems = List.from(state.buyingItems);
 
-  if (state.sellingItems.contains(itemToDelete)) {
-    // Remove the item from selling items
-    updatedSellingItems = updatedSellingItems
-        .where((item) => item.num != itemToDelete.num)
-        .toList();
+    if (state.sellingItems.contains(itemToDelete)) {
+      // Remove the item from selling items
+      updatedSellingItems = updatedSellingItems
+          .where((item) => item.num != itemToDelete.num)
+          .toList();
 
-    // Update total cash and inventory for selling items
-    await _updateCash(itemToDelete, isSellingItem: true);
-    await updateInventory(
-      itemToDelete,
-      int.parse(itemToDelete.adad),
-      double.parse(itemToDelete.gram),
-    );
-  } else if (state.buyingItems.contains(itemToDelete)) {
-    // Remove the item from buying items
-    updatedBuyingItems = updatedBuyingItems
-        .where((item) => item.num != itemToDelete.num)
-        .toList();
-
-    // Update total cash for buying items
-    await _updateCash(itemToDelete, isSellingItem: false);
-
-    // Check if the item type is "سبائك" and subtract from inventory
-    if (itemToDelete.details.contains('سبائك')) {
+      // Update total cash and inventory for selling items
+      await _updateCash(itemToDelete, isSellingItem: true);
       await updateInventory(
         itemToDelete,
-        -int.parse(itemToDelete.adad),
-        -double.parse(itemToDelete.gram),
+        int.parse(itemToDelete.adad),
+        double.parse(itemToDelete.gram),
       );
-    } else {
-      // Handle other buying items
-      await _subtractItemGramsFromWeight(itemToDelete);
+    } else if (state.buyingItems.contains(itemToDelete)) {
+      // Remove the item from buying items
+      updatedBuyingItems = updatedBuyingItems
+          .where((item) => item.num != itemToDelete.num)
+          .toList();
+
+      // Update total cash for buying items
+      await _updateCash(itemToDelete, isSellingItem: false);
+
+      // Check if the item type is "سبائك" and subtract from inventory
+      if (itemToDelete.details.contains('سبائك')) {
+        await updateInventory(
+          itemToDelete,
+          -int.parse(itemToDelete.adad),
+          -double.parse(itemToDelete.gram),
+        );
+      } else {
+        // Handle other buying items
+        await _subtractItemGramsFromWeight(itemToDelete);
+      }
     }
+
+    // Emit updated state with modified lists
+    emit(EmployeesitemState(
+      sellingItems: updatedSellingItems,
+      buyingItems: updatedBuyingItems,
+    ));
+
+    // Perform additional updates to Firestore and totals
+    await _updateFirestore();
+    await _updateTotals();
+
+    emit(state.copyWith(isLoading: false));
   }
-
-  // Emit updated state with modified lists
-  emit(EmployeesitemState(
-    sellingItems: updatedSellingItems,
-    buyingItems: updatedBuyingItems,
-  ));
-
-  // Perform additional updates to Firestore and totals
-  await _updateFirestore();
-  await _updateTotals();
-
-  emit(state.copyWith(isLoading: false));
-}
-
 
   Future<void> _updateCash(Daftarcheckmodel item,
       {required bool isSellingItem}) async {

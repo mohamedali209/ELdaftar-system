@@ -12,11 +12,12 @@ class CollectionModifyCubit extends Cubit<CollectionModifyState> {
   CollectionModifyCubit()
       : super(const CollectionModifyState(sellingItems: [], buyingItems: []));
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-    DateTime? selectedDate;
+  DateTime? selectedDate;
 
-    void setSelectedDate(DateTime date) {
+  void setSelectedDate(DateTime date) {
     selectedDate = date;
   }
+
   void selectDateAndmodifyitem(String year, String month, String day) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -57,86 +58,85 @@ class CollectionModifyCubit extends Cubit<CollectionModifyState> {
     }
   }
 
-void modifyItem(
-  Daftarcheckmodel modifiedItem, {
-  bool isBuyingItem = false,
-}) async {
-  try {
-    if (selectedDate == null) {
-      debugPrint('No date selected. Cannot modify item.');
-      return;
-    }
-    // Fetch current selling and buying items
-    Daftarcheckmodel oldSellingItem = state.sellingItems.firstWhere(
-      (item) => item.num == modifiedItem.num,
-      orElse: () => Daftarcheckmodel(
-        tfasel: '',
-        num: '0',
-        adad: '0',
-        gram: '0',
-        ayar: '',
-        details: '',
-        price: '0',
-      ),
-    );
+  void modifyItem(
+    Daftarcheckmodel modifiedItem, {
+    bool isBuyingItem = false,
+  }) async {
+    try {
+      if (selectedDate == null) {
+        debugPrint('No date selected. Cannot modify item.');
+        return;
+      }
+      // Fetch current selling and buying items
+      Daftarcheckmodel oldSellingItem = state.sellingItems.firstWhere(
+        (item) => item.num == modifiedItem.num,
+        orElse: () => Daftarcheckmodel(
+          tfasel: '',
+          num: '0',
+          adad: '0',
+          gram: '0',
+          ayar: '',
+          details: '',
+          price: '0',
+        ),
+      );
 
-    Daftarcheckmodel oldBuyingItem = state.buyingItems.firstWhere(
-      (item) => item.num == modifiedItem.num,
-      orElse: () => Daftarcheckmodel(
-        tfasel: '',
-        num: '0',
-        adad: '0',
-        gram: '0',
-        ayar: '',
-        details: '',
-        price: '0',
-      ),
-    );
+      Daftarcheckmodel oldBuyingItem = state.buyingItems.firstWhere(
+        (item) => item.num == modifiedItem.num,
+        orElse: () => Daftarcheckmodel(
+          tfasel: '',
+          num: '0',
+          adad: '0',
+          gram: '0',
+          ayar: '',
+          details: '',
+          price: '0',
+        ),
+      );
 
-    if (!isBuyingItem) {
-      // Update selling item
-      if (oldSellingItem.num != '0') {
-        await updateSellingItem(oldSellingItem, modifiedItem);
+      if (!isBuyingItem) {
+        // Update selling item
+        if (oldSellingItem.num != '0') {
+          await updateSellingItem(oldSellingItem, modifiedItem);
+        }
+
+        // Update Selling Items List
+        List<Daftarcheckmodel> updatedSellingItems = state.sellingItems
+            .map((item) => item.num == modifiedItem.num ? modifiedItem : item)
+            .toList();
+
+        emit(CollectionModifyState(
+          sellingItems: updatedSellingItems,
+          buyingItems: state.buyingItems,
+        ));
+      } else {
+        // Update buying item
+        if (oldBuyingItem.num != '0') {
+          await updateBuyingItem(oldBuyingItem, modifiedItem);
+        }
+
+        // Update Buying Items List
+        List<Daftarcheckmodel> updatedBuyingItems = state.buyingItems
+            .map((item) => item.num == modifiedItem.num ? modifiedItem : item)
+            .toList();
+
+        emit(CollectionModifyState(
+          sellingItems: state.sellingItems,
+          buyingItems: updatedBuyingItems,
+        ));
       }
 
-      // Update Selling Items List
-      List<Daftarcheckmodel> updatedSellingItems = state.sellingItems
-          .map((item) => item.num == modifiedItem.num ? modifiedItem : item)
-          .toList();
-
-      emit(CollectionModifyState(
-        sellingItems: updatedSellingItems,
-        buyingItems: state.buyingItems,
-      ));
-    } else {
-      // Update buying item
-      if (oldBuyingItem.num != '0') {
-        await updateBuyingItem(oldBuyingItem, modifiedItem);
-      }
-
-      // Update Buying Items List
-      List<Daftarcheckmodel> updatedBuyingItems = state.buyingItems
-          .map((item) => item.num == modifiedItem.num ? modifiedItem : item)
-          .toList();
-
-      emit(CollectionModifyState(
-        sellingItems: state.sellingItems,
-        buyingItems: updatedBuyingItems,
-      ));
+      // Update Firestore with date-specific logic
+      await _updateFirestore();
+      await _updateTotals();
+    } catch (e) {
+      debugPrint('Error modifying item: $e');
     }
-
-    // Update Firestore with date-specific logic
-    await _updateFirestore();
-    await _updateTotals();
-  } catch (e) {
-    debugPrint('Error modifying item: $e');
   }
-}
-
 
   Future<void> _updateFirestore() async {
     final user = FirebaseAuth.instance.currentUser;
- final String year = DateFormat('yyyy').format(selectedDate!);
+    final String year = DateFormat('yyyy').format(selectedDate!);
     final String month = DateFormat('MM').format(selectedDate!);
     final String day = DateFormat('dd').format(selectedDate!);
     if (user != null) {
@@ -205,20 +205,60 @@ void modifyItem(
           priceDifference.abs()); // Add the absolute difference to total_cash
     }
 
-    // Buying Item Update Logic (including price)
+    // Check if the item is سبائك
+    if (oldBuyingItem.details.contains('سبائك')) {
+      try {
+        User? user = FirebaseAuth.instance.currentUser;
+        if (user == null) return; // Ensure the user is authenticated
+
+        String userId = user.uid;
+
+        DocumentSnapshot snapshot = await _firestore
+            .collection('users')
+            .doc(userId)
+            .collection('weight')
+            .doc('init')
+            .get();
+
+        if (snapshot.exists) {
+          // Retrieve current sabaek values
+          int currentSabaekCount =
+              int.tryParse(snapshot['sabaek_count'] ?? '0') ?? 0;
+          double currentSabaekWeight =
+              double.tryParse(snapshot['sabaek_weight'] ?? '0.0') ?? 0.0;
+
+          // Calculate new values based on the modified item
+          int oldAdad = int.parse(oldBuyingItem.adad);
+          double oldGram = double.parse(oldBuyingItem.gram);
+          int newAdad = int.parse(modifiedItem.adad);
+          double newGram = double.parse(modifiedItem.gram);
+
+          int newSabaekCount = currentSabaekCount - oldAdad + newAdad;
+          double newSabaekWeight = currentSabaekWeight - oldGram + newGram;
+
+          // Update Firestore with the new values
+          await _firestore
+              .collection('users')
+              .doc(userId)
+              .collection('weight')
+              .doc('init')
+              .update({
+            'sabaek_count': newSabaekCount.toString(),
+            'sabaek_weight': newSabaekWeight.toString(),
+          });
+        }
+      } catch (e) {
+        debugPrint('Error updating سبائك: $e');
+      }
+      return; // Exit as سبائك has been handled
+    }
+
+    // General Buying Item Update Logic (excluding سبائك)
     if (oldBuyingItem.ayar != modifiedItem.ayar ||
-        oldBuyingItem.price != modifiedItem.price||oldBuyingItem.gram!=modifiedItem.gram) {
+        oldBuyingItem.price != modifiedItem.price ||
+        oldBuyingItem.gram != modifiedItem.gram) {
       await _subtractItemGramsFromWeight(oldBuyingItem);
       await _addNewItemGramsToNewAyar(modifiedItem);
-    } else {
-      // int adadDifference =
-      //     int.parse(oldBuyingItem.adad) - int.parse(modifiedItem.adad);
-      // double gramDifference =
-      //     double.parse(oldBuyingItem.gram) - double.parse(modifiedItem.gram);
-
-      // if (adadDifference != 0 || gramDifference != 0) {
-      //   await updateInventory(modifiedItem, adadDifference, gramDifference);
-      // }
     }
   }
 
@@ -351,26 +391,31 @@ void modifyItem(
       String itemType =
           _getItemType(item.details); // Helper function to get item type
       bool is18k = item.ayar.contains('18k');
-      bool is24k = item.ayar.contains('24k'); // For سبائك (Sabaek)
 
       if (itemType.isNotEmpty) {
-        if (itemType == 'سبائك' && is24k) {
-          int currentSabaekCount = int.parse(snapshot['sabaek_count'] ?? '0');
-          double currentSabaekWeight =
-              double.parse(snapshot['sabaek_weight'] ?? '0.0');
+        if (itemType == 'سبائك') {
+          try {
+            int currentSabaekCount =
+                int.tryParse(snapshot['sabaek_count'] ?? '0') ?? 0;
+            double currentSabaekWeight =
+                double.tryParse(snapshot['sabaek_weight'] ?? '0.0') ?? 0.0;
 
-          int newSabaekCount = currentSabaekCount + adadDifference;
-          double newSabaekWeight = currentSabaekWeight + gramDifference;
+            int newSabaekCount = currentSabaekCount + adadDifference;
+            double newSabaekWeight = currentSabaekWeight + gramDifference;
 
-          await _firestore
-              .collection('users')
-              .doc(userId)
-              .collection('weight')
-              .doc('init')
-              .update({
-            'sabaek_count': newSabaekCount.toString(),
-            'sabaek_weight': newSabaekWeight.toString(),
-          });
+            await _firestore
+                .collection('users')
+                .doc(userId)
+                .collection('weight')
+                .doc('init')
+                .update({
+              'sabaek_count': newSabaekCount.toString(),
+              'sabaek_weight': newSabaekWeight.toString(),
+            });
+          } catch (e) {
+            debugPrint('Error updating سبائك: $e');
+          }
+          return; // Exit to ensure no further processing for سبائك
         } else if (itemType == 'جنيهات') {
           int currentGnihatCount = int.parse(snapshot['gnihat_count'] ?? '0');
           double currentGnihatWeight =
@@ -378,7 +423,17 @@ void modifyItem(
 
           int newGnihatCount = currentGnihatCount + adadDifference;
           double newGnihatWeight = currentGnihatWeight + gramDifference;
-
+          double total21kWeight =
+              double.parse(snapshot['total21kWeight'] ?? '0.0');
+          total21kWeight += gramDifference;
+          await _firestore
+              .collection('users')
+              .doc(userId)
+              .collection('weight')
+              .doc('init')
+              .update({
+            'total21kWeight': total21kWeight.toString(),
+          });
           await _firestore
               .collection('users')
               .doc(userId)
@@ -456,96 +511,96 @@ void modifyItem(
     return '';
   }
 
- void deleteItem(Daftarcheckmodel itemToDelete) async {
-  if (selectedDate == null) {
-    debugPrint('No date selected. Cannot delete item.');
-    return;
-  }
-
-  try {
-    // Fetch the selected date
-    final String year = DateFormat('yyyy').format(selectedDate!);
-    final String month = DateFormat('MM').format(selectedDate!);
-    final String day = DateFormat('dd').format(selectedDate!);
-
-    // Debugging: Log current state and item to delete
-    debugPrint('Current selling items: ${state.sellingItems}');
-    debugPrint('Current buying items: ${state.buyingItems}');
-    debugPrint('Item to delete: ${itemToDelete.toString()}');
-
-    // Clone lists to work with them
-    List<Daftarcheckmodel> updatedSellingItems = List.from(state.sellingItems);
-    List<Daftarcheckmodel> updatedBuyingItems = List.from(state.buyingItems);
-
-    if (state.sellingItems.any((item) => item.num == itemToDelete.num)) {
-      updatedSellingItems = state.sellingItems
-          .where((item) => item.num != itemToDelete.num)
-          .toList();
-
-      // Subtract the item's price from total_cash when deleting a selling item
-      await _updateCash(itemToDelete, isSellingItem: true);
-
-      // Update inventory when deleting a selling item
-      await updateInventory(itemToDelete, int.parse(itemToDelete.adad),
-          double.parse(itemToDelete.gram));
-    } else if (state.buyingItems.contains(itemToDelete)) {
-    updatedBuyingItems = state.buyingItems
-        .where((item) => item.num != itemToDelete.num)
-        .toList();
-
-    // Add the item's price to total_cash when deleting a buying item
-    await _updateCash(itemToDelete, isSellingItem: false);
-
-    // Subtract grams from total weights when deleting a buying item
-    if (itemToDelete.details.contains('سبائك')) {
-      // Ensure subtraction for سبائك
-      await updateInventory(
-        itemToDelete,
-        -int.parse(itemToDelete.adad),
-        -double.parse(itemToDelete.gram),
-      );
-    } else {
-      // Subtract the grams from total weights for other buying items
-      await _subtractItemGramsFromWeight(itemToDelete);
-    }
-  }
-
-
-    // Emit the updated state
-    emit(CollectionModifyState(
-      sellingItems: updatedSellingItems,
-      buyingItems: updatedBuyingItems,
-    ));
-
-    // Update Firestore
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      debugPrint('User not logged in.');
+  void deleteItem(Daftarcheckmodel itemToDelete) async {
+    if (selectedDate == null) {
+      debugPrint('No date selected. Cannot delete item.');
       return;
     }
-    final userId = user.uid;
 
-    await _firestore
-        .collection('users')
-        .doc(userId)
-        .collection('dailyTransactions')
-        .doc(year)
-        .collection(month)
-        .doc(day)
-        .update({
-      'sellingItems': updatedSellingItems.map((e) => e.toFirestore()).toList(),
-      'buyingItems': updatedBuyingItems.map((e) => e.toFirestore()).toList(),
-    });
+    try {
+      // Fetch the selected date
+      final String year = DateFormat('yyyy').format(selectedDate!);
+      final String month = DateFormat('MM').format(selectedDate!);
+      final String day = DateFormat('dd').format(selectedDate!);
 
-    // Update totals
-    await _updateTotals();
+      // Debugging: Log current state and item to delete
+      debugPrint('Current selling items: ${state.sellingItems}');
+      debugPrint('Current buying items: ${state.buyingItems}');
+      debugPrint('Item to delete: ${itemToDelete.toString()}');
 
-    debugPrint('Item deleted successfully.');
-  } catch (e) {
-    debugPrint('Error deleting item: $e');
+      // Clone lists to work with them
+      List<Daftarcheckmodel> updatedSellingItems =
+          List.from(state.sellingItems);
+      List<Daftarcheckmodel> updatedBuyingItems = List.from(state.buyingItems);
+
+      if (state.sellingItems.any((item) => item.num == itemToDelete.num)) {
+        updatedSellingItems = state.sellingItems
+            .where((item) => item.num != itemToDelete.num)
+            .toList();
+
+        // Subtract the item's price from total_cash when deleting a selling item
+        await _updateCash(itemToDelete, isSellingItem: true);
+
+        // Update inventory when deleting a selling item
+        await updateInventory(itemToDelete, int.parse(itemToDelete.adad),
+            double.parse(itemToDelete.gram));
+      } else if (state.buyingItems.contains(itemToDelete)) {
+        updatedBuyingItems = state.buyingItems
+            .where((item) => item.num != itemToDelete.num)
+            .toList();
+
+        // Add the item's price to total_cash when deleting a buying item
+        await _updateCash(itemToDelete, isSellingItem: false);
+
+        // Subtract grams from total weights when deleting a buying item
+        if (itemToDelete.details.contains('سبائك')) {
+          // Ensure subtraction for سبائك
+          await updateInventory(
+            itemToDelete,
+            -int.parse(itemToDelete.adad),
+            -double.parse(itemToDelete.gram),
+          );
+        } else {
+          // Subtract the grams from total weights for other buying items
+          await _subtractItemGramsFromWeight(itemToDelete);
+        }
+      }
+
+      // Emit the updated state
+      emit(CollectionModifyState(
+        sellingItems: updatedSellingItems,
+        buyingItems: updatedBuyingItems,
+      ));
+
+      // Update Firestore
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        debugPrint('User not logged in.');
+        return;
+      }
+      final userId = user.uid;
+
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('dailyTransactions')
+          .doc(year)
+          .collection(month)
+          .doc(day)
+          .update({
+        'sellingItems':
+            updatedSellingItems.map((e) => e.toFirestore()).toList(),
+        'buyingItems': updatedBuyingItems.map((e) => e.toFirestore()).toList(),
+      });
+
+      // Update totals
+      await _updateTotals();
+
+      debugPrint('Item deleted successfully.');
+    } catch (e) {
+      debugPrint('Error deleting item: $e');
+    }
   }
-}
-
 
 // Helper function to update total_cash based on the item being deleted
   Future<void> _updateCash(Daftarcheckmodel item,
@@ -590,10 +645,9 @@ void modifyItem(
       });
     }
   }
-  Future<void> _updateTotals(
-   
-  ) async {
-     final String year = DateFormat('yyyy').format(selectedDate!);
+
+  Future<void> _updateTotals() async {
+    final String year = DateFormat('yyyy').format(selectedDate!);
     final String month = DateFormat('MM').format(selectedDate!);
     final String day = DateFormat('dd').format(selectedDate!);
     final user = FirebaseAuth.instance.currentUser;

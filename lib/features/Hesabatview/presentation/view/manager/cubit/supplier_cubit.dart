@@ -50,8 +50,9 @@ class SupplierCubit extends Cubit<SupplierState> {
               return currentSum + value;
             });
 
-            final totalNakdyia = suppliers.fold<int>(0, (currentSum, supplier) {
-              final value = int.tryParse(supplier.nakdyia) ?? 0;
+            final totalNakdyia =
+                suppliers.fold<double>(0.0, (currentSum, supplier) {
+              final value = double.tryParse(supplier.nakdyia) ?? 0.0;
               return currentSum + value;
             });
 
@@ -185,11 +186,12 @@ class SupplierCubit extends Cubit<SupplierState> {
         final supplierData = supplierDoc.data()!;
         double currentWazna21 =
             double.tryParse(supplierData['wazna21'] ?? '0') ?? 0;
-        int currentNakdyia = int.tryParse(supplierData['nakdyia'] ?? '0') ?? 0;
+        double currentNakdyia =
+            double.tryParse(supplierData['nakdyia'] ?? '0') ?? 0;
 
         // Convert input to double for calculations
         double newWazna21 = double.tryParse(ayar21) ?? 0;
-        final newNakdyia = int.tryParse(nakdyia) ?? 0;
+        final newNakdyia = double.tryParse(nakdyia) ?? 0;
 
         if (!isAdd) {
           // Subtraction Logic: Handle nakdyia and ayar21 subtraction
