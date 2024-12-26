@@ -98,37 +98,47 @@ class ItemsCubit extends Cubit<ItemsState> {
     return 'year_${now.year}';
   }
 
-  void addSellingItem(Daftarcheckmodel newItem) async {
-    emit(state.copyWith(isLoading: true));
-    await Future.delayed(const Duration(milliseconds: 700));
+ void addSellingItem(Daftarcheckmodel newItem) async {
+  emit(state.copyWith(isLoading: true));
+  await Future.delayed(const Duration(milliseconds: 700));
 
-    final nextNum = (state.sellingItems.length + 1).toString();
-    final newItemWithNum = newItem.copyWith(num: nextNum);
+  try {
+    // Add the new item with the next sequential number
+    final updatedSellingItems = List<Daftarcheckmodel>.from(state.sellingItems)
+      ..add(newItem);
+    final recalculatedItems = _recalculateItemNumbers(updatedSellingItems);
 
     emit(state.copyWith(
-      sellingItems: List.from(state.sellingItems)..add(newItemWithNum),
+      sellingItems: recalculatedItems,
     ));
 
-    try {
-      await _updateFirestore();
-      await _subtractFromInventory(newItemWithNum);
-      await _updateTotals();
-      await _updateTotalCash(double.tryParse(newItemWithNum.price) ?? 0,
-          add: true);
+    await _updateFirestore();
+    await _subtractFromInventory(newItem);
+    await _updateTotals();
+    await _updateTotalCash(double.tryParse(newItem.price) ?? 0, add: true);
 
-      final salesAmount = double.tryParse(newItemWithNum.price) ?? 0;
+    final salesAmount = double.tryParse(newItem.price) ?? 0;
+    await updateSalesSummary(salesAmount);
 
-      await updateSalesSummary(salesAmount); // Call it only once
-      final itemWeight = double.tryParse(newItemWithNum.gram) ?? 0.0;
-      final itemType =
-          newItemWithNum.details; // Assuming 'type' holds the item type
-      await updateSalesSummaryPercentage(itemType, itemWeight);
-    } catch (e) {
-      debugPrint('Error adding selling item: $e');
-    } finally {
-      emit(state.copyWith(isLoading: false));
-    }
+    final itemWeight = double.tryParse(newItem.gram) ?? 0.0;
+    final itemType = newItem.details;
+    await updateSalesSummaryPercentage(itemType, itemWeight);
+  } catch (e) {
+    debugPrint('Error adding selling item: $e');
+  } finally {
+    emit(state.copyWith(isLoading: false));
   }
+}
+
+  List<Daftarcheckmodel> _recalculateItemNumbers(
+    List<Daftarcheckmodel> items) {
+  return items.asMap().entries.map((entry) {
+    final index = entry.key;
+    final item = entry.value;
+    return item.copyWith(num: (index + 1).toString());
+  }).toList();
+}
+
 
   void addBuyingItem(Daftarcheckmodel newItem) async {
     // Start loading
@@ -1364,57 +1374,116 @@ class ItemsCubit extends Cubit<ItemsState> {
     if (details.contains('جنيه')) return 'جنيهات'; // Added جنيهات item type
     return '';
   }
+void deleteItem(Daftarcheckmodel itemToDelete) async {
+  emit(state.copyWith(isLoading: true));
 
-  void deleteItem(Daftarcheckmodel itemToDelete) async {
-    emit(state.copyWith(isLoading: true));
-
+  try {
     List<Daftarcheckmodel> updatedSellingItems = List.from(state.sellingItems);
     List<Daftarcheckmodel> updatedBuyingItems = List.from(state.buyingItems);
 
     if (state.sellingItems.contains(itemToDelete)) {
+      // Remove the item and recalculate numbers for selling items
       updatedSellingItems = state.sellingItems
           .where((item) => item.num != itemToDelete.num)
           .toList();
+      updatedSellingItems = _recalculateItemNumbers(updatedSellingItems);
 
-      // Subtract the item's price from total_cash when deleting a selling item
+      // Subtract the item's price from total_cash
       await _updateCash(itemToDelete, isSellingItem: true);
 
-      // Update inventory when deleting a selling item
+      // Update inventory
       await updateInventory(itemToDelete, int.parse(itemToDelete.adad),
           double.parse(itemToDelete.gram));
     } else if (state.buyingItems.contains(itemToDelete)) {
+      // Remove the item and recalculate numbers for buying items
       updatedBuyingItems = state.buyingItems
           .where((item) => item.num != itemToDelete.num)
           .toList();
+      updatedBuyingItems = _recalculateItemNumbers(updatedBuyingItems);
 
-      // Add the item's price to total_cash when deleting a buying item
+      // Add the item's price to total_cash
       await _updateCash(itemToDelete, isSellingItem: false);
 
-      // Subtract grams from total weights when deleting a buying item
+      // Update inventory and total weights
       if (itemToDelete.details.contains('سبائك')) {
-        // Ensure subtraction for سبائك
+        // Subtract for سبائك
         await updateInventory(
           itemToDelete,
           -int.parse(itemToDelete.adad),
           -double.parse(itemToDelete.gram),
         );
       } else {
-        // Subtract the grams from total weights for other buying items
+        // Subtract grams for other buying items
         await _subtractItemGramsFromWeight(itemToDelete);
       }
     }
 
-    // Emit the new state with updated lists
-    emit(ItemsState(
+    // Emit the updated state with recalculated lists
+    emit(state.copyWith(
       sellingItems: updatedSellingItems,
       buyingItems: updatedBuyingItems,
     ));
 
+    // Update Firestore
     await _updateFirestore();
     await _updateTotals();
-
+  } catch (e) {
+    debugPrint('Error deleting item: $e');
+  } finally {
     emit(state.copyWith(isLoading: false));
   }
+}
+
+  // void deleteItem(Daftarcheckmodel itemToDelete) async {
+  //   emit(state.copyWith(isLoading: true));
+
+  //   List<Daftarcheckmodel> updatedSellingItems = List.from(state.sellingItems);
+  //   List<Daftarcheckmodel> updatedBuyingItems = List.from(state.buyingItems);
+
+  //   if (state.sellingItems.contains(itemToDelete)) {
+  //     updatedSellingItems = state.sellingItems
+  //         .where((item) => item.num != itemToDelete.num)
+  //         .toList();
+
+  //     // Subtract the item's price from total_cash when deleting a selling item
+  //     await _updateCash(itemToDelete, isSellingItem: true);
+
+  //     // Update inventory when deleting a selling item
+  //     await updateInventory(itemToDelete, int.parse(itemToDelete.adad),
+  //         double.parse(itemToDelete.gram));
+  //   } else if (state.buyingItems.contains(itemToDelete)) {
+  //     updatedBuyingItems = state.buyingItems
+  //         .where((item) => item.num != itemToDelete.num)
+  //         .toList();
+
+  //     // Add the item's price to total_cash when deleting a buying item
+  //     await _updateCash(itemToDelete, isSellingItem: false);
+
+  //     // Subtract grams from total weights when deleting a buying item
+  //     if (itemToDelete.details.contains('سبائك')) {
+  //       // Ensure subtraction for سبائك
+  //       await updateInventory(
+  //         itemToDelete,
+  //         -int.parse(itemToDelete.adad),
+  //         -double.parse(itemToDelete.gram),
+  //       );
+  //     } else {
+  //       // Subtract the grams from total weights for other buying items
+  //       await _subtractItemGramsFromWeight(itemToDelete);
+  //     }
+  //   }
+
+  //   // Emit the new state with updated lists
+  //   emit(ItemsState(
+  //     sellingItems: updatedSellingItems,
+  //     buyingItems: updatedBuyingItems,
+  //   ));
+
+  //   await _updateFirestore();
+  //   await _updateTotals();
+
+  //   emit(state.copyWith(isLoading: false));
+  // }
 
 // Helper function to update total_cash based on the item being deleted
   Future<void> _updateCash(Daftarcheckmodel item,

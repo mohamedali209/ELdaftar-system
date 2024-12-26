@@ -1439,9 +1439,10 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
 
     if (state.sellingItems.contains(itemToDelete)) {
       // Remove the item from selling items
-      updatedSellingItems = updatedSellingItems
+     updatedSellingItems = state.sellingItems
           .where((item) => item.num != itemToDelete.num)
           .toList();
+      updatedSellingItems = _recalculateItemNumbers(updatedSellingItems);
 
       // Update total cash and inventory for selling items
       await _updateCash(itemToDelete, isSellingItem: true);
@@ -1452,10 +1453,10 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
       );
     } else if (state.buyingItems.contains(itemToDelete)) {
       // Remove the item from buying items
-      updatedBuyingItems = updatedBuyingItems
+     updatedBuyingItems = state.buyingItems
           .where((item) => item.num != itemToDelete.num)
           .toList();
-
+      updatedBuyingItems = _recalculateItemNumbers(updatedBuyingItems);
       // Update total cash for buying items
       await _updateCash(itemToDelete, isSellingItem: false);
 
@@ -1473,10 +1474,11 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
     }
 
     // Emit updated state with modified lists
-    emit(EmployeesitemState(
+   emit(state.copyWith(
       sellingItems: updatedSellingItems,
       buyingItems: updatedBuyingItems,
     ));
+
 
     // Perform additional updates to Firestore and totals
     await _updateFirestore();
@@ -1484,7 +1486,14 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
 
     emit(state.copyWith(isLoading: false));
   }
-
+ List<Daftarcheckmodel> _recalculateItemNumbers(
+    List<Daftarcheckmodel> items) {
+  return items.asMap().entries.map((entry) {
+    final index = entry.key;
+    final item = entry.value;
+    return item.copyWith(num: (index + 1).toString());
+  }).toList();
+}
   Future<void> _updateCash(Daftarcheckmodel item,
       {required bool isSellingItem}) async {
     // Get the current user ID from Firebase Authentication

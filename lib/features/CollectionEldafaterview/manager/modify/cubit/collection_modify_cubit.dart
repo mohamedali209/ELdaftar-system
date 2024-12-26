@@ -534,9 +534,10 @@ class CollectionModifyCubit extends Cubit<CollectionModifyState> {
       List<Daftarcheckmodel> updatedBuyingItems = List.from(state.buyingItems);
 
       if (state.sellingItems.any((item) => item.num == itemToDelete.num)) {
-        updatedSellingItems = state.sellingItems
-            .where((item) => item.num != itemToDelete.num)
-            .toList();
+         updatedSellingItems = state.sellingItems
+          .where((item) => item.num != itemToDelete.num)
+          .toList();
+      updatedSellingItems = _recalculateItemNumbers(updatedSellingItems);
 
         // Subtract the item's price from total_cash when deleting a selling item
         await _updateCash(itemToDelete, isSellingItem: true);
@@ -546,8 +547,9 @@ class CollectionModifyCubit extends Cubit<CollectionModifyState> {
             double.parse(itemToDelete.gram));
       } else if (state.buyingItems.contains(itemToDelete)) {
         updatedBuyingItems = state.buyingItems
-            .where((item) => item.num != itemToDelete.num)
-            .toList();
+          .where((item) => item.num != itemToDelete.num)
+          .toList();
+      updatedBuyingItems = _recalculateItemNumbers(updatedBuyingItems);
 
         // Add the item's price to total_cash when deleting a buying item
         await _updateCash(itemToDelete, isSellingItem: false);
@@ -567,10 +569,10 @@ class CollectionModifyCubit extends Cubit<CollectionModifyState> {
       }
 
       // Emit the updated state
-      emit(CollectionModifyState(
-        sellingItems: updatedSellingItems,
-        buyingItems: updatedBuyingItems,
-      ));
+     emit(state.copyWith(
+      sellingItems: updatedSellingItems,
+      buyingItems: updatedBuyingItems,
+    ));
 
       // Update Firestore
       final user = FirebaseAuth.instance.currentUser;
@@ -601,6 +603,14 @@ class CollectionModifyCubit extends Cubit<CollectionModifyState> {
       debugPrint('Error deleting item: $e');
     }
   }
+  List<Daftarcheckmodel> _recalculateItemNumbers(
+    List<Daftarcheckmodel> items) {
+  return items.asMap().entries.map((entry) {
+    final index = entry.key;
+    final item = entry.value;
+    return item.copyWith(num: (index + 1).toString());
+  }).toList();
+}
 
 // Helper function to update total_cash based on the item being deleted
   Future<void> _updateCash(Daftarcheckmodel item,
