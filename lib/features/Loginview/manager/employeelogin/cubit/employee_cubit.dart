@@ -19,8 +19,8 @@ class EmployeeCubit extends Cubit<EmployeeState> {
 
     try {
       // Sign in the user with FirebaseAuth
-      final UserCredential userCredential =
-          await _auth.signInWithEmailAndPassword(email: email, password: password);
+      final UserCredential userCredential = await _auth
+          .signInWithEmailAndPassword(email: email, password: password);
 
       if (userCredential.user != null) {
         // Query Firestore for employee document
@@ -35,20 +35,37 @@ class EmployeeCubit extends Cubit<EmployeeState> {
           final String shopId = employeeData['shopId'];
 
           // Query users collection with shopId
-          final userDoc = await _firestore.collection('users').doc(shopId).get();
+          final userDoc =
+              await _firestore.collection('users').doc(shopId).get();
 
           if (userDoc.exists) {
             debugPrint('Login succeeded!');
             emit(EmployeeSuccess(role)); // Emit success state
           } else {
-            emit(const EmployeeFailure("No user data found for this shop ID."));
+            emit(const EmployeeFailure("لم يتم العثور على بيانات المستخدم لهذا المتجر."));
           }
         } else {
-          emit(const EmployeeFailure("Invalid email or password."));
+          emit(const EmployeeFailure("البريد الإلكتروني أو كلمة المرور غير صحيحة."));
         }
       }
+    } on FirebaseAuthException catch (e) {
+      String errorMessage;
+      if (e.code == 'user-not-found') {
+        errorMessage = 'المستخدم غير موجود.';
+      } else if (e.code == 'wrong-password') {
+        errorMessage = 'كلمة المرور غير صحيحة.';
+      } else if (e.code == 'too-many-requests') {
+        errorMessage = 'تم حظر الحساب مؤقتًا بسبب محاولات تسجيل دخول كثيرة. حاول مرة أخرى لاحقًا.';
+      } else if (e.message?.contains('The supplied auth credential is incorrect') ?? false) {
+        errorMessage = 'البيانات المدخلة غير صحيحة.';
+      } else {
+        errorMessage = e.message != null
+            ? 'حدث خطأ أثناء تسجيل الدخول: ${e.message}'
+            : 'فشل تسجيل الدخول.';
+      }
+      emit(EmployeeFailure(errorMessage));
     } catch (e) {
-      emit(EmployeeFailure("Login failed: ${e.toString()}")); // Emit failure state
+      emit(const EmployeeFailure("حدث خطأ أثناء تسجيل الدخول."));
     }
   }
 }

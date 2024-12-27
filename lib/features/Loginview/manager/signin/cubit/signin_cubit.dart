@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:aldafttar/features/Loginview/manager/signin/cubit/signin_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SigninCubit extends Cubit<SigninState> {
@@ -22,15 +23,19 @@ class SigninCubit extends Cubit<SigninState> {
     } on FirebaseAuthException catch (e) {
       String errorMessage;
       if (e.code == 'user-not-found') {
-        errorMessage = 'User not found';
+        errorMessage = 'المستخدم غير موجود';
       } else if (e.code == 'wrong-password') {
-        errorMessage = 'Incorrect password';
+        errorMessage = 'كلمة المرور غير صحيحة';
+      } else if (e.message?.contains('The supplied auth credential is incorrect') ?? false) {
+        errorMessage = 'البيانات المدخلة غير صحيحة';
       } else {
-        errorMessage = e.message ?? 'Sign-in failed';
+        errorMessage = e.message != null
+            ? 'خطأ حدث أثناء تسجيل الدخول: ${e.message}'
+            : 'فشل تسجيل الدخول';
       }
       emit(SigninState(errorMessage: errorMessage)); // Emit failure state
     } catch (e) {
-      emit(const SigninState(errorMessage: 'An error occurred during sign-in'));
+      emit(const SigninState(errorMessage: 'حدث خطأ أثناء تسجيل الدخول'));
     }
   }
 
