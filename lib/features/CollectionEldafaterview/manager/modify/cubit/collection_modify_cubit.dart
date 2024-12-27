@@ -410,7 +410,7 @@ class CollectionModifyCubit extends Cubit<CollectionModifyState> {
                 .doc('init')
                 .update({
               'sabaek_count': newSabaekCount.toString(),
-              'sabaek_weight': newSabaekWeight.toString(),
+              'sabaek_weight': newSabaekWeight.toStringAsFixed(2),
             });
           } catch (e) {
             debugPrint('Error updating سبائك: $e');
@@ -441,7 +441,7 @@ class CollectionModifyCubit extends Cubit<CollectionModifyState> {
               .doc('init')
               .update({
             'gnihat_count': newGnihatCount.toString(),
-            'gnihat_weight': newGnihatWeight.toString(),
+            'gnihat_weight': newGnihatWeight.toStringAsFixed(2),
           });
         } else {
           String quantityField =
@@ -461,7 +461,7 @@ class CollectionModifyCubit extends Cubit<CollectionModifyState> {
               .doc('init')
               .update({
             quantityField: newQuantity.toString(),
-            weightField: newWeight.toString(),
+            weightField: newWeight.toStringAsFixed(2),
           });
 
           if (is18k) {

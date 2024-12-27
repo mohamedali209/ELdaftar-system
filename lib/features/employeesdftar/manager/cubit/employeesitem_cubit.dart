@@ -628,7 +628,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
               .update({
             'total18kKasr': currentTotal18kKasr.toString(),
             'total21kKasr': currentTotal21kKasr.toString(),
-            'sabaek_weight': currentTotal24kKasr.toString(),
+            'sabaek_weight': currentTotal24kKasr.toStringAsFixed(2),
             'sabaek_count': currentTotal24kKasrQuantity.toString(),
           });
         }
@@ -770,7 +770,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
                     .doc('init')
                     .update({
                   'sabaek_count': newSabaekCount.toString(),
-                  'sabaek_weight': newSabaekWeight.toString(),
+                  'sabaek_weight': newSabaekWeight.toStringAsFixed(2),
                 });
               } else if (itemType == 'كسر') {
                 // Handle the case for كسر (18k and 21k)
@@ -819,7 +819,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
                     .doc('init')
                     .update({
                   'gnihat_count': newGnihatCount.toString(),
-                  'gnihat_weight': newGnihatWeight.toString(),
+                  'gnihat_weight': newGnihatWeight.toStringAsFixed(2),
                 });
 
                 // Subtract جنيهات weight from total21kWeight
@@ -857,7 +857,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
                     .doc('init')
                     .update({
                   quantityField: newQuantity.toString(),
-                  weightField: newWeight.toString(),
+                  weightField: newWeight.toStringAsFixed(2),
                 });
 
                 // Update the total weight fields
@@ -1135,7 +1135,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
               .doc('init')
               .update({
             'sabaek_count': newSabaekCount.toString(),
-            'sabaek_weight': newSabaekWeight.toString(),
+            'sabaek_weight': newSabaekWeight.toStringAsFixed(2),
           });
           return;
         } else if (itemType == 'جنيهات') {
@@ -1163,7 +1163,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
               .doc('init')
               .update({
             'gnihat_count': newGnihatCount.toString(),
-            'gnihat_weight': newGnihatWeight.toString(),
+            'gnihat_weight': newGnihatWeight.toStringAsFixed(2),
           });
         } else {
           String quantityField =
@@ -1183,7 +1183,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
               .doc('init')
               .update({
             quantityField: newQuantity.toString(),
-            weightField: newWeight.toString(),
+            weightField: newWeight.toStringAsFixed(2),
           });
 
           if (is18k) {
@@ -1294,7 +1294,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
               .doc('init')
               .update({
             'sabaek_count': newSabaekCount.toString(),
-            'sabaek_weight': newSabaekWeight.toString(),
+            'sabaek_weight': newSabaekWeight.toStringAsFixed(2),
           });
         }
       } catch (e) {
