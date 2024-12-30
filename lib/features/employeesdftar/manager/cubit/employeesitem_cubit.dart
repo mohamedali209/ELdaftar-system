@@ -917,7 +917,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
       totalBuyingPrice += int.parse(item.price);
       if (item.ayar == '18k') {
         total18kasr += double.parse(item.gram);
-      } else {
+      } else if (item.ayar == '21k') {
         total21kasr += double.parse(item.gram);
       }
     }
@@ -1145,17 +1145,17 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
 
           int newGnihatCount = currentGnihatCount + adadDifference;
           double newGnihatWeight = currentGnihatWeight + gramDifference;
-   double total21kWeight =
-                double.parse(snapshot['total21kWeight'] ?? '0.0');
-            total21kWeight += gramDifference;
-            await _firestore
-                .collection('users')
-                .doc(shopId)
-                .collection('weight')
-                .doc('init')
-                .update({
-              'total21kWeight': total21kWeight.toString(),
-            });
+          double total21kWeight =
+              double.parse(snapshot['total21kWeight'] ?? '0.0');
+          total21kWeight += gramDifference;
+          await _firestore
+              .collection('users')
+              .doc(shopId)
+              .collection('weight')
+              .doc('init')
+              .update({
+            'total21kWeight': total21kWeight.toString(),
+          });
           await _firestore
               .collection('users')
               .doc(shopId)
@@ -1439,7 +1439,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
 
     if (state.sellingItems.contains(itemToDelete)) {
       // Remove the item from selling items
-     updatedSellingItems = state.sellingItems
+      updatedSellingItems = state.sellingItems
           .where((item) => item.num != itemToDelete.num)
           .toList();
       updatedSellingItems = _recalculateItemNumbers(updatedSellingItems);
@@ -1453,7 +1453,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
       );
     } else if (state.buyingItems.contains(itemToDelete)) {
       // Remove the item from buying items
-     updatedBuyingItems = state.buyingItems
+      updatedBuyingItems = state.buyingItems
           .where((item) => item.num != itemToDelete.num)
           .toList();
       updatedBuyingItems = _recalculateItemNumbers(updatedBuyingItems);
@@ -1474,11 +1474,10 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
     }
 
     // Emit updated state with modified lists
-   emit(state.copyWith(
+    emit(state.copyWith(
       sellingItems: updatedSellingItems,
       buyingItems: updatedBuyingItems,
     ));
-
 
     // Perform additional updates to Firestore and totals
     await _updateFirestore();
@@ -1486,14 +1485,15 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
 
     emit(state.copyWith(isLoading: false));
   }
- List<Daftarcheckmodel> _recalculateItemNumbers(
-    List<Daftarcheckmodel> items) {
-  return items.asMap().entries.map((entry) {
-    final index = entry.key;
-    final item = entry.value;
-    return item.copyWith(num: (index + 1).toString());
-  }).toList();
-}
+
+  List<Daftarcheckmodel> _recalculateItemNumbers(List<Daftarcheckmodel> items) {
+    return items.asMap().entries.map((entry) {
+      final index = entry.key;
+      final item = entry.value;
+      return item.copyWith(num: (index + 1).toString());
+    }).toList();
+  }
+
   Future<void> _updateCash(Daftarcheckmodel item,
       {required bool isSellingItem}) async {
     // Get the current user ID from Firebase Authentication

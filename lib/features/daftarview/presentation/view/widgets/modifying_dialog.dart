@@ -1,6 +1,7 @@
 import 'package:aldafttar/features/daftarview/presentation/view/manager/cubit/items_cubit.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/models/daftar_check_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ModifyOrDeleteDialog extends StatefulWidget {
   final TextEditingController adadController;
@@ -76,6 +77,9 @@ class ModifyOrDeleteDialogState extends State<ModifyOrDeleteDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly, // Allow digits only
+                ],
                 keyboardType: TextInputType.number,
                 controller: widget.adadController,
                 decoration: const InputDecoration(labelText: "عدد"),
@@ -102,6 +106,9 @@ class ModifyOrDeleteDialogState extends State<ModifyOrDeleteDialog> {
                 },
               ),
               TextField(
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly, // Allow digits only
+                ],
                 keyboardType: TextInputType.number,
                 controller: widget.priceController,
                 decoration: const InputDecoration(labelText: "السعر"),

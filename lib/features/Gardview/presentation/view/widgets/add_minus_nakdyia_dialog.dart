@@ -1,5 +1,6 @@
 import 'package:aldafttar/features/Gardview/presentation/manager/cubit/updateinventory/cubit/updateinventory_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class UpdateCashDialog extends StatefulWidget {
@@ -76,6 +77,7 @@ class UpdateCashDialogState extends State<UpdateCashDialog> {
 
                   // TextField for entering the cash amount
                   buildTextField(
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     controller: cashController,
                     labelText: 'أدخل المبلغ',
                     keyboardType: TextInputType.number,
@@ -118,8 +120,10 @@ class UpdateCashDialogState extends State<UpdateCashDialog> {
     required TextEditingController controller,
     required String labelText,
     required TextInputType keyboardType,
+    List<TextInputFormatter>? inputFormatters
   }) {
     return TextField(
+      inputFormatters: inputFormatters,
       controller: controller,
       decoration: InputDecoration(labelText: labelText),
       keyboardType: keyboardType,

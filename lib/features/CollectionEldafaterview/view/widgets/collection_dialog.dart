@@ -1,6 +1,7 @@
 import 'package:aldafttar/features/CollectionEldafaterview/manager/modify/cubit/collection_modify_cubit.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/models/daftar_check_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CollectionModifyOrDeleteDialog extends StatefulWidget {
   final TextEditingController adadController;
@@ -9,7 +10,7 @@ class CollectionModifyOrDeleteDialog extends StatefulWidget {
   final Daftarcheckmodel item;
   final CollectionModifyCubit collectionModifyCubit;
   final bool isBuyingItem; // Add this final field
-   final String year;
+  final String year;
   final String month;
   final String day;
 
@@ -21,7 +22,9 @@ class CollectionModifyOrDeleteDialog extends StatefulWidget {
     required this.item,
     required this.collectionModifyCubit,
     required this.isBuyingItem,
-     required this.year, required this.month, required this.day, // Pass isBuyingItem
+    required this.year,
+    required this.month,
+    required this.day, // Pass isBuyingItem
   });
 
   @override
@@ -82,6 +85,9 @@ class CollectionModifyOrDeleteDialogState
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly, // Allow digits only
+                ],
                 keyboardType: TextInputType.number,
                 controller: widget.adadController,
                 decoration: const InputDecoration(labelText: "عدد"),
@@ -108,6 +114,9 @@ class CollectionModifyOrDeleteDialogState
                 },
               ),
               TextField(
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly, // Allow digits only
+                ],
                 keyboardType: TextInputType.number,
                 controller: widget.priceController,
                 decoration: const InputDecoration(labelText: "السعر"),
@@ -142,8 +151,10 @@ class CollectionModifyOrDeleteDialogState
                       ayar: selectedAyar,
                       price: widget.priceController.text,
                     );
-                    widget.collectionModifyCubit.modifyItem(modifiedItem,
-                        isBuyingItem: widget.isBuyingItem,); // Use isBuyingItem
+                    widget.collectionModifyCubit.modifyItem(
+                      modifiedItem,
+                      isBuyingItem: widget.isBuyingItem,
+                    ); // Use isBuyingItem
                     Navigator.of(context).pop();
                   },
                   child: Container(
@@ -174,9 +185,10 @@ class CollectionModifyOrDeleteDialogState
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                   onPressed: () {
-                    widget.collectionModifyCubit.deleteItem(widget.item,
-                       isBuyingItem: widget.isBuyingItem,
-                       ); // Use isBuyingItem
+                    widget.collectionModifyCubit.deleteItem(
+                      widget.item,
+                      isBuyingItem: widget.isBuyingItem,
+                    ); // Use isBuyingItem
                     Navigator.of(context).pop();
                   },
                   child: const Text(
@@ -185,7 +197,7 @@ class CollectionModifyOrDeleteDialogState
                   ),
                 ),
               ),
-            ], 
+            ],
           ),
         ],
       ),

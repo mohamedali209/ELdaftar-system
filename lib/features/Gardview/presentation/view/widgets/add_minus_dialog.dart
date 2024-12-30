@@ -1,6 +1,7 @@
 import 'package:aldafttar/features/Gardview/presentation/manager/cubit/updateinventory/cubit/updateinventory_cubit.dart';
 import 'package:aldafttar/utils/styles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AddOrMinusDialog extends StatefulWidget {
@@ -167,6 +168,10 @@ class AddOrMinusDialogState extends State<AddOrMinusDialog> {
                   ),
                   const SizedBox(height: 10),
                   buildTextField(
+                    inputFormatters: [
+                      FilteringTextInputFormatter
+                          .digitsOnly, // Allow digits only
+                    ],
                     controller: quantityController,
                     labelText: 'الكمية',
                     keyboardType: TextInputType.number,
@@ -201,8 +206,10 @@ class AddOrMinusDialogState extends State<AddOrMinusDialog> {
     required TextEditingController controller,
     required String labelText,
     required TextInputType keyboardType,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return TextField(
+      inputFormatters: inputFormatters,
       controller: controller,
       decoration: InputDecoration(labelText: labelText),
       keyboardType: keyboardType,

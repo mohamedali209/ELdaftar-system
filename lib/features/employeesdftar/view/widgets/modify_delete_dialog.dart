@@ -1,6 +1,7 @@
 import 'package:aldafttar/features/daftarview/presentation/view/models/daftar_check_model.dart';
 import 'package:aldafttar/features/employeesdftar/manager/cubit/employeesitem_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class EmployeeModifyOrDeleteDialog extends StatefulWidget {
   final TextEditingController adadController;
@@ -78,6 +79,9 @@ class EmployeeModifyOrDeleteDialogState
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly, // Allow digits only
+                ],
                 keyboardType: TextInputType.number,
                 controller: widget.adadController,
                 decoration: const InputDecoration(labelText: "عدد"),
@@ -104,6 +108,9 @@ class EmployeeModifyOrDeleteDialogState
                 },
               ),
               TextField(
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly, // Allow digits only
+                ],
                 keyboardType: TextInputType.number,
                 controller: widget.priceController,
                 decoration: const InputDecoration(labelText: "السعر"),

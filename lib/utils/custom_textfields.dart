@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CustomTextField2 extends StatelessWidget {
   final TextEditingController controller;
@@ -6,6 +7,7 @@ class CustomTextField2 extends StatelessWidget {
   final String? Function(String?)? validator;
  final TextInputType? keyboardType;
 final bool obscureText ;
+ final List<TextInputFormatter>? inputFormatters;
 
   const CustomTextField2({
     super.key,
@@ -14,11 +16,13 @@ final bool obscureText ;
     this.validator,
     this.keyboardType,
     this.obscureText = false,
+    this.inputFormatters
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      inputFormatters:inputFormatters ,
       obscureText:obscureText,
       keyboardType: keyboardType,
       controller: controller,

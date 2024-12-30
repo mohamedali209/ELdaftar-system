@@ -2,6 +2,7 @@ import 'package:aldafttar/features/daftarview/presentation/view/models/daftar_ch
 import 'package:aldafttar/utils/custom_textfields.dart';
 import 'package:aldafttar/utils/styles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 
 class Textfieldanddfater extends StatelessWidget {
@@ -164,6 +165,10 @@ class CustombuttonAddorSubtract extends StatelessWidget {
 
                         // Number Field
                         CustomTextField2(
+                          inputFormatters: [
+                            FilteringTextInputFormatter
+                                .digitsOnly, // Allow digits only
+                          ],
                           keyboardType: TextInputType.number,
                           controller: adadController,
                           hintText: '...ادخل العدد',
@@ -210,11 +215,15 @@ class CustombuttonAddorSubtract extends StatelessWidget {
                                   if (value!.isEmpty) {
                                     return 'Field required';
                                   }
-                                  if (double.tryParse(value) == null) {
+                                  if (int.tryParse(value) == null) {
                                     return 'رقم فقط';
                                   }
                                   return null;
                                 },
+                                inputFormatters: [
+                                  FilteringTextInputFormatter
+                                      .digitsOnly, // Allow digits only
+                                ],
                               ),
                             ),
                           ],
@@ -242,7 +251,7 @@ class CustombuttonAddorSubtract extends StatelessWidget {
 
                         // Details TextField
                         CustomTextField2(
-                          keyboardType: TextInputType.number,
+                          keyboardType: TextInputType.text,
                           controller: detailsController,
                           hintText: '...يوجد تفاصيل ؟',
                           validator: (value) {
