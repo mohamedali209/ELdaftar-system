@@ -108,7 +108,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
       await _updateFirestore();
       await _subtractFromInventory(newItemWithNum);
       await _updateTotals();
-      await _updateTotalCash(double.tryParse(newItemWithNum.price) ?? 0,
+      await _updateTotalCash(int.tryParse(newItemWithNum.price) ?? 0,
           add: true);
 
       final salesAmount = double.tryParse(newItemWithNum.price) ?? 0;
@@ -140,7 +140,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
       await _updateFirestore();
       await _addItemGramsToWeight(newItemWithNum); // Update weight collection
       await _updateTotals();
-      await _updateTotalCash(double.tryParse(newItemWithNum.price) ?? 0,
+      await _updateTotalCash(int.tryParse(newItemWithNum.price) ?? 0,
           add: false);
       final purchaseAmount = double.tryParse(newItemWithNum.price) ?? 0;
       await updatePurchaseSummary(purchaseAmount);
@@ -958,7 +958,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
     }
   }
 
-  Future<void> _updateTotalCash(double amount, {required bool add}) async {
+  Future<void> _updateTotalCash(int amount, {required bool add}) async {
     User? user =
         FirebaseAuth.instance.currentUser; // Get the authenticated user
     if (user == null) {
@@ -980,8 +980,8 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
         .get();
 
     if (snapshot.exists) {
-      double currentTotalCash = double.parse(snapshot['total_cash'] ?? '0.0');
-      double newTotalCash =
+      int currentTotalCash = int.parse(snapshot['total_cash'] ?? '0.0');
+      int newTotalCash =
           add ? currentTotalCash + amount : currentTotalCash - amount;
 
       // Update the 'total_cash' for this user in Firestore
