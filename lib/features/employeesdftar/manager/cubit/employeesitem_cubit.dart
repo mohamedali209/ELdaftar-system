@@ -1071,9 +1071,9 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
   Future<void> updateSellingItem(
       Daftarcheckmodel oldItem, Daftarcheckmodel modifiedItem) async {
     // Calculate price difference and update total_cash
-    double oldPrice = double.parse(oldItem.price);
-    double newPrice = double.parse(modifiedItem.price);
-    double priceDifference = newPrice - oldPrice;
+    int oldPrice = int.parse(oldItem.price);
+    int newPrice = int.parse(modifiedItem.price);
+    int priceDifference = newPrice - oldPrice;
     await updateTotalCash(priceDifference);
 
     // Selling Item Update Logic (including price)
@@ -1237,9 +1237,9 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
   Future<void> updateBuyingItem(
       Daftarcheckmodel oldBuyingItem, Daftarcheckmodel modifiedItem) async {
     // Calculate price difference and update total_cash based on the logic
-    double oldPrice = double.parse(oldBuyingItem.price);
-    double newPrice = double.parse(modifiedItem.price);
-    double priceDifference = newPrice - oldPrice; // Difference for buying items
+    int oldPrice = int.parse(oldBuyingItem.price);
+    int newPrice = int.parse(modifiedItem.price);
+    int priceDifference = newPrice - oldPrice; // Difference for buying items
 
     // If the price increases, subtract the difference from total_cash
     if (priceDifference > 0) {
@@ -1312,7 +1312,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
     }
   }
 
-  Future<void> updateTotalCash(double priceDifference) async {
+  Future<void> updateTotalCash(int priceDifference) async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) return; // Ensure the user is authenticated
 
@@ -1329,7 +1329,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
         .get();
 
     if (snapshot.exists) {
-      double totalCash = double.parse(snapshot['total_cash'] ?? '0.0');
+      int totalCash = int.parse(snapshot['total_cash'] ?? '0.0');
       totalCash += priceDifference;
 
       await _firestore
