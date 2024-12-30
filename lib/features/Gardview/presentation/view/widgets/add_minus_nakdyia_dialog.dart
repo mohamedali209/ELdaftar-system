@@ -94,7 +94,7 @@ class UpdateCashDialogState extends State<UpdateCashDialog> {
           ),
           TextButton(
             onPressed: () {
-              final double? cashAmount = double.tryParse(cashController.text);
+              final int? cashAmount = int.tryParse(cashController.text);
               if (cashAmount != null) {
                 context.read<UpdateInventoryCubit>().updateTotalCash(
                       operation: selectedOperation,

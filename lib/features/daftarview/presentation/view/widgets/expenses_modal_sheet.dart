@@ -65,7 +65,9 @@ class ExpenseModalSheetState extends State<ExpenseModalSheet> {
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom, // Adjust padding when keyboard is visible
+          bottom: MediaQuery.of(context)
+              .viewInsets
+              .bottom, // Adjust padding when keyboard is visible
         ),
         child: Container(
           decoration: BoxDecoration(
@@ -104,7 +106,8 @@ class ExpenseModalSheetState extends State<ExpenseModalSheet> {
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _addExpense,
-                  child: const Text('حفظ', style: TextStyle(fontSize: 16, color: Colors.white)),
+                  child: const Text('حفظ',
+                      style: TextStyle(fontSize: 16, color: Colors.white)),
                 ),
                 const SizedBox(height: 16),
                 BlocBuilder<ExpensesCubit, ExpensesState>(
@@ -116,8 +119,10 @@ class ExpenseModalSheetState extends State<ExpenseModalSheet> {
                       return expenses.isEmpty
                           ? const Text('لا توجد مصاريف حتى الآن.')
                           : ListView.builder(
-                              shrinkWrap: true, // Prevent ListView from taking infinite height
-                              physics: const NeverScrollableScrollPhysics(), // Disable scroll within the ListView
+                              shrinkWrap:
+                                  true, // Prevent ListView from taking infinite height
+                              physics:
+                                  const NeverScrollableScrollPhysics(), // Disable scroll within the ListView
                               itemCount: expenses.length,
                               itemBuilder: (context, index) {
                                 final expense = expenses[index];
@@ -128,14 +133,24 @@ class ExpenseModalSheetState extends State<ExpenseModalSheet> {
                                     children: [
                                       Text('${expense.amount} ج'),
                                       IconButton(
-                                        icon: const Icon(Icons.delete, color: Colors.red),
+                                        icon: const Icon(Icons.delete,
+                                            color: Colors.red),
                                         onPressed: () {
-                                          BlocProvider.of<ExpensesCubit>(context).deleteExpense(
+                                          BlocProvider.of<ExpensesCubit>(
+                                                  context)
+                                              .deleteExpense(
                                             year: year,
                                             month: month,
                                             day: day,
                                             description: expense.description,
-                                            amount: expense.amount.toDouble(),
+                                            amount: expense.amount,
+                                          );
+                                          BlocProvider.of<ExpensesCubit>(
+                                                  context)
+                                              .fetchExpenses(
+                                            year: year,
+                                            month: month,
+                                            day: day,
                                           );
                                         },
                                       ),

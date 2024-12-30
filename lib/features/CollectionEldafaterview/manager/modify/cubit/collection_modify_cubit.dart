@@ -497,6 +497,7 @@ class CollectionModifyCubit extends Cubit<CollectionModifyState> {
 // Helper function to determine the item type based on details
   String _getItemType(String details) {
     if (details.contains('خاتم')) return 'خواتم';
+    if (details.contains('توينز')) return 'توينز';
     if (details.contains('اسورة')) return 'اساور';
     if (details.contains('محابس')) return 'محابس';
     if (details.contains('دبلة')) return 'دبل';
@@ -511,98 +512,106 @@ class CollectionModifyCubit extends Cubit<CollectionModifyState> {
     return '';
   }
 
-  void deleteItem(Daftarcheckmodel itemToDelete) async {
-    if (selectedDate == null) {
-      debugPrint('No date selected. Cannot delete item.');
-      return;
-    }
+ void deleteItem(Daftarcheckmodel itemToDelete, {required bool isBuyingItem}) async {
+  if (selectedDate == null) {
+    debugPrint('No date selected. Cannot delete item.');
+    return;
+  }
 
-    try {
-      // Fetch the selected date
-      final String year = DateFormat('yyyy').format(selectedDate!);
-      final String month = DateFormat('MM').format(selectedDate!);
-      final String day = DateFormat('dd').format(selectedDate!);
+  try {
+    // Fetch the selected date
+    final String year = DateFormat('yyyy').format(selectedDate!);
+    final String month = DateFormat('MM').format(selectedDate!);
+    final String day = DateFormat('dd').format(selectedDate!);
 
-      // Debugging: Log current state and item to delete
-      debugPrint('Current selling items: ${state.sellingItems}');
-      debugPrint('Current buying items: ${state.buyingItems}');
-      debugPrint('Item to delete: ${itemToDelete.toString()}');
+    // Debugging: Log current state and item to delete
+    debugPrint('Current selling items: ${state.sellingItems}');
+    debugPrint('Current buying items: ${state.buyingItems}');
+    debugPrint('Item to delete: ${itemToDelete.toString()}');
 
-      // Clone lists to work with them
-      List<Daftarcheckmodel> updatedSellingItems =
-          List.from(state.sellingItems);
-      List<Daftarcheckmodel> updatedBuyingItems = List.from(state.buyingItems);
+    // Clone lists to work with them
+    List<Daftarcheckmodel> updatedSellingItems = List.from(state.sellingItems);
+    List<Daftarcheckmodel> updatedBuyingItems = List.from(state.buyingItems);
 
-      if (state.sellingItems.any((item) => item.num == itemToDelete.num)) {
-         updatedSellingItems = state.sellingItems
+    if (!isBuyingItem) {
+      // Handle deleting a selling item
+      if (!state.sellingItems.any((item) => item.num == itemToDelete.num)) {
+        debugPrint('Item not found in selling items.');
+        return;
+      }
+
+      updatedSellingItems = state.sellingItems
           .where((item) => item.num != itemToDelete.num)
           .toList();
       updatedSellingItems = _recalculateItemNumbers(updatedSellingItems);
 
-        // Subtract the item's price from total_cash when deleting a selling item
-        await _updateCash(itemToDelete, isSellingItem: true);
+      // Subtract the item's price from total_cash when deleting a selling item
+      await _updateCash(itemToDelete, isSellingItem: true);
 
-        // Update inventory when deleting a selling item
-        await updateInventory(itemToDelete, int.parse(itemToDelete.adad),
-            double.parse(itemToDelete.gram));
-      } else if (state.buyingItems.contains(itemToDelete)) {
-        updatedBuyingItems = state.buyingItems
+      // Update inventory when deleting a selling item
+      await updateInventory(itemToDelete, int.parse(itemToDelete.adad),
+          double.parse(itemToDelete.gram));
+    } else {
+      // Handle deleting a buying item
+      if (!state.buyingItems.any((item) => item.num == itemToDelete.num)) {
+        debugPrint('Item not found in buying items.');
+        return;
+      }
+
+      updatedBuyingItems = state.buyingItems
           .where((item) => item.num != itemToDelete.num)
           .toList();
       updatedBuyingItems = _recalculateItemNumbers(updatedBuyingItems);
 
-        // Add the item's price to total_cash when deleting a buying item
-        await _updateCash(itemToDelete, isSellingItem: false);
+      // Add the item's price to total_cash when deleting a buying item
+      await _updateCash(itemToDelete, isSellingItem: false);
 
-        // Subtract grams from total weights when deleting a buying item
-        if (itemToDelete.details.contains('سبائك')) {
-          // Ensure subtraction for سبائك
-          await updateInventory(
-            itemToDelete,
-            -int.parse(itemToDelete.adad),
-            -double.parse(itemToDelete.gram),
-          );
-        } else {
-          // Subtract the grams from total weights for other buying items
-          await _subtractItemGramsFromWeight(itemToDelete);
-        }
+      // Subtract grams from total weights when deleting a buying item
+      if (itemToDelete.details.contains('سبائك')) {
+        await updateInventory(
+          itemToDelete,
+          -int.parse(itemToDelete.adad),
+          -double.parse(itemToDelete.gram),
+        );
+      } else {
+        await _subtractItemGramsFromWeight(itemToDelete);
       }
+    }
 
-      // Emit the updated state
-     emit(state.copyWith(
+    // Emit the updated state
+    emit(state.copyWith(
       sellingItems: updatedSellingItems,
       buyingItems: updatedBuyingItems,
     ));
 
-      // Update Firestore
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        debugPrint('User not logged in.');
-        return;
-      }
-      final userId = user.uid;
-
-      await _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('dailyTransactions')
-          .doc(year)
-          .collection(month)
-          .doc(day)
-          .update({
-        'sellingItems':
-            updatedSellingItems.map((e) => e.toFirestore()).toList(),
-        'buyingItems': updatedBuyingItems.map((e) => e.toFirestore()).toList(),
-      });
-
-      // Update totals
-      await _updateTotals();
-
-      debugPrint('Item deleted successfully.');
-    } catch (e) {
-      debugPrint('Error deleting item: $e');
+    // Update Firestore
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      debugPrint('User not logged in.');
+      return;
     }
+    final userId = user.uid;
+
+    await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('dailyTransactions')
+        .doc(year)
+        .collection(month)
+        .doc(day)
+        .update({
+      'sellingItems': updatedSellingItems.map((e) => e.toFirestore()).toList(),
+      'buyingItems': updatedBuyingItems.map((e) => e.toFirestore()).toList(),
+    });
+
+    // Update totals
+    await _updateTotals();
+
+    debugPrint('Item deleted successfully.');
+  } catch (e) {
+    debugPrint('Error deleting item: $e');
   }
+}
   List<Daftarcheckmodel> _recalculateItemNumbers(
     List<Daftarcheckmodel> items) {
   return items.asMap().entries.map((entry) {

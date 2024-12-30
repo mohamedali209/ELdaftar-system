@@ -175,6 +175,7 @@ class CollectionModifyOrDeleteDialogState
                   ),
                   onPressed: () {
                     widget.collectionModifyCubit.deleteItem(widget.item,
+                       isBuyingItem: widget.isBuyingItem,
                        ); // Use isBuyingItem
                     Navigator.of(context).pop();
                   },

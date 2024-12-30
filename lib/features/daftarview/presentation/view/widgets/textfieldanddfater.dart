@@ -77,7 +77,20 @@ class CustombuttonAddorSubtract extends StatelessWidget {
       '21k',
       '24k'
     ]; // Options for 'عيار'
-
+    final List<String> restrictedItems = [
+      'خاتم',
+      'دبلة',
+      'توينز',
+      'سلسلة',
+      'حلق',
+      'محبس',
+      'انسيال',
+      'اسورة',
+      'تعليقة',
+      'كوليه',
+      'غوايش',
+      'جنيهات',
+    ]; // Items where 24k is not allowed
     showDialog(
       context: context,
       builder: (context) {
@@ -216,8 +229,15 @@ class CustombuttonAddorSubtract extends StatelessWidget {
                             selectedAyar = newValue!;
                           },
                           labelText: 'عيار',
-                          validator: (value) =>
-                              value == null ? 'Field required' : null,
+                          validator: (value) {
+                            if (value == null) return 'Field required';
+                            // Validate Ayar for restricted items
+                            if (restrictedItems.contains(selectedDetail) &&
+                                selectedAyar == '24k') {
+                              return 'هذا العيار غير مسموح للصنف المختار';
+                            }
+                            return null;
+                          },
                         ),
 
                         // Details TextField

@@ -16,7 +16,22 @@ class AddOrMinusDialogState extends State<AddOrMinusDialog> {
   String? purity;
   TextEditingController weightController = TextEditingController();
   TextEditingController quantityController = TextEditingController();
-
+  final List<String> restrictedItems = [
+    'خاتم',
+    'دبلة',
+    'توينز',
+    'سلسلة',
+    'حلق',
+    'محبس',
+    'انسيال',
+    'اسورة',
+    'تعليقة',
+    'كوليه',
+    'غوايش',
+    'جنيهات',
+  ]; // Items where 24k is not allowed
+  String selectedAyar = '18k'; // Default value for 'عيار'
+  final List<String> ayarOptions = ['18k', '21k', '24k']; // Options for 'عيار'
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -115,11 +130,33 @@ class AddOrMinusDialogState extends State<AddOrMinusDialog> {
                     ],
                     onChanged: (value) {
                       if (jewelryType == 'سبائك') {
-                        purity = '24k';
+                        purity = '24k'; // Automatically set for سبائك
                       } else if (jewelryType == 'جنيهات') {
-                        purity = '21k';
+                        purity = '21k'; // Automatically set for جنيهات
+                      } else {
+                        purity = value; // Update based on user selection
                       }
-                      purity = value;
+                    },
+                    validator: (value) {
+                      const restrictedItems = [
+                        'خاتم',
+                        'دبلة',
+                        'توينز',
+                        'سلسلة',
+                        'حلق',
+                        'محبس',
+                        'انسيال',
+                        'اسورة',
+                        'تعليقة',
+                        'كوليه',
+                        'غوايش',
+                      ];
+                      // Validate the selection for restricted items
+                      if (restrictedItems.contains(jewelryType) &&
+                          value == '24k') {
+                        return 'هذا الصنف لا يمكن أن يكون عياره 24k.';
+                      }
+                      return null; // No error
                     },
                   ),
                   const SizedBox(height: 10),
@@ -150,11 +187,13 @@ class AddOrMinusDialogState extends State<AddOrMinusDialog> {
     required String label,
     required List<DropdownMenuItem<String>> items,
     required ValueChanged<String?> onChanged,
+    String? Function(String?)? validator, // Pass a custom validator
   }) {
     return DropdownButtonFormField<String>(
       decoration: InputDecoration(labelText: label),
       items: items,
       onChanged: onChanged,
+      validator: validator, // Apply the validator here
     );
   }
 
@@ -193,7 +232,7 @@ class AddOrMinusDialogState extends State<AddOrMinusDialog> {
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 12),
             ),
-            onPressed: () {
+            onPressed: () async {
               // Validate input before proceeding
               if (operation != null && jewelryType != null && purity != null) {
                 final weightInput = weightController.text;
@@ -217,8 +256,10 @@ class AddOrMinusDialogState extends State<AddOrMinusDialog> {
                 } else if (jewelryType == 'جنيهات') {
                   purity = '21k';
                 }
+
                 // Proceed to update the inventory
-                BlocProvider.of<UpdateInventoryCubit>(context).updateInventory(
+                await BlocProvider.of<UpdateInventoryCubit>(context)
+                    .updateInventory(
                   type: jewelryType!,
                   weight: weight,
                   quantity: quantity,

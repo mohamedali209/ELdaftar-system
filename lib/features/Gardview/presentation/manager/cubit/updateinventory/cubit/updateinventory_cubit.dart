@@ -70,7 +70,7 @@ class UpdateInventoryCubit extends Cubit<UpdateInventoryState> {
 
       transaction.update(documentRef, {
         fieldQuantity: newQuantity.toString(),
-        fieldWeight: newWeight.toString(),
+        fieldWeight: newWeight.toStringAsFixed(2),
       });
 
       final total18kWeight =
@@ -91,7 +91,7 @@ class UpdateInventoryCubit extends Cubit<UpdateInventoryState> {
               : currentTotalKasr - weight;
 
           transaction.update(documentRef, {
-            'total18kKasr': newTotalKasr.toString(),
+            'total18kKasr': newTotalKasr.toStringAsFixed(2),
           });
         } else {
           updatedTotal18kWeight = operation == 'add'
@@ -107,7 +107,7 @@ class UpdateInventoryCubit extends Cubit<UpdateInventoryState> {
               : currentTotalKasr - weight;
 
           transaction.update(documentRef, {
-            'total21kKasr': newTotalKasr.toString(),
+            'total21kKasr': newTotalKasr.toStringAsFixed(2),
           });
         } else {
           updatedTotal21kWeight = operation == 'add'
@@ -134,7 +134,7 @@ class UpdateInventoryCubit extends Cubit<UpdateInventoryState> {
 
   Future<void> updateTotalCash({
   required String operation,  // Either 'إضافة' (add) or 'سحب' (subtract)
-  required double amount,     // The cash amount to add or subtract
+  required int amount,     // The cash amount to add or subtract
 }) async {
   try {
     // Get the current authenticated user
@@ -165,10 +165,10 @@ class UpdateInventoryCubit extends Cubit<UpdateInventoryState> {
       }
 
       // Get the current total cash value
-      double currentCash = double.tryParse(snapshot['total_cash'].toString()) ?? 0;
+      int currentCash = int.tryParse(snapshot['total_cash'].toString()) ?? 0;
 
       // Calculate the updated cash value based on the operation (add or subtract)
-      double updatedCash = operation == 'إضافة'
+      int updatedCash = operation == 'إضافة'
           ? currentCash + amount
           : currentCash - amount;
 

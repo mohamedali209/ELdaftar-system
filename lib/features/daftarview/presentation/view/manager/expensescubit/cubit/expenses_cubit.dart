@@ -135,7 +135,7 @@ Future<void> fetchExpenses({
     required String month,
     required String day,
     required String description,
-    required double amount,
+    required int amount,
   }) async {
     try {
       // Get the authenticated user's ID
