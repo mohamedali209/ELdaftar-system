@@ -18,19 +18,21 @@ class AddOrMinusDialogState extends State<AddOrMinusDialog> {
   TextEditingController weightController = TextEditingController();
   TextEditingController quantityController = TextEditingController();
   final List<String> restrictedItems = [
-    'خاتم',
-    'دبلة',
+    'خواتم',
+    'دبل',
     'توينز',
-    'سلسلة',
-    'حلق',
-    'محبس',
-    'انسيال',
-    'اسورة',
-    'تعليقة',
-    'كوليه',
+    'سلاسل',
+    'حلقان',
+    'محابس',
+    'انسيالات',
+    'اساور',
+    'تعاليق',
+    'كوليهات',
     'غوايش',
     'جنيهات',
+    'كسر'
   ]; // Items where 24k is not allowed
+
   String selectedAyar = '18k'; // Default value for 'عيار'
   final List<String> ayarOptions = ['18k', '21k', '24k']; // Options for 'عيار'
   @override
@@ -124,10 +126,13 @@ class AddOrMinusDialogState extends State<AddOrMinusDialog> {
                   const SizedBox(height: 10),
                   buildDropdown(
                     label: 'اختيار العيار',
-                    items: const [
-                      DropdownMenuItem(value: '18k', child: Text('18k')),
-                      DropdownMenuItem(value: '21k', child: Text('21k')),
-                      DropdownMenuItem(value: '24k', child: Text('24k')),
+                    items: [
+                      const DropdownMenuItem(value: '18k', child: Text('18k')),
+                      const DropdownMenuItem(value: '21k', child: Text('21k')),
+                      if (!restrictedItems.contains(
+                          jewelryType)) // Allow 24k only if not restricted
+                        const DropdownMenuItem(
+                            value: '24k', child: Text('24k')),
                     ],
                     onChanged: (value) {
                       if (jewelryType == 'سبائك') {
@@ -137,27 +142,6 @@ class AddOrMinusDialogState extends State<AddOrMinusDialog> {
                       } else {
                         purity = value; // Update based on user selection
                       }
-                    },
-                    validator: (value) {
-                      const restrictedItems = [
-                        'خاتم',
-                        'دبلة',
-                        'توينز',
-                        'سلسلة',
-                        'حلق',
-                        'محبس',
-                        'انسيال',
-                        'اسورة',
-                        'تعليقة',
-                        'كوليه',
-                        'غوايش',
-                      ];
-                      // Validate the selection for restricted items
-                      if (restrictedItems.contains(jewelryType) &&
-                          value == '24k') {
-                        return 'هذا الصنف لا يمكن أن يكون عياره 24k.';
-                      }
-                      return null; // No error
                     },
                   ),
                   const SizedBox(height: 10),
@@ -244,6 +228,7 @@ class AddOrMinusDialogState extends State<AddOrMinusDialog> {
               if (operation != null && jewelryType != null && purity != null) {
                 final weightInput = weightController.text;
                 final quantityInput = quantityController.text;
+                final trimmedJewelryType = jewelryType!.trim();
 
                 // Validate weight
                 final weight = double.tryParse(weightInput);
@@ -252,6 +237,13 @@ class AddOrMinusDialogState extends State<AddOrMinusDialog> {
                   return;
                 }
 
+                // Validate restricted items for 24k purity
+                if (restrictedItems.contains(trimmedJewelryType) &&
+                    purity == '24k') {
+                  showErrorDialog(
+                      context, 'هذا الصنف لا يمكن أن يكون عياره 24');
+                  return;
+                }
                 // Validate quantity
                 final quantity = int.tryParse(quantityInput);
                 if (quantity == null) {
@@ -265,8 +257,7 @@ class AddOrMinusDialogState extends State<AddOrMinusDialog> {
                 }
 
                 // Proceed to update the inventory
-                await BlocProvider.of<UpdateInventoryCubit>(context)
-                    .updateInventory(
+                BlocProvider.of<UpdateInventoryCubit>(context).updateInventory(
                   type: jewelryType!,
                   weight: weight,
                   quantity: quantity,
