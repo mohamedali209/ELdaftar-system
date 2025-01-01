@@ -11,7 +11,9 @@ import 'package:intl/intl.dart';
 class ItemsCubit extends Cubit<ItemsState> {
   StreamSubscription<DocumentSnapshot>? _subscription;
 
-  ItemsCubit() : super(const ItemsState(sellingItems: [], buyingItems: [],storeName: '')) {
+  ItemsCubit()
+      : super(const ItemsState(
+            sellingItems: [], buyingItems: [], storeName: '')) {
     fetchInitialData();
   }
 
@@ -23,15 +25,8 @@ class ItemsCubit extends Cubit<ItemsState> {
 
       if (user != null) {
         final userId = user.uid;
-       // Fetch storeName initially
-        _firestore.collection('users').doc(userId).get().then((snapshot) {
-          if (snapshot.exists) {
-            final storeName = snapshot.data()?['storeName'] as String? ?? '';
-            emit(state.copyWith(storeName: storeName));
-          }
-        }).catchError((error) {
-          debugPrint('Error fetching storeName: $error');
-        });
+        // Fetch storeName initially
+
         // Get the current date components (year, month, day)
         final now = DateTime.now();
         final String year = DateFormat('yyyy').format(now);
@@ -51,7 +46,15 @@ class ItemsCubit extends Cubit<ItemsState> {
           if (snapshot.exists) {
             List<Daftarcheckmodel> sellingItems = [];
             List<Daftarcheckmodel> buyingItems = [];
-
+            _firestore.collection('users').doc(userId).get().then((snapshot) {
+              if (snapshot.exists) {
+                final storeName =
+                    snapshot.data()?['storeName'] as String? ?? '';
+                emit(state.copyWith(storeName: storeName));
+              }
+            }).catchError((error) {
+              debugPrint('Error fetching storeName: $error');
+            });
             if (snapshot.data() != null) {
               if (snapshot['sellingItems'] != null) {
                 sellingItems = (snapshot['sellingItems'] as List)
@@ -123,9 +126,9 @@ class ItemsCubit extends Cubit<ItemsState> {
       await _updateFirestore();
       await _subtractFromInventory(newItem);
       await _updateTotals();
-      await _updateTotalCash(double.tryParse(newItem.price) ?? 0, add: true);
+      await _updateTotalCash(int.tryParse(newItem.price) ?? 0, add: true);
 
-      final salesAmount = double.tryParse(newItem.price) ?? 0;
+      final salesAmount = int.tryParse(newItem.price) ?? 0;
       await updateSalesSummary(salesAmount);
 
       final itemWeight = double.tryParse(newItem.gram) ?? 0.0;
@@ -163,7 +166,7 @@ class ItemsCubit extends Cubit<ItemsState> {
       await _addItemGramsToWeight(newItemWithNum); // Update weight collection
       await _updateTotals();
 
-      final purchaseAmount = double.tryParse(newItemWithNum.price) ?? 0;
+      final purchaseAmount = int.tryParse(newItemWithNum.price) ?? 0;
       await _updateTotalCash(purchaseAmount, add: false);
 
       // Update purchase summaries for each period
@@ -176,7 +179,7 @@ class ItemsCubit extends Cubit<ItemsState> {
     }
   }
 
-  Future<void> updateSalesSummary(double salesAmount) async {
+  Future<void> updateSalesSummary(int salesAmount) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       final userId = user.uid;
@@ -376,7 +379,7 @@ class ItemsCubit extends Cubit<ItemsState> {
 
 // Helper functions to manage the summaries
   List<dynamic> _updateWeeklySummary(
-      List<dynamic> weeklyData, DateTime now, double salesAmount) {
+      List<dynamic> weeklyData, DateTime now, int salesAmount) {
     // Calculate the day index for the current day in the weekly format (0 for Monday to 6 for Sunday)
     int dayOfWeek = (now.weekday - 1) % 7; // Monday is 0, Sunday is 6
     String period = 'day-$dayOfWeek';
@@ -405,7 +408,7 @@ class ItemsCubit extends Cubit<ItemsState> {
   }
 
   List<dynamic> _updateMonthlySummary(
-      List<dynamic> monthlyData, DateTime now, double salesAmount) {
+      List<dynamic> monthlyData, DateTime now, int salesAmount) {
     int weekOfMonth =
         ((now.day - 1) ~/ 7) + 1; // Calculate which week of the month it is
     String period = '${now.month}-$weekOfMonth';
@@ -429,7 +432,7 @@ class ItemsCubit extends Cubit<ItemsState> {
   }
 
   List<dynamic> _updateYearlySummary(
-      List<dynamic> yearlyData, DateTime now, double salesAmount) {
+      List<dynamic> yearlyData, DateTime now, int salesAmount) {
     String monthYear = '${now.month}-${now.year}';
 
     // Remove entries older than 12 months
@@ -460,7 +463,7 @@ class ItemsCubit extends Cubit<ItemsState> {
     return now.difference(dateParsed).inDays >= 365;
   }
 
-  Future<void> updatePurchaseSummary(double purchaseAmount) async {
+  Future<void> updatePurchaseSummary(int purchaseAmount) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       final userId = user.uid;
@@ -512,7 +515,7 @@ class ItemsCubit extends Cubit<ItemsState> {
 
 // Helper functions to manage the purchase summaries for each period
   List<dynamic> _updateWeeklySummarypurchase(
-      List<dynamic> weeklyData, DateTime now, double purchaseAmount) {
+      List<dynamic> weeklyData, DateTime now, int purchaseAmount) {
     // Calculate the day index for the current day in the weekly format (0 for Monday to 6 for Sunday)
     int dayOfWeek = (now.weekday - 1) % 7; // Monday is 0, Sunday is 6
     String period = 'day-$dayOfWeek';
@@ -541,7 +544,7 @@ class ItemsCubit extends Cubit<ItemsState> {
   }
 
   List<dynamic> _updateMonthlySummarypurchase(
-      List<dynamic> monthlyData, DateTime now, double purchaseAmount) {
+      List<dynamic> monthlyData, DateTime now, int purchaseAmount) {
     int weekOfMonth =
         ((now.day - 1) ~/ 7) + 1; // Calculate which week of the month it is
     String period = '${now.month}-$weekOfMonth';
@@ -565,7 +568,7 @@ class ItemsCubit extends Cubit<ItemsState> {
   }
 
   List<dynamic> _updateYearlySummarypurchase(
-      List<dynamic> yearlyData, DateTime now, double purchaseAmount) {
+      List<dynamic> yearlyData, DateTime now, int purchaseAmount) {
     String monthYear = '${now.month}-${now.year}';
 
     // Remove entries older than 12 months
@@ -912,7 +915,7 @@ class ItemsCubit extends Cubit<ItemsState> {
     });
   }
 
-  Future<void> _updateTotalCash(double amount, {required bool add}) async {
+  Future<void> _updateTotalCash(int amount, {required bool add}) async {
     User? user =
         FirebaseAuth.instance.currentUser; // Get the authenticated user
     if (user == null) {
@@ -930,9 +933,9 @@ class ItemsCubit extends Cubit<ItemsState> {
         .get();
 
     if (snapshot.exists) {
-      double currentTotalCash = double.parse(snapshot['total_cash'] ?? '0.0');
+      int currentTotalCash = int.parse(snapshot['total_cash'] ?? '0.0');
 
-      double newTotalCash =
+      int newTotalCash =
           add ? currentTotalCash + amount : currentTotalCash - amount;
 
       // Update the 'total_cash' for this user in Firestore

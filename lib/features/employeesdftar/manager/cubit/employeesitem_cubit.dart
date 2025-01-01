@@ -13,7 +13,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
   StreamSubscription<DocumentSnapshot>? _subscription;
 
   EmployeesitemCubit()
-      : super(const EmployeesitemState(sellingItems: [], buyingItems: [])) {
+      : super(const EmployeesitemState(sellingItems: [], buyingItems: [],)) {
     fetchInitialData();
   }
 
@@ -31,8 +31,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
         if (employeeDoc.exists && employeeDoc.data() != null) {
           final data = employeeDoc.data() as Map<String, dynamic>?;
           final shopId = data?['shopId'];
-          final name = data?['name'];
-          emit(state.copyWith(employeeName: name));
+        
 
           // Step 2: Get the current date components (year, month, day)
           final now = DateTime.now();
@@ -113,7 +112,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
       await _updateTotalCash(int.tryParse(newItemWithNum.price) ?? 0,
           add: true);
 
-      final salesAmount = double.tryParse(newItemWithNum.price) ?? 0;
+      final salesAmount = int.tryParse(newItemWithNum.price) ?? 0;
       await updateSalesSummary(salesAmount);
       final itemWeight = double.tryParse(newItemWithNum.gram) ?? 0.0;
       final itemType =
@@ -144,7 +143,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
       await _updateTotals();
       await _updateTotalCash(int.tryParse(newItemWithNum.price) ?? 0,
           add: false);
-      final purchaseAmount = double.tryParse(newItemWithNum.price) ?? 0;
+      final purchaseAmount = int.tryParse(newItemWithNum.price) ?? 0;
       await updatePurchaseSummary(purchaseAmount);
     } catch (e) {
       debugPrint('Error adding buying item: $e');
@@ -153,7 +152,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
     }
   }
 
-  Future<void> updateSalesSummary(double salesAmount) async {
+  Future<void> updateSalesSummary(int salesAmount) async {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
@@ -364,7 +363,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
 
 // Helper functions to manage the summaries
   List<dynamic> _updateWeeklySummary(
-      List<dynamic> weeklyData, DateTime now, double salesAmount) {
+      List<dynamic> weeklyData, DateTime now, int salesAmount) {
     // Calculate the day index for the current day in the weekly format (0 for Monday to 6 for Sunday)
     int dayOfWeek = (now.weekday - 1) % 7; // Monday is 0, Sunday is 6
     String period = 'day-$dayOfWeek';
@@ -393,7 +392,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
   }
 
   List<dynamic> _updateMonthlySummary(
-      List<dynamic> monthlyData, DateTime now, double salesAmount) {
+      List<dynamic> monthlyData, DateTime now, int salesAmount) {
     int weekOfMonth =
         ((now.day - 1) ~/ 7) + 1; // Calculate which week of the month it is
     String period = '${now.month}-$weekOfMonth';
@@ -417,7 +416,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
   }
 
   List<dynamic> _updateYearlySummary(
-      List<dynamic> yearlyData, DateTime now, double salesAmount) {
+      List<dynamic> yearlyData, DateTime now, int salesAmount) {
     String monthYear = '${now.month}-${now.year}';
 
     // Remove entries older than 12 months
@@ -448,7 +447,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
     return now.difference(dateParsed).inDays >= 365;
   }
 
-  Future<void> updatePurchaseSummary(double purchaseAmount) async {
+  Future<void> updatePurchaseSummary(int purchaseAmount) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       final userId = user.uid;
@@ -505,7 +504,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
 
 // Helper functions to manage the purchase summaries for each period
   List<dynamic> _updateWeeklySummarypurchase(
-      List<dynamic> weeklyData, DateTime now, double purchaseAmount) {
+      List<dynamic> weeklyData, DateTime now, int purchaseAmount) {
     // Calculate the day index for the current day in the weekly format (0 for Monday to 6 for Sunday)
     int dayOfWeek = (now.weekday - 1) % 7; // Monday is 0, Sunday is 6
     String period = 'day-$dayOfWeek';
@@ -534,7 +533,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
   }
 
   List<dynamic> _updateMonthlySummarypurchase(
-      List<dynamic> monthlyData, DateTime now, double purchaseAmount) {
+      List<dynamic> monthlyData, DateTime now, int purchaseAmount) {
     int weekOfMonth =
         ((now.day - 1) ~/ 7) + 1; // Calculate which week of the month it is
     String period = '${now.month}-$weekOfMonth';
@@ -558,7 +557,7 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
   }
 
   List<dynamic> _updateYearlySummarypurchase(
-      List<dynamic> yearlyData, DateTime now, double purchaseAmount) {
+      List<dynamic> yearlyData, DateTime now, int purchaseAmount) {
     String monthYear = '${now.month}-${now.year}';
 
     // Remove entries older than 12 months

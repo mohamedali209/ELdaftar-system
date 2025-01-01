@@ -2,6 +2,7 @@ import 'package:aldafttar/features/daftarview/presentation/view/manager/expenses
 import 'package:aldafttar/features/daftarview/presentation/view/manager/expensescubit/cubit/expenses_state.dart';
 import 'package:aldafttar/utils/custom_textfields.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ExpenseModalSheet extends StatefulWidget {
@@ -99,6 +100,9 @@ class ExpenseModalSheetState extends State<ExpenseModalSheet> {
                 ),
                 const SizedBox(height: 16),
                 CustomTextField2(
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly, // Allow digits only
+                  ],
                   controller: _amountController,
                   keyboardType: TextInputType.number,
                   hintText: 'المبلغ',
