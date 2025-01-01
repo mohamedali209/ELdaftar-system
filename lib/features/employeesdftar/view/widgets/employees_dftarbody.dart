@@ -5,25 +5,12 @@ import 'package:aldafttar/features/employeesdftar/manager/cubit/employeesitem_cu
 import 'package:aldafttar/features/employeesdftar/manager/cubit/employeesitem_state.dart';
 import 'package:aldafttar/utils/app_router.dart';
 import 'package:aldafttar/utils/styles.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class EmployeesDftarBody extends StatelessWidget {
   const EmployeesDftarBody({super.key});
-
-  Future<String> _fetchEmployeeName() async {
-    final userId = FirebaseAuth.instance.currentUser?.uid;
-    if (userId != null) {
-      final doc = await FirebaseFirestore.instance
-          .collection('employees')
-          .doc(userId)
-          .get();
-      return doc['name'] ?? 'User';
-    }
-    return 'User';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,13 +38,21 @@ class EmployeesDftarBody extends StatelessWidget {
               bottom: 0,
               child: CustomScrollView(
                 slivers: [
+                  const SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        SizedBox(height: 10),
+                      ],
+                    ),
+                  ),
                   // Employee greeting
                   SliverToBoxAdapter(
                     child: Row(
                       children: [
                         TextButton(
-                          onPressed: () async{
-                           await FirebaseAuth.instance.signOut();
+                          onPressed: () async {
+                            await FirebaseAuth.instance.signOut();
                             AppRouter.router.go(AppRouter.kloginview);
                           },
                           child: Text(
@@ -69,29 +64,14 @@ class EmployeesDftarBody extends StatelessWidget {
                         const Spacer(),
                         Padding(
                           padding: const EdgeInsets.only(top: 50),
-                          child: FutureBuilder<String>(
-                            future: _fetchEmployeeName(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return  Text(
-                                  'اهلا...',
-                                      style: Appstyles.regular25(context)
-                                        .copyWith(fontSize: 30),
-                                  textDirection: TextDirection.rtl,
-                                  textAlign: TextAlign.right,
-                                );
-                              } else if (snapshot.hasError) {
-                                return const Text(' اهلا,  User');
-                              } else {
-                                final name = snapshot.data ?? 'User';
-                                return Text('اهلا, $name',
-                                    textAlign: TextAlign.right,
-                                    textDirection: TextDirection.rtl,
-                                    style: Appstyles.regular25(context)
-                                        .copyWith(fontSize: 30));
-                              }
-                            },
+                          child: Text(
+                            'اهلا : ${state.employeeName}',
+                            textDirection: TextDirection.rtl,
+                            style: Appstyles.regular12cairo(context).copyWith(
+                                color: Colors.amber,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.right,
                           ),
                         ),
                       ],

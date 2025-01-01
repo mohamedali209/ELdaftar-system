@@ -41,6 +41,7 @@ class DaftarTodayContent extends StatelessWidget {
               ),
             ),
             // Rest of the content placed after the image
+
             Positioned(
               top: 0, // Adjusted the top to start from the top
               left: 0,
@@ -48,13 +49,30 @@ class DaftarTodayContent extends StatelessWidget {
               bottom: 0,
               child: CustomScrollView(
                 slivers: [
+                  SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        const SizedBox(height: 10),
+                        Text(
+                          'معرض : ${state.storeName}',
+                          textDirection: TextDirection.rtl,
+                          style: Appstyles.regular12cairo(context).copyWith(
+                              color: Colors.amber,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.right,
+                        ),
+                      ],
+                    ),
+                  ),
                   // Sliver for summary list
                   SliverToBoxAdapter(
                     child: Column(
                       children: [
                         const SizedBox(
-                            height: 40), // Space for the background image
-                        Summarydftarlist( 
+                            height: 10), // Space for the background image
+                        Summarydftarlist(
                           onItemAdded: () {
                             context.read<SummaryDftarCubit>().fetchData();
                           },

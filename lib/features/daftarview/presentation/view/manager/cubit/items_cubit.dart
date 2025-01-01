@@ -11,7 +11,7 @@ import 'package:intl/intl.dart';
 class ItemsCubit extends Cubit<ItemsState> {
   StreamSubscription<DocumentSnapshot>? _subscription;
 
-  ItemsCubit() : super(const ItemsState(sellingItems: [], buyingItems: [])) {
+  ItemsCubit() : super(const ItemsState(sellingItems: [], buyingItems: [],storeName: '')) {
     fetchInitialData();
   }
 
@@ -23,7 +23,15 @@ class ItemsCubit extends Cubit<ItemsState> {
 
       if (user != null) {
         final userId = user.uid;
-
+       // Fetch storeName initially
+        _firestore.collection('users').doc(userId).get().then((snapshot) {
+          if (snapshot.exists) {
+            final storeName = snapshot.data()?['storeName'] as String? ?? '';
+            emit(state.copyWith(storeName: storeName));
+          }
+        }).catchError((error) {
+          debugPrint('Error fetching storeName: $error');
+        });
         // Get the current date components (year, month, day)
         final now = DateTime.now();
         final String year = DateFormat('yyyy').format(now);

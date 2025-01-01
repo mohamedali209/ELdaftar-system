@@ -31,6 +31,8 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
         if (employeeDoc.exists && employeeDoc.data() != null) {
           final data = employeeDoc.data() as Map<String, dynamic>?;
           final shopId = data?['shopId'];
+          final name = data?['name'];
+          emit(state.copyWith(employeeName: name));
 
           // Step 2: Get the current date components (year, month, day)
           final now = DateTime.now();
