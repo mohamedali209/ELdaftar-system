@@ -13,7 +13,7 @@ class ItemsCubit extends Cubit<ItemsState> {
 
   ItemsCubit()
       : super(const ItemsState(
-            sellingItems: [], buyingItems: [], storeName: '')) {
+            sellingItems: [], buyingItems: [],)) {
     fetchInitialData();
   }
 
@@ -46,15 +46,7 @@ class ItemsCubit extends Cubit<ItemsState> {
           if (snapshot.exists) {
             List<Daftarcheckmodel> sellingItems = [];
             List<Daftarcheckmodel> buyingItems = [];
-            _firestore.collection('users').doc(userId).get().then((snapshot) {
-              if (snapshot.exists) {
-                final storeName =
-                    snapshot.data()?['storeName'] as String? ?? '';
-                emit(state.copyWith(storeName: storeName));
-              }
-            }).catchError((error) {
-              debugPrint('Error fetching storeName: $error');
-            });
+          
             if (snapshot.data() != null) {
               if (snapshot['sellingItems'] != null) {
                 sellingItems = (snapshot['sellingItems'] as List)

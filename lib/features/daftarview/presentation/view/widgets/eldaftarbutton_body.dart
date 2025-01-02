@@ -49,26 +49,7 @@ class DaftarTodayContent extends StatelessWidget {
               bottom: 0,
               child: CustomScrollView(
                 slivers: [
-                  SliverToBoxAdapter(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        const SizedBox(height: 10),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 20),
-                          child: Text(
-                            'معرض : ${state.storeName}',
-                            textDirection: TextDirection.rtl,
-                            style: Appstyles.regular12cairo(context).copyWith(
-                                color: Colors.amber,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.right,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                
                   // Sliver for summary list
                   SliverToBoxAdapter(
                     child: Column(
