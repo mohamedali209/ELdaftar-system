@@ -1518,8 +1518,8 @@ class EmployeesitemCubit extends Cubit<EmployeesitemState> {
         .get();
 
     if (cashSnapshot.exists) {
-      double totalCash = double.parse(cashSnapshot['total_cash'] ?? '0.0');
-      double itemPrice = double.parse(item.price);
+      int totalCash = int.parse(cashSnapshot['total_cash'] ?? '0.0');
+      int itemPrice = int.parse(item.price);
 
       if (isSellingItem) {
         // Subtract from total_cash if it's a selling item
