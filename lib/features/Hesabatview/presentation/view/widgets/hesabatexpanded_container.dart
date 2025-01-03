@@ -77,109 +77,129 @@ class Hesabatcontainer extends StatelessWidget {
                       : const EdgeInsets.symmetric(
                           horizontal: 30, vertical: 15),
                   child: Custombackgroundcontainer(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            _showAddSupplierDialog(context);
-                          },
-                          icon: Container(
-                            height: screenHeight * 0.05, // Fixed height
-                            width: screenWidth * 0.2, // Responsive width
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [
-                                  Colors.amber, // Left color
-                                  Color(0xFF735600), // Right color
-                                ],
-                                begin:
-                                    Alignment.centerLeft, // Start from the left
-                                end: Alignment.centerRight, // End on the right
-                              ),
-                              borderRadius:
-                                  BorderRadius.circular(8), // Rounded corners
-                            ),
-                            child: Center(
-                              child: Text(
-                                '    اضافة حساب    ',
-                                style: Appstyles.regular25(context).copyWith(
-                                  color: Colors.white,
-                                  fontSize: screenWidth < 600
-                                      ? 14
-                                      : 16, // Adjust font size based on screen width// Change text color to white
-                                ),
-                              ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.black,
+                      ),
+                      child: Stack(
+                        children: [
+                          // Background image positioned at the bottom-right
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: Image.asset(
+                              'assets/images/marmatbackground.png',
+                              height: 300, // Adjust the height as needed
+                              fit: BoxFit.cover,
                             ),
                           ),
-                        ),
-                        Expanded(
-                          child: BlocBuilder<SupplierCubit, SupplierState>(
-                            builder: (context, state) {
-                              if (state is SupplierLoadInProgress) {
-                                return const Center(
-                                    child: CustomLoadingIndicator());
-                              } else if (state is SupplierLoadSuccess) {
-                                if (state.suppliers.isEmpty) {
-                                  return Center(
-                                      child: Text('لا يوجد حسابات',
-                                          style: Appstyles.regular25(context)));
-                                }
-                                return Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 5, bottom: 20, left: 15, right: 15),
-                                  child: Container(
-                                    height:
-                                        300, // Set the height of the container
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      color: Colors.black,
+                          // Content inside the black container
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              const SizedBox(height: 10),
+                              IconButton(
+                                onPressed: () {
+                                  _showAddSupplierDialog(
+                                      context); // Your method for adding supplier
+                                },
+                                icon: Container(
+                                  height: screenHeight * 0.05, // Fixed height
+                                  width: screenWidth * 0.2, // Responsive width
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Colors.amber, // Left color
+                                        Color(0xFF735600), // Right color
+                                      ],
+                                      begin: Alignment
+                                          .centerLeft, // Start from the left
+                                      end: Alignment
+                                          .centerRight, // End on the right
                                     ),
-                                    child: Stack(
-                                      children: [
-                                        // Image positioned at the bottom-right
-                                        Positioned(
-                                          bottom: 0,
-                                          right: 0,
-                                          child: Image.asset(
-                                            'assets/images/hesabbackground.png',
-                                            height:
-                                                100, // Adjust height as needed for the image
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                        // Content inside the black container
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
-                                          children: [
-                                            const SizedBox(height: 10),
-                                            Expanded(
-                                              child: Hesabatgridview(
-                                                  items: state.suppliers),
-                                            ),
-                                          ],
-                                        ),
-                                      ], 
+                                    borderRadius: BorderRadius.circular(
+                                        8), // Rounded corners
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      'اضافة حساب',
+                                      style:
+                                          Appstyles.regular25(context).copyWith(
+                                        color: Colors.white,
+                                        fontSize: screenWidth < 600
+                                            ? 14
+                                            : 16, // Adjust font size
+                                      ),
                                     ),
                                   ),
-                                );
-                              } else if (state is SupplierLoadFailure) {
-                                return Center(
-                                  child: Text(
-                                      'Failed to load suppliers: ${state.error}'),
-                                );
-                              } else {
-                                return const Center(
-                                    child: Text('Unexpected state'));
-                              }
-                            },
+                                ),
+                              ),
+                              Expanded(
+                                child:
+                                    BlocBuilder<SupplierCubit, SupplierState>(
+                                  builder: (context, state) {
+                                    if (state is SupplierLoadInProgress) {
+                                      return const Center(
+                                        child: CustomLoadingIndicator(),
+                                      );
+                                    } else if (state is SupplierLoadSuccess) {
+                                      if (state.suppliers.isEmpty) {
+                                        return Center(
+                                          child: Text(
+                                            'لا يوجد حسابات',
+                                            style: Appstyles.regular12cairo(
+                                                context),
+                                          ),
+                                        );
+                                      }
+                                      return Padding(
+                                        padding: const EdgeInsets.all(15.0),
+                                        child: Container(
+                                          height:
+                                              300, // Adjust container height as needed
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            color: Colors.black,
+                                          ),
+                                          child: Stack(
+                                            children: [
+                                              // Image positioned at the bottom-right
+
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.end,
+                                                children: [
+                                                  const SizedBox(height: 10),
+                                                  Expanded(
+                                                    child: Hesabatgridview(
+                                                        items: state.suppliers),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    } else if (state is SupplierLoadFailure) {
+                                      return Center(
+                                        child: Text(
+                                          'Failed to load suppliers: ${state.error}',
+                                        ),
+                                      );
+                                    } else {
+                                      return const Center(
+                                        child: Text('Unexpected state'),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

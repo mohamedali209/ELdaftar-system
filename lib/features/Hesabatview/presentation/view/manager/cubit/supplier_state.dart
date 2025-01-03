@@ -10,7 +10,7 @@ class SupplierLoadInProgress extends SupplierState {}
 class SupplierLoadSuccess extends SupplierState {
   final List<Hesabmodel> suppliers;
   final double totalWazna21;
-  final double nakdyia;
+  final int nakdyia;
   final int accountCount;
 
   SupplierLoadSuccess(

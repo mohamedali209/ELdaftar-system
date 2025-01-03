@@ -2,6 +2,7 @@ import 'package:aldafttar/features/Hesabatview/presentation/view/manager/cubit/s
 import 'package:aldafttar/features/Hesabatview/presentation/view/manager/cubit/supplier_state.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/models/daftar_header_model.dart';
 import 'package:aldafttar/features/daftarview/presentation/view/widgets/summary_daftar_item.dart';
+import 'package:aldafttar/utils/commas.dart';
 import 'package:aldafttar/utils/custom_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,7 +22,10 @@ class Summaryhesabatlist extends StatelessWidget {
             ),
             DaftarheaderModel(
               title: 'اجمالي النقدية',
-              subtitle: state.nakdyia.toStringAsFixed(0),
+              subtitle:NumberFormatter.formatDouble(
+        double.tryParse(state.nakdyia.toString()) ?? 0.0,
+        ),
+              //  state.nakdyia.toStringAsFixed(0),
             ),
             DaftarheaderModel(
               title: 'عدد الحسابات',

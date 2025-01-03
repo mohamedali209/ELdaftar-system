@@ -1,6 +1,8 @@
 import 'package:aldafttar/features/Hesabatview/presentation/view/manager/cubit/supplier_cubit.dart';
 import 'package:aldafttar/features/Hesabatview/presentation/view/models/hesab_item_model.dart';
+import 'package:aldafttar/utils/commas_textfields_price.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AddSupplierDialog extends StatefulWidget {
@@ -17,10 +19,12 @@ class AddSupplierDialogState extends State<AddSupplierDialog> {
 
   // Helper method for building text fields
   Widget _buildTextField(
-      String label, Function(String) onChanged, TextInputType? keyboardType) {
+      String label, Function(String) onChanged, TextInputType? keyboardType,
+      {List<TextInputFormatter>? inputFormatters}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
+        inputFormatters: inputFormatters,
         keyboardType: keyboardType,
         decoration: InputDecoration(
           labelText: label,
@@ -87,7 +91,13 @@ class AddSupplierDialogState extends State<AddSupplierDialog> {
                   _buildTextField('وزنة 21', (value) => wazna21 = value,
                       TextInputType.number),
                   const SizedBox(height: 5),
-                  _buildTextField('نقدية', (value) => nakdyia = value,
+                  _buildTextField(
+                      'نقدية',
+                      (value) => nakdyia = value,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        ThousandsSeparatorInputFormatter(), // Custom formatter for commas
+                      ],
                       TextInputType.number),
                 ],
               ),
@@ -135,12 +145,13 @@ class AddSupplierDialogState extends State<AddSupplierDialog> {
                   // Ensure supplierName is filled
                   if (supplierName.isNotEmpty) {
                     // Validate numeric input
+                    final String cleanNakdyia = nakdyia.replaceAll(',', '');
 
                     double? wazna210 =
                         double.tryParse(wazna21.isNotEmpty ? wazna21 : '0');
 
-                    double? nakdyia0 =
-                        double.tryParse(nakdyia.isNotEmpty ? nakdyia : '0');
+                    double? nakdyia0 = double.tryParse(
+                        cleanNakdyia.isNotEmpty ? cleanNakdyia : '0');
 
                     // Check if parsing failed (i.e., not valid numbers)
                     if (wazna210 == null || nakdyia0 == null) {

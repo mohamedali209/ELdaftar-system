@@ -1,7 +1,9 @@
 import 'package:aldafttar/features/Hesabatview/presentation/view/manager/cubit/supplier_cubit.dart';
 import 'package:aldafttar/features/Hesabatview/presentation/view/manager/transaction/cubit/transaction_cubit.dart';
 import 'package:aldafttar/features/Hesabatview/presentation/view/models/hesab_item_model.dart';
+import 'package:aldafttar/utils/commas_textfields_price.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DialogEditHesab extends StatefulWidget {
@@ -80,6 +82,10 @@ class _DialogEditHesabState extends State<DialogEditHesab> {
 
                     const SizedBox(height: 10), // Space between fields
                     TextField(
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        ThousandsSeparatorInputFormatter(),
+                      ],
                       controller: widget.nakdyiaController,
                       decoration: const InputDecoration(labelText: 'نقدية'),
                       keyboardType: TextInputType.number,
@@ -162,11 +168,15 @@ class _DialogEditHesabState extends State<DialogEditHesab> {
                     final navigator = Navigator.of(context);
 
                     try {
+                      // Remove commas and parse to a clean value
+                      final String cleanNakdyia =
+                          widget.nakdyiaController.text.replaceAll(',', '');
+                      final int? nakdyiaAmount = int.tryParse(cleanNakdyia);
                       // Wait until addTransaction completes
                       await context.read<SupplierCubit>().addTransaction(
                             widget.hesabmodel.id,
                             widget.ayar21Controller.text,
-                            widget.nakdyiaController.text,
+                            nakdyiaAmount.toString(),
                             false, // false indicates a subtraction
                           );
 
@@ -183,7 +193,8 @@ class _DialogEditHesabState extends State<DialogEditHesab> {
                       }
                     } catch (error) {
                       // Handle any errors in the process
-                      debugPrint("Error during transaction subtraction: $error");
+                      debugPrint(
+                          "Error during transaction subtraction: $error");
                     }
                   },
                   child: const Text('خصم'),
