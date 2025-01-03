@@ -1,4 +1,5 @@
 import 'package:aldafttar/features/Gardview/presentation/manager/cubit/updateinventory/cubit/updateinventory_cubit.dart';
+import 'package:aldafttar/utils/commas_textfields_price.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -77,7 +78,10 @@ class UpdateCashDialogState extends State<UpdateCashDialog> {
 
                   // TextField for entering the cash amount
                   buildTextField(
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      ThousandsSeparatorInputFormatter(), // Custom formatter for commas
+                    ],
                     controller: cashController,
                     labelText: 'أدخل المبلغ',
                     keyboardType: TextInputType.number,
@@ -96,7 +100,8 @@ class UpdateCashDialogState extends State<UpdateCashDialog> {
           ),
           TextButton(
             onPressed: () {
-              final int? cashAmount = int.tryParse(cashController.text);
+              final String cleanText = cashController.text.replaceAll(',', '');
+              final int? cashAmount = int.tryParse(cleanText);
               if (cashAmount != null) {
                 context.read<UpdateInventoryCubit>().updateTotalCash(
                       operation: selectedOperation,
@@ -116,12 +121,11 @@ class UpdateCashDialogState extends State<UpdateCashDialog> {
     );
   }
 
-  Widget buildTextField({
-    required TextEditingController controller,
-    required String labelText,
-    required TextInputType keyboardType,
-    List<TextInputFormatter>? inputFormatters
-  }) {
+  Widget buildTextField(
+      {required TextEditingController controller,
+      required String labelText,
+      required TextInputType keyboardType,
+      List<TextInputFormatter>? inputFormatters}) {
     return TextField(
       inputFormatters: inputFormatters,
       controller: controller,

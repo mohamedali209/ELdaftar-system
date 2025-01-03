@@ -69,7 +69,7 @@ periodMap.forEach((key, value) {
 emit(FetchInsightsSuccess(salesData, purchaseData, salesPercentageData));
 
       } else {
-        emit(FetchInsightsFailure("No data available."));
+        emit(FetchInsightsFailure("لا يوجد بيانات للتحليل"));
       }
     } else {
       emit(FetchInsightsFailure("User not authenticated."));

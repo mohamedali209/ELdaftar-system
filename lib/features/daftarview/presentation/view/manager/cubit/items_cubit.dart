@@ -13,7 +13,9 @@ class ItemsCubit extends Cubit<ItemsState> {
 
   ItemsCubit()
       : super(const ItemsState(
-            sellingItems: [], buyingItems: [],)) {
+          sellingItems: [],
+          buyingItems: [],
+        )) {
     fetchInitialData();
   }
 
@@ -46,7 +48,7 @@ class ItemsCubit extends Cubit<ItemsState> {
           if (snapshot.exists) {
             List<Daftarcheckmodel> sellingItems = [];
             List<Daftarcheckmodel> buyingItems = [];
-          
+
             if (snapshot.data() != null) {
               if (snapshot['sellingItems'] != null) {
                 sellingItems = (snapshot['sellingItems'] as List)

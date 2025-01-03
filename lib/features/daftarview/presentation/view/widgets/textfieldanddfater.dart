@@ -1,4 +1,5 @@
 import 'package:aldafttar/features/daftarview/presentation/view/models/daftar_check_model.dart';
+import 'package:aldafttar/utils/commas_textfields_price.dart';
 import 'package:aldafttar/utils/custom_textfields.dart';
 import 'package:aldafttar/utils/styles.dart';
 import 'package:flutter/material.dart';
@@ -215,7 +216,8 @@ class CustombuttonAddorSubtract extends StatelessWidget {
                                   if (value!.isEmpty) {
                                     return 'Field required';
                                   }
-                                  if (int.tryParse(value) == null) {
+                                  if (int.tryParse(value.replaceAll(',', '')) ==
+                                      null) {
                                     return 'رقم فقط';
                                   }
                                   return null;
@@ -223,6 +225,7 @@ class CustombuttonAddorSubtract extends StatelessWidget {
                                 inputFormatters: [
                                   FilteringTextInputFormatter
                                       .digitsOnly, // Allow digits only
+                                  ThousandsSeparatorInputFormatter(), // Custom formatter for commas
                                 ],
                               ),
                             ),
@@ -292,13 +295,15 @@ class CustombuttonAddorSubtract extends StatelessWidget {
                       ),
                       onPressed: () async {
                         if (formKey.currentState!.validate()) {
+                                  final cleanPrice = priceController.text.replaceAll(',', '');
+
                           final newItem = Daftarcheckmodel(
                             tfasel: detailsController.text,
                             gram: gramController.text,
                             num: '',
                             details: selectedDetail,
                             adad: adadController.text,
-                            price: priceController.text,
+                            price: cleanPrice.toString(),
                             ayar: selectedAyar,
                           );
 

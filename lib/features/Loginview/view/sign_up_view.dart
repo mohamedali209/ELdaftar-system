@@ -85,7 +85,7 @@ class SignupForm extends StatelessWidget {
         if (state.isSuccess) {
           // Show success message
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Account created successfully!')),
+            const SnackBar(content: Text('تم انشاء حسابك بنجاح')),
           );
           Navigator.pop(context);
         } else if (state.errorMessage != null) {
