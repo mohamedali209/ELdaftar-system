@@ -499,7 +499,7 @@ class CollectionModifyCubit extends Cubit<CollectionModifyState> {
     if (details.contains('خاتم')) return 'خواتم';
     if (details.contains('توينز')) return 'توينز';
     if (details.contains('اسورة')) return 'اساور';
-    if (details.contains('محابس')) return 'محابس';
+    if (details.contains('محبس')) return 'محابس';
     if (details.contains('دبلة')) return 'دبل';
     if (details.contains('سلسلة')) return 'سلاسل';
     if (details.contains('غوايش')) return 'غوايش';
@@ -508,7 +508,7 @@ class CollectionModifyCubit extends Cubit<CollectionModifyState> {
     if (details.contains('انسيال')) return 'انسيالات';
     if (details.contains('تعليقة')) return 'تعاليق';
     if (details.contains('سبائك')) return 'سبائك'; // سبائك item type
-    if (details.contains('جنيه')) return 'جنيهات'; // Added جنيهات item type
+    if (details.contains('جنيهات')) return 'جنيهات'; // Added جنيهات item type
     return '';
   }
 
