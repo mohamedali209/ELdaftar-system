@@ -295,7 +295,8 @@ class CustombuttonAddorSubtract extends StatelessWidget {
                       ),
                       onPressed: () async {
                         if (formKey.currentState!.validate()) {
-                                  final cleanPrice = priceController.text.replaceAll(',', '');
+                          final cleanPrice =
+                              priceController.text.replaceAll(',', '');
 
                           final newItem = Daftarcheckmodel(
                             tfasel: detailsController.text,

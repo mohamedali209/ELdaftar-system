@@ -1022,9 +1022,9 @@ class ItemsCubit extends Cubit<ItemsState> {
   Future<void> updateSellingItem(
       Daftarcheckmodel oldItem, Daftarcheckmodel modifiedItem) async {
     // Calculate price difference and update total_cash
-    double oldPrice = double.parse(oldItem.price);
-    double newPrice = double.parse(modifiedItem.price);
-    double priceDifference = newPrice - oldPrice;
+    int oldPrice = int.parse(oldItem.price);
+    int newPrice = int.parse(modifiedItem.price);
+    int priceDifference = newPrice - oldPrice;
     await updateTotalCash(priceDifference);
 
     // Selling Item Update Logic (including price)
@@ -1049,9 +1049,9 @@ class ItemsCubit extends Cubit<ItemsState> {
   Future<void> updateBuyingItem(
       Daftarcheckmodel oldBuyingItem, Daftarcheckmodel modifiedItem) async {
     // Calculate price difference and update total_cash based on the logic
-    double oldPrice = double.parse(oldBuyingItem.price);
-    double newPrice = double.parse(modifiedItem.price);
-    double priceDifference = newPrice - oldPrice; // Difference for buying items
+    int oldPrice = int.parse(oldBuyingItem.price);
+    int newPrice = int.parse(modifiedItem.price);
+    int priceDifference = newPrice - oldPrice; // Difference for buying items
 
     // If the price increases, subtract the difference from total_cash
     if (priceDifference > 0) {
@@ -1132,7 +1132,7 @@ class ItemsCubit extends Cubit<ItemsState> {
     }
   }
 
-  Future<void> updateTotalCash(double priceDifference) async {
+  Future<void> updateTotalCash(int priceDifference) async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) return; // Ensure the user is authenticated
 
@@ -1146,7 +1146,7 @@ class ItemsCubit extends Cubit<ItemsState> {
         .get();
 
     if (snapshot.exists) {
-      double totalCash = double.parse(snapshot['total_cash'] ?? '0.0');
+      int totalCash = int.parse(snapshot['total_cash'] ?? '0.0');
       totalCash += priceDifference;
 
       await _firestore
@@ -1443,57 +1443,7 @@ class ItemsCubit extends Cubit<ItemsState> {
     }
   }
 
-  // void deleteItem(Daftarcheckmodel itemToDelete) async {
-  //   emit(state.copyWith(isLoading: true));
-
-  //   List<Daftarcheckmodel> updatedSellingItems = List.from(state.sellingItems);
-  //   List<Daftarcheckmodel> updatedBuyingItems = List.from(state.buyingItems);
-
-  //   if (state.sellingItems.contains(itemToDelete)) {
-  //     updatedSellingItems = state.sellingItems
-  //         .where((item) => item.num != itemToDelete.num)
-  //         .toList();
-
-  //     // Subtract the item's price from total_cash when deleting a selling item
-  //     await _updateCash(itemToDelete, isSellingItem: true);
-
-  //     // Update inventory when deleting a selling item
-  //     await updateInventory(itemToDelete, int.parse(itemToDelete.adad),
-  //         double.parse(itemToDelete.gram));
-  //   } else if (state.buyingItems.contains(itemToDelete)) {
-  //     updatedBuyingItems = state.buyingItems
-  //         .where((item) => item.num != itemToDelete.num)
-  //         .toList();
-
-  //     // Add the item's price to total_cash when deleting a buying item
-  //     await _updateCash(itemToDelete, isSellingItem: false);
-
-  //     // Subtract grams from total weights when deleting a buying item
-  //     if (itemToDelete.details.contains('سبائك')) {
-  //       // Ensure subtraction for سبائك
-  //       await updateInventory(
-  //         itemToDelete,
-  //         -int.parse(itemToDelete.adad),
-  //         -double.parse(itemToDelete.gram),
-  //       );
-  //     } else {
-  //       // Subtract the grams from total weights for other buying items
-  //       await _subtractItemGramsFromWeight(itemToDelete);
-  //     }
-  //   }
-
-  //   // Emit the new state with updated lists
-  //   emit(ItemsState(
-  //     sellingItems: updatedSellingItems,
-  //     buyingItems: updatedBuyingItems,
-  //   ));
-
-  //   await _updateFirestore();
-  //   await _updateTotals();
-
-  //   emit(state.copyWith(isLoading: false));
-  // }
-
+ 
 // Helper function to update total_cash based on the item being deleted
   Future<void> _updateCash(Daftarcheckmodel item,
       {required bool isSellingItem}) async {
@@ -1515,8 +1465,8 @@ class ItemsCubit extends Cubit<ItemsState> {
         .get();
 
     if (cashSnapshot.exists) {
-      double totalCash = double.parse(cashSnapshot['total_cash'] ?? '0.0');
-      double itemPrice = double.parse(item.price);
+      int totalCash = int.parse(cashSnapshot['total_cash'] ?? '0.0');
+      int itemPrice = int.parse(item.price);
 
       if (isSellingItem) {
         // Subtract from total_cash if it's a selling item
